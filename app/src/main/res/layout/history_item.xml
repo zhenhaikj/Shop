@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:orientation="horizontal">
+
+
+    <LinearLayout
+        android:id="@+id/tab_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tab_rl"
+        android:orientation="horizontal"
+        android:padding="@dimen/history_padding"
+        android:gravity="center"
+        android:background="#F0F0F0">
+        <TextView
+            android:id="@+id/tab_je"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textSize="@dimen/banlance_item"
+            android:textColor="@color/balance_item"
+            android:text= "金额" />
+        <TextView
+            android:id="@+id/tab_sj"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textSize="@dimen/banlance_item"
+            android:textColor="@color/balance_item"
+            android:text= "时间" />
+
+    </LinearLayout>
+
+</LinearLayout>

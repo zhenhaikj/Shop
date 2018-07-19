@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="#f0f0f0">
+
+    <include layout="@layout/tool_bar"/>
+
+    <!--<LinearLayout
+        android:id="@+id/tab_rl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/wsy_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/white"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tab_wsy"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:gravity="center"
+                android:text="未使用（8）"
+                android:textColor="@color/black"
+                android:textSize="13sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/syjl_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/white"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tab_syjl"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:gravity="center"
+                android:text="使用记录（10）"
+                android:textColor="@color/black"
+                android:textSize="13sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/ygq_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/white"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tab_ygq"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:gravity="center"
+                android:text="已过期（1）"
+                android:textColor="@color/black"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </LinearLayout>-->
+
+
+    <!--<View
+        android:id="@+id/line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#ECECEC"
+        android:layout_below="@+id/tab_rl"/>
+
+    <LinearLayout
+        android:id="@+id/search_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/line"
+        android:background="#ffffff"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/et_content"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            android:hint="请输入优惠码"
+            android:paddingLeft="5dp"
+            android:textColor="@color/black"
+            android:textColorHint="#F0F0F0"
+            android:background="@drawable/category_edit_shape"
+            android:layout_margin="8dp"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/exchange"
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/exchange_shape"
+            android:gravity="center"
+            android:text="兑换"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+
+    </LinearLayout>
+    <View
+        android:id="@+id/line2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#ECECEC"
+        android:layout_below="@+id/search_ll"/>-->
+    <com.lwkandroid.stateframelayout.StateFrameLayout
+        android:id="@+id/stateLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        app:enableContentAnim="true"
+        app:emptyLayoutResId="@layout/layout_no_coupon"
+        app:netErrorLayoutResId="@layout/layout_net_error"
+        app:loadingLayoutResId="@layout/layout_loading">
+        <ListView
+            android:id="@+id/lv_coupon"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:divider="#F0F0F0"
+            android:dividerHeight="10dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"/>
+    </com.lwkandroid.stateframelayout.StateFrameLayout>
+</LinearLayout>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tabs>
+    <tab
+        id="@+id/tab_recents"
+        icon="@drawable/home"
+        title="首页" />
+    <tab
+        id="@+id/tab_favorites"
+        icon="@drawable/fenlei"
+        title="分类" />
+    <tab
+        id="@+id/tab_nearby"
+        icon="@drawable/shequ"
+        title="社区" />
+    <tab
+        id="@+id/tab_friends"
+        icon="@drawable/car"
+        title="购物车" />
+    <tab
+        id="@+id/tab_food"
+        icon="@drawable/wd"
+        title="我的" />
+</tabs>

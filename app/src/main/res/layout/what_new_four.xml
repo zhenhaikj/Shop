@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ACEDB1">
+
+    <ImageView
+        android:id="@+id/img"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/guide4"/>
+    <Button
+        android:id="@+id/start_btn"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:background="@drawable/guide_shape"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="20dp"
+        android:text="立即开启"/>
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY"
+        android:layout_gravity="center|bottom"
+        android:layout_marginBottom="80dp"
+        android:src="@drawable/dot_four"/>
+
+</FrameLayout>

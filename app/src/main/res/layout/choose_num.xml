@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="@color/white"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:orientation="horizontal">
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/empty_img" />
+        <LinearLayout
+            android:id="@+id/ll_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="牛肉"
+                android:textColor="#333333"
+                android:textSize="15sp"/>
+            <TextView
+                android:id="@+id/price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="¥112.00"
+                android:textColor="#C43947"
+                android:textSize="12sp"/>
+            <TextView
+                android:id="@+id/preprice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="原价¥112.00"
+                android:textColor="#858585"
+                android:textSize="12sp"/>
+
+
+        </LinearLayout>
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/line_color"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:gravity="right|center_vertical"
+            android:layout_margin="10dp"
+            android:orientation="horizontal">
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginLeft="3dp"
+                android:text="购买数量："
+                android:textColor="#AEAEAE"
+                android:textSize="13sp" />
+
+
+            <LinearLayout
+                android:layout_width="100dp"
+                android:layout_height="30dp"
+                android:background="@drawable/category_edit_shape"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/down"
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="-"
+                    android:textColor="@color/black" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="#F2F2F2" />
+
+                <EditText
+                    android:id="@+id/et_count"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:enabled="false"
+                    android:background="@null"
+                    android:gravity="center"
+                    android:inputType="number"
+                    android:singleLine="true"
+                    android:textSize="15dp"
+                    android:text="1"
+                    android:textColor="@color/black" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="#F2F2F2" />
+
+                <TextView
+                    android:id="@+id/up"
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="+"
+                    android:textColor="@color/black" />
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="right|center_vertical"
+            android:layout_marginLeft="10dp"
+            android:orientation="horizontal">
+        <TextView
+            android:id="@+id/kc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textSize="11sp"
+            android:text="剩余80件"
+            android:textColor="#333333"/>
+        <TextView
+            android:id="@+id/xg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textSize="11sp"
+            android:textColor="#F05D74"
+            android:text="每人限购5件" />
+        </LinearLayout>
+        <TextView
+            android:id="@+id/next"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textSize="11sp"
+            android:textColor="#ffffff"
+            android:background="#EB544D"
+            android:layout_marginTop="10dp"
+            android:text="下一步" />
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.emjiayuan.app">
+
+    <!-- if you want to load images from a file OR from the internet -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <!-- 这个权限用于进行网络定位-->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"></uses-permission>
+    <!-- 这个权限用于访问GPS定位-->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"></uses-permission>
+    <!-- 用于访问wifi网络信息，wifi信息会用于进行网络定位-->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"></uses-permission>
+    <!-- 获取运营商信息，用于支持提供运营商信息相关的接口-->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"></uses-permission>
+    <!-- 这个权限用于获取wifi的获取权限，wifi信息会用来进行网络定位-->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"></uses-permission>
+    <!-- 用于读取手机当前的状态-->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"></uses-permission>
+    <!-- 写入扩展存储，向扩展卡写入数据，用于写入离线定位数据-->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
+    <!-- 访问网络，网络定位需要上网-->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- SD卡读取权限，用户写入离线定位数据-->
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"></uses-permission>
+    <uses-permission android:name="android.permission.CAMERA"></uses-permission>
+    <uses-permission android:name="android.permission.BAIDU_LOCATION_SERVICE" />
+
+
+    <application
+        android:name=".AppApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/start_icon"
+        android:label="@string/app_name"
+        android:roundIcon="@drawable/start_icon"
+        android:supportsRtl="true"
+        android:largeHeap="true"
+        android:hardwareAccelerated="false"
+        tools:replace="android:theme"
+        android:theme="@style/Theme.AppCompat.NoActionBar">
+
+        <meta-data
+            android:name="com.baidu.lbsapi.API_KEY"
+            android:value="p4nrYAl0at4GGsotA7BdEwiuyDZQShmX" >
+        </meta-data>
+        <!--<service
+            android:name="com.baidu.location.f"
+            android:enabled="true"
+            android:process=":remote"/>-->
+
+        <activity android:name=".activity.SplashActivity"
+            android:launchMode="singleTask"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".MainActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".activity.GuideActivity"
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.SearchActivity"
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.MySoupOrderActivity"
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.AllGoodsActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.GoodsDetailActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.IntegralYlDetailActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.NewArrivalsActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.PostActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.PostDetailActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.LoginActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.RegisterActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.PwdForgetActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.BalanceActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.IntegralActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.CouponActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.CouponActivity2"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.CollectionActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.address.AddressActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.address.AddAddressActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.address.ModifyAddressActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.TopUpActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.LogisticsActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.LogisticsDetailActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.VipActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.CouponGetActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.CouponUseActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.SecondsKillActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.OrderConfirmActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.OrderConfirmActivity2"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.OrderConfirmActivity3"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.OrderNormalActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.OrderNormalActivity2"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.OrderTopUPActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.OrderSoupActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.OrderIntegralActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.OrderDetailActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.SoupOrderDetailActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.SpitActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.EnterpriseActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.KfActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.HelpActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.SettingActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.SuccessActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.SoupSuccessActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.SpecialActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.TwzqActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.TlzqActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.PopularActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.IntegralYlActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.TldzActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.MessageActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.MessageDetailActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.JudgeActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.TypeActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.ShoppingCarActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.SoupOrderConfirmActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.CityActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".BaseActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.FundArealistActivity"
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait"></activity>
+        //图片选择器
+        <activity android:name="me.iwf.photopicker.PhotoPickerActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name="me.iwf.photopicker.PhotoPagerActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:screenOrientation="portrait"/>
+        //图片裁剪
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+        //支付宝相关
+        <activity
+            android:name="com.alipay.sdk.app.H5PayActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize"
+            android:exported="false"
+            android:screenOrientation="behind"
+            android:windowSoftInputMode="adjustResize|stateHidden" >
+        </activity>
+        <activity
+            android:name="com.alipay.sdk.app.H5AuthActivity"
+            android:configChanges="orientation|keyboardHidden|navigation"
+            android:exported="false"
+            android:screenOrientation="behind"
+            android:windowSoftInputMode="adjustResize|stateHidden" >
+        </activity>
+        //微信相关
+        <activity
+            android:name=".wxapi.WXPayEntryActivity"
+            android:exported="true"
+            android:launchMode="singleTop"/>
+
+        <receiver android:name=".AppRegister">
+            <intent-filter>
+                <action android:name="com.tencent.mm.plugin.openapi.Intent.ACTION_REFRESH_WXAPP" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>

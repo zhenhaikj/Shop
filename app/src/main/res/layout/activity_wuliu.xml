@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <include layout="@layout/tool_bar"/>
+    <com.lwkandroid.stateframelayout.StateFrameLayout
+        android:id="@+id/stateLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:enableContentAnim="true"
+        app:emptyLayoutResId="@layout/layout_no_wl"
+        app:netErrorLayoutResId="@layout/layout_net_error"
+        app:loadingLayoutResId="@layout/layout_loading">
+        <ListView
+            android:id="@+id/lv_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:dividerHeight="1dp"
+            android:divider="@color/line_color"/>
+    </com.lwkandroid.stateframelayout.StateFrameLayout>
+</LinearLayout>
