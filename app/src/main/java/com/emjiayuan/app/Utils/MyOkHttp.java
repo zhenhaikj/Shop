@@ -49,8 +49,8 @@ public class MyOkHttp {
         formBody.add("password","110");//传递键值对参数*/
         //创建一个Request
         final Request request = new Request.Builder()
-//                .url("https://api.emjiayuan.com/api.php")
-                .url("http://emapi.emjiayuan.com/api.php")
+                .url("https://api.emjiayuan.com/api.php")//正式服
+//                .url("http://emapi.emjiayuan.com/api.php")//测试服
                 .post(formBody.build())
                 .header("User-Agent", "OkHttp Headers.java")
                 .header("sign",MyUtils.md5(text))

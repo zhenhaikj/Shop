@@ -91,20 +91,20 @@ public class ShoppingCarFragment2 extends BaseLazyFragment implements View.OnCli
     @Override
     protected void initView() {
         super.initView();
-        if (Global.loginResult==null){
-            startActivityForResult(new Intent(mActivity,LoginActivity.class),100);
-            return;
-        }
-        reqCarList();
-    }
-
-    @Override
-    protected void initData() {
 //        if (Global.loginResult==null){
 //            startActivityForResult(new Intent(mActivity,LoginActivity.class),100);
 //            return;
 //        }
 //        reqCarList();
+    }
+
+    @Override
+    protected void initData() {
+        if (Global.loginResult==null){
+            startActivityForResult(new Intent(mActivity,LoginActivity.class),100);
+            return;
+        }
+        reqCarList();
         //        adapter=new ShoppingCarAdapter(getActivity(), new ArrayList<Product>());
 //        adapter = new ShoppingCarAdapter(getActivity(), Global.list);
 //        lvGoods.setAdapter(adapter);

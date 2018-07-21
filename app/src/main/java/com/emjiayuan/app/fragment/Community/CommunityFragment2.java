@@ -191,7 +191,10 @@ public class CommunityFragment2 extends BaseLazyFragment implements View.OnClick
 //            progressBar.setProgress(newProgress);
         }
     };
-
+    @Override
+    protected boolean isLazyLoad() {
+        return true;
+    }
 
     @Override
     protected void setListener() {

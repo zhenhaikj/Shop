@@ -110,6 +110,11 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
     }
 
     @Override
+    protected boolean isLazyLoad() {
+        return true;
+    }
+
+    @Override
     protected void initData() {
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);

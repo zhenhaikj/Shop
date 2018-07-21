@@ -107,11 +107,12 @@ public class ShoppingCarFragment extends BaseLazyFragment implements View.OnClic
                 reqCarList();
             }
         });
-        reqCarList();
+//        reqCarList();
     }
 
     @Override
     protected void initData() {
+        reqCarList();
         manage.setVisibility(View.GONE);
         refreshLayout.setEnableLoadmore(false);
         refreshLayout.setEnableHeaderTranslationContent(false);
@@ -208,7 +209,7 @@ public class ShoppingCarFragment extends BaseLazyFragment implements View.OnClic
 
     @Override
     protected boolean isLazyLoad() {
-        return false;
+        return true;
     }
 
     @Override
