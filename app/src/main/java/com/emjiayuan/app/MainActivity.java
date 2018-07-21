@@ -56,8 +56,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     private CommunityFragment2 communityFragment;
     public static ShoppingCarFragment shoppingCarFragment;
     private PersonalFragment personalFragment;
-//    private PersonalFragment personalFragment;
-//    private PersonalFragment personalFragment;
 
 
 
