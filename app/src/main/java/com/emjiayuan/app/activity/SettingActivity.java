@@ -1,21 +1,23 @@
 package com.emjiayuan.app.activity;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.content.FileProvider;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -25,16 +27,14 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.emjiayuan.app.BaseActivity;
 import com.emjiayuan.app.R;
-import com.emjiayuan.app.Utils.GlideUtil;
+import com.emjiayuan.app.Utils.DownLoadManager;
 import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.Utils.SpUtils;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.User;
-import com.emjiayuan.app.widget.MyListView;
 import com.google.gson.Gson;
 import com.yalantis.ucrop.UCrop;
-import com.youth.banner.Banner;
 
 import org.json.JSONObject;
 
@@ -45,12 +45,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.Calendar;
-import java.util.List;
 
 import butterknife.BindView;
-import de.hdodenhof.circleimageview.CircleImageView;
 import me.iwf.photopicker.PhotoPicker;
-import me.iwf.photopicker.PhotoPreview;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -77,6 +74,10 @@ public class SettingActivity extends BaseActivity {
     TextView version;
     @BindView(R.id.login_out)
     Button loginOut;
+    @BindView(R.id.service_ll)
+    LinearLayout serviceLl;
+    @BindView(R.id.update_ll)
+    LinearLayout updateLl;
     private String imagepath;
     private String nicknames;
 
@@ -102,8 +103,18 @@ public class SettingActivity extends BaseActivity {
                 finish();
             }
         });
+        updateLl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!MyUtils.isFastClick()) {
+                    return;
+                }
+                getAppVersion();
+            }
+        });
         user();
     }
+
     public void user() {
         FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
         if (Global.loginResult == null) {
@@ -143,7 +154,7 @@ public class SettingActivity extends BaseActivity {
             return;
         }
         formBody.add("userid", Global.loginResult.getId());
-        if (imagepath!=null){
+        if (imagepath != null) {
             formBody.add("headimg", imagepath);
         }
         if (nicknames != null) {
@@ -174,12 +185,40 @@ public class SettingActivity extends BaseActivity {
         });
     }
 
-    public void setData(){
+    public void getAppVersion() {
+        FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
+        formBody.add("versionno",Integer.toString(MyUtils.getAppVersionCode(mActivity)));
+//new call
+        Call call = MyOkHttp.GetCall("system.getAppVersion", formBody);
+//请求加入调度
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("------------", e.toString());
+//                        myHandler.sendEmptyMessage(1);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String result = response.body().string();
+                MyUtils.e("------检查更新------", result);
+                Message message = new Message();
+                message.what = 3;
+                Bundle bundle = new Bundle();
+                bundle.putString("result", result);
+                message.setData(bundle);
+                myHandler.sendMessage(message);
+            }
+        });
+    }
+
+    public void setData() {
         Glide.with(mActivity).load(user.getHeadimg()).apply(RequestOptions.circleCropTransform().placeholder(R.drawable.default_tx).error(R.drawable.default_tx)).into(tx);
         username.setText(user.getUsername());
         nickname.setText(user.getNickname());
         version.setText(MyUtils.getAppVersionName(mActivity));
     }
+
     private User user;
     Handler myHandler = new Handler() {
         @Override
@@ -197,7 +236,7 @@ public class SettingActivity extends BaseActivity {
                         String data = jsonObject.getString("data");
                         Gson gson = new Gson();
                         if ("200".equals(code)) {
-                            user=gson.fromJson(data, User.class);
+                            user = gson.fromJson(data, User.class);
                             setData();
                         } else {
                             MyUtils.showToast(mActivity, message);
@@ -214,8 +253,8 @@ public class SettingActivity extends BaseActivity {
                         String data = jsonObject.getString("data");
                         Gson gson = new Gson();
                         if ("200".equals(code)) {
-                            JSONObject jsonObject1=new JSONObject(data);
-                            imagepath=jsonObject1.getString("imgurl");
+                            JSONObject jsonObject1 = new JSONObject(data);
+                            imagepath = jsonObject1.getString("imgurl");
                             editUserInfo();
 //                            MyUtils.showToast(mActivity, message);
                         } else {
@@ -242,30 +281,149 @@ public class SettingActivity extends BaseActivity {
                         e.printStackTrace();
                     }
                     break;
+                case 3:
+                    try {
+                        JSONObject jsonObject = new JSONObject(result);
+                        String code = jsonObject.getString("code");
+                        String message = jsonObject.getString("message");
+                        String data = jsonObject.getString("data");
+                        Gson gson = new Gson();
+                        if ("200".equals(code)) {
+                            JSONObject jsonObject1 = new JSONObject(data);
+
+                            String is_update = jsonObject1.getString("is_update");
+                            final String app_download_url = jsonObject1.getString("download_url");
+//                            String appcode = "234";
+//                            final String app_download_url = "http://pz0.3dn.mse.sogou.com/semob5.13.5_154189_R14189_121106002_build47127_2.1.0.2133.apk";
+                            if("1".equals(is_update)) {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                                builder.setTitle("更新");
+                                builder.setMessage("检测到有更新,是否立刻更新？");
+                                builder.setNegativeButton("稍后更新", new DialogInterface.OnClickListener() {
+
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                    }
+                                });
+                                builder.setPositiveButton("立刻更新", new DialogInterface.OnClickListener() {
+
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        if(MyUtils.isWifi(mActivity)) {
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                                            builder.setTitle("提示");
+                                            builder.setMessage("您当前正在使用移动网络，继续下载将消耗流量");
+                                            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+
+                                                }
+                                            });
+                                            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    downLoadApk(app_download_url);
+                                                }
+                                            });
+                                            builder.create().show();
+                                        } else{
+                                            downLoadApk(app_download_url);
+                                        }
+                                    }
+                                });
+                                builder.create().show();
+                            } else{
+                                    MyUtils.showToast(mActivity, "当前已是最新版本");
+                            }
+
+
+                        } else {
+                            MyUtils.showToast(mActivity, message);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
 
 
             }
         }
     };
 
+    /*
+     * 从服务器中下载APK
+     */
+    protected void downLoadApk(final String url) {
+        final ProgressDialog pd;    //进度条对话框
+        pd = new ProgressDialog(this);
+        pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        pd.setMessage("正在下载更新");
+        pd.show();
+        new Thread() {
+            @Override
+            public void run() {
+                try{
+                    File file = DownLoadManager.getFileFromServer(url, pd);
+                    sleep(3000);
+                    installApk(file);
+                    pd.dismiss(); //结束掉进度条对话框
+                } catch(Exception e) {
+//                    Toast.makeText(mActivity, "下载失败!",
+//                            Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
+    //安装apk
+    protected void installApk(File file) {
+        Intent intent = new Intent();
+        //执行动作
+        intent.setAction(Intent.ACTION_VIEW);
+        //执行的数据类型
+        //判断是否是AndroidN以及更高的版本
+
+        if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.N) {
+
+            Uri contentUri = FileProvider.getUriForFile(mActivity,"com.emjiayuan.app.fileProvider",file);
+
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            intent.setDataAndType(contentUri,"application/vnd.android.package-archive");
+
+        }else{
+
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            intent.setDataAndType(Uri.fromFile(file),"application/vnd.android.package-archive");
+
+        }
+        startActivity(intent);
+    }
+
     @Override
     protected void setListener() {
         loginOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!MyUtils.isFastClick()){
+                if (!MyUtils.isFastClick()) {
                     return;
                 }
-                Global.loginResult=null;
-                SpUtils.putObject(mActivity,"loginResult",Global.loginResult);
-                startActivity(new Intent(mActivity,LoginActivity.class));
+                Global.loginResult = null;
+                SpUtils.putObject(mActivity, "loginResult", Global.loginResult);
+                startActivity(new Intent(mActivity, LoginActivity.class));
                 finish();
             }
         });
         tx.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!MyUtils.isFastClick()){
+                if (!MyUtils.isFastClick()) {
                     return;
                 }
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);
@@ -280,7 +438,7 @@ public class SettingActivity extends BaseActivity {
         nickname.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!MyUtils.isFastClick()){
+                if (!MyUtils.isFastClick()) {
                     return;
                 }
                 final EditText et = new EditText(mActivity);
@@ -292,14 +450,15 @@ public class SettingActivity extends BaseActivity {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 //按下确定键后的事件
-                                nicknames=et.getText().toString();
+                                nicknames = et.getText().toString();
                                 editUserInfo();
 //                                Toast.makeText(getApplicationContext(), et.getText().toString(),Toast.LENGTH_LONG).show();
                             }
-                        }).setNegativeButton("取消",null).show();
+                        }).setNegativeButton("取消", null).show();
             }
         });
     }
+
     /*
      * 剪切图片
      */
@@ -321,26 +480,28 @@ public class SettingActivity extends BaseActivity {
         // 开启一个带有返回值的Activity，请求码为PHOTO_REQUEST_CUT
         startActivityForResult(intent, 3);
     }
+
     private void startCrop(Uri sourceUri) {
 //        Uri sourceUri = Uri.parse("http://star.xiziwang.net/uploads/allimg/140512/19_140512150412_1.jpg");
         //裁剪后保存到文件中
         Uri destinationUri = Uri.fromFile(new File(getCacheDir(), "SampleCropImage.png"));
         UCrop.of(sourceUri, destinationUri).withAspectRatio(1, 1).withMaxResultSize(300, 300).start(this);
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (resultCode == RESULT_OK ){
-            if(requestCode == PhotoPicker.REQUEST_CODE){
+        if (resultCode == RESULT_OK) {
+            if (requestCode == PhotoPicker.REQUEST_CODE) {
 //                List<String> photos = null;
                 if (data != null) {
 //                    photos = data.getStringArrayListExtra(PhotoPicker.KEY_SELECTED_PHOTOS);
-                    Uri uri=data.getData();
+                    Uri uri = data.getData();
 //                    crop(uri);
                     startCrop(uri);
                 }
-            }else if (requestCode==UCrop.REQUEST_CROP){
+            } else if (requestCode == UCrop.REQUEST_CROP) {
                 // 从剪切图片返回的数据
                 if (data != null) {
                     /*Bitmap bitmap = data.getParcelableExtra("data");
@@ -360,7 +521,7 @@ public class SettingActivity extends BaseActivity {
                     String downloadsDirectoryPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
                     String filename = String.format("%d_%s", Calendar.getInstance().getTimeInMillis(), croppedFileUri.getLastPathSegment());
                     Bitmap bitmap = BitmapFactory.decodeFile(croppedFileUri.getPath());
-                    if(bitmap ==null){
+                    if (bitmap == null) {
                         return;
                     }
                     //第一步:将Bitmap压缩至字节数组输出流ByteArrayOutputStream
@@ -369,7 +530,7 @@ public class SettingActivity extends BaseActivity {
                     //第二步:利用Base64将字节数组输出流中的数据转换成字符串String
                     byte[] byteArray = byteArrayOutputStream.toByteArray();
                     String imageString = new String(Base64.encodeToString(byteArray, Base64.DEFAULT));
-                    uploadImgFor64("data:image/png;base64,"+imageString);
+                    uploadImgFor64("data:image/png;base64," + imageString);
                     File saveFile = new File(downloadsDirectoryPath, filename);
                     //保存下载的图片
                     FileInputStream inStream = null;
@@ -403,6 +564,7 @@ public class SettingActivity extends BaseActivity {
             Toast.makeText(this, "裁切图片失败", Toast.LENGTH_SHORT).show();
         }
     }
+
     public void uploadImgFor64(String imageString) {
         FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
         formBody.add("imagedata", imageString);

@@ -40,6 +40,26 @@
         tools:replace="android:theme"
         android:theme="@style/Theme.AppCompat.NoActionBar">
 
+        <provider
+
+            android:name="android.support.v4.content.FileProvider"
+
+            android:authorities="com.emjiayuan.app.fileProvider"
+
+            android:grantUriPermissions="true"
+
+            android:exported="false">
+
+            <meta-data
+
+                android:name="android.support.FILE_PROVIDER_PATHS"
+
+                android:resource="@xml/file_paths"/>
+
+        </provider>
+
+
+
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="p4nrYAl0at4GGsotA7BdEwiuyDZQShmX" >

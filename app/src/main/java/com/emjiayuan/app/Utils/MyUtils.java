@@ -85,6 +85,16 @@ public class MyUtils {
         String packageSign = md5(sb.toString()).toUpperCase();
         return packageSign;    //返回签名
     }
+    /**
+     * 网络类型
+     */
+    public static boolean isWifi(Context context){
+        ConnectivityManager cm;
+        cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        boolean isWifitrue = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED ? true : false;
+        boolean isGprstrue = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ? true : false;
+        return isGprstrue;
+    }
 
     /**
      * 返回当前程序版本名
@@ -104,6 +114,22 @@ public class MyUtils {
             Log.e("VersionInfo", "Exception", e);
         }
         return versionName;
+    }
+
+    /**
+     * 返回当前程序版本号
+     */
+    public static int getAppVersionCode(Context context) {
+        int VersionCode=0;
+        try {
+            // ---get the package info---
+            PackageManager pm = context.getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
+            VersionCode = pi.versionCode;
+        } catch (Exception e) {
+            Log.e("VersionInfo", "Exception", e);
+        }
+        return VersionCode;
     }
     // 两次点击按钮之间的点击间隔不能少于1000毫秒
     private static final int MIN_CLICK_DELAY_TIME = 500;

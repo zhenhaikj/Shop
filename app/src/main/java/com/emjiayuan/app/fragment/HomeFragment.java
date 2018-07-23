@@ -1,15 +1,20 @@
 package com.emjiayuan.app.fragment;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -29,6 +34,7 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.emjiayuan.app.R;
+import com.emjiayuan.app.Utils.DownLoadManager;
 import com.emjiayuan.app.Utils.GlideUtil;
 import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
@@ -79,6 +85,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -228,6 +235,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                 request();
             }
         });
+        getAppVersion();
     }
 
     @Override
@@ -297,6 +305,33 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                 MyUtils.e("------获取首页结果------", provincecode + "|" + result);
                 Message message = new Message();
                 message.what = 0;
+                Bundle bundle = new Bundle();
+                bundle.putString("result", result);
+                message.setData(bundle);
+                myHandler.sendMessage(message);
+            }
+        });
+    }
+
+    public void getAppVersion() {
+        FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
+        formBody.add("versionno",Integer.toString(MyUtils.getAppVersionCode(mActivity)));
+//new call
+        Call call = MyOkHttp.GetCall("system.getAppVersion", formBody);
+//请求加入调度
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("------------", e.toString());
+//                        myHandler.sendEmptyMessage(1);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String result = response.body().string();
+                MyUtils.e("------检查更新------", result);
+                Message message = new Message();
+                message.what = 2;
                 Bundle bundle = new Bundle();
                 bundle.putString("result", result);
                 message.setData(bundle);
@@ -622,6 +657,71 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                     }
 
                     break;
+                case 2:
+                    try {
+                        JSONObject jsonObject = new JSONObject(result);
+                        String code = jsonObject.getString("code");
+                        String message = jsonObject.getString("message");
+                        String data = jsonObject.getString("data");
+                        Gson gson = new Gson();
+                        if ("200".equals(code)) {
+                            JSONObject jsonObject1 = new JSONObject(data);
+
+                            String is_update = jsonObject1.getString("is_update");
+                            final String app_download_url = jsonObject1.getString("download_url");
+//                            String appcode = "234";
+//                            final String app_download_url = "http://pz0.3dn.mse.sogou.com/semob5.13.5_154189_R14189_121106002_build47127_2.1.0.2133.apk";
+                            if("1".equals(is_update)) {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                                builder.setTitle("更新");
+                                builder.setMessage("检测到有更新,是否立刻更新？");
+                                builder.setNegativeButton("稍后更新", new DialogInterface.OnClickListener() {
+
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                    }
+                                });
+                                builder.setPositiveButton("立刻更新", new DialogInterface.OnClickListener() {
+
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        if(MyUtils.isWifi(mActivity)) {
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                                            builder.setTitle("提示");
+                                            builder.setMessage("您当前正在使用移动网络，继续下载将消耗流量");
+                                            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+
+                                                }
+                                            });
+                                            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    downLoadApk(app_download_url);
+                                                }
+                                            });
+                                            builder.create().show();
+                                        } else{
+                                            downLoadApk(app_download_url);
+                                        }
+                                    }
+                                });
+                                builder.create().show();
+                            } else{
+//                                MyUtils.showToast(mActivity, "当前已是最新版本");
+                            }
+
+
+                        } else {
+                            MyUtils.showToast(mActivity, message);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
             }
         }
     };
@@ -797,5 +897,59 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                 break;
 
         }
+    }
+
+    /*
+     * 从服务器中下载APK
+     */
+    protected void downLoadApk(final String url) {
+        final ProgressDialog pd;    //进度条对话框
+        pd = new ProgressDialog(mActivity);
+        pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        pd.setMessage("正在下载更新");
+        pd.show();
+        new Thread() {
+            @Override
+            public void run() {
+                try{
+                    File file = DownLoadManager.getFileFromServer(url, pd);
+                    sleep(3000);
+                    installApk(file);
+                    pd.dismiss(); //结束掉进度条对话框
+                } catch(Exception e) {
+//                    Toast.makeText(mActivity, "下载失败!",
+//                            Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
+    //安装apk
+    protected void installApk(File file) {
+        Intent intent = new Intent();
+        //执行动作
+        intent.setAction(Intent.ACTION_VIEW);
+        //执行的数据类型
+        //判断是否是AndroidN以及更高的版本
+
+        if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.N) {
+
+            Uri contentUri = FileProvider.getUriForFile(mActivity,"com.emjiayuan.app.fileProvider",file);
+
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            intent.setDataAndType(contentUri,"application/vnd.android.package-archive");
+
+        }else{
+
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            intent.setDataAndType(Uri.fromFile(file),"application/vnd.android.package-archive");
+
+        }
+        startActivity(intent);
     }
 }
