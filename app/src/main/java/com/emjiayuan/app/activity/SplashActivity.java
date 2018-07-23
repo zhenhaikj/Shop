@@ -9,24 +9,17 @@ import android.os.Message;
 import android.util.Log;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.emjiayuan.app.MainActivity;
 import com.emjiayuan.app.R;
-import com.emjiayuan.app.Utils.GlideUtil;
 import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.Utils.SpUtils;
-import com.emjiayuan.app.entity.CityBean;
 import com.emjiayuan.app.entity.Global;
-import com.google.gson.Gson;
 import com.tencent.android.tpush.XGPushConfig;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

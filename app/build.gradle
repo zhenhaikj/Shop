@@ -5,7 +5,7 @@ android {
     compileSdkVersion 26
     defaultConfig {
 //        applicationId "com.example.administrator.app"
-        applicationId "com.emjiayuan.app"
+//        applicationId "com.emjiayuan.app"
         minSdkVersion 15
         targetSdkVersion 26
         versionCode 233
