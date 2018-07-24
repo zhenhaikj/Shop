@@ -19,6 +19,7 @@ import com.emjiayuan.app.adapter.SoupOrderAdapter;
 import com.emjiayuan.app.entity.SoupOrder;
 import com.emjiayuan.app.event.WXpaySuccessEvent;
 import com.google.gson.Gson;
+import com.gyf.barlibrary.ImmersionBar;
 import com.lwkandroid.stateframelayout.StateFrameLayout;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
@@ -135,7 +136,16 @@ public class ViewPagerFragment extends BaseLazyFragment {
 //        return fragment;
 //    }
 
-
+    /**
+     * 初始化沉浸式
+     */
+    protected void initImmersionBar() {
+        mImmersionBar = ImmersionBar.with(this);
+        mImmersionBar.statusBarDarkFont(true, 0.2f); //原理：如果当前设备支持状态栏字体变色，会设置状态栏字体为黑色，如果当前设备不支持状态栏字体变色，会使当前状态栏加上透明度，否则不执行透明度
+        mImmersionBar.statusBarColor(R.color.white);
+        mImmersionBar.fitsSystemWindows(true);
+        mImmersionBar.keyboardEnable(true).navigationBarWithKitkatEnable(false).init();
+    }
     @Override
     protected void initData() {
         super.initData();

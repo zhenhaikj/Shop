@@ -8,13 +8,15 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.emjiayuan.app.BaseActivity;
 import com.emjiayuan.app.R;
 import com.emjiayuan.app.adapter.ViewPagerAdapter;
+import com.gyf.barlibrary.ImmersionBar;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class GuideActivity extends Activity implements ViewPager.OnPageChangeListener {
+public class GuideActivity extends BaseActivity implements ViewPager.OnPageChangeListener {
 
 
     private ViewPager vp;
@@ -23,13 +25,34 @@ public class GuideActivity extends Activity implements ViewPager.OnPageChangeLis
     private ImageView[] dots;
     private int currentIndex;
 
+    @Override
+    protected int setLayoutId() {
+        return R.layout.activity_guide;
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_guide);
+    protected void initData() {
         initViews();
         initDots();
+    }
+
+    protected void initImmersionBar() {
+        //在BaseActivity里初始化
+        mImmersionBar = ImmersionBar.with(this);
+        mImmersionBar.statusBarDarkFont(true, 0.2f); //原理：如果当前设备支持状态栏字体变色，会设置状态栏字体为黑色，如果当前设备不支持状态栏字体变色，会使当前状态栏加上透明度，否则不执行透明度
+        mImmersionBar.statusBarColor(R.color.guide);
+        mImmersionBar.fitsSystemWindows(true);
+        mImmersionBar.init();
+    }
+
+    @Override
+    protected void initView() {
+
+    }
+
+    @Override
+    protected void setListener() {
+
     }
 
     private void initViews() {

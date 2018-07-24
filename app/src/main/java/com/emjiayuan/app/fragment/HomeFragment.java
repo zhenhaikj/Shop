@@ -218,6 +218,14 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
     }
 
     @Override
+    protected void initImmersionBar() {
+        super.initImmersionBar();
+        mImmersionBar.titleBar(R.id.toolbar)
+                .fitsSystemWindows(false)
+                .init();
+    }
+
+    @Override
     protected void initData() {
 
         //设置图片加载器

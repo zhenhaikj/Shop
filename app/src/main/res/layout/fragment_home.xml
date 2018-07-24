@@ -5,65 +5,71 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/fragment_home_bg"
     android:orientation="vertical">
-    <LinearLayout
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:background="@drawable/color_shape"
-        android:orientation="horizontal">
+        android:background="@drawable/color_shape" >
         <LinearLayout
-            android:id="@+id/ll_search"
-            android:layout_width="0dp"
-            android:layout_height="30dp"
-            android:layout_weight="3.5"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:padding="6dp"
-            android:background="@drawable/search_edit_shape">
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginLeft="10dp"
-                android:src="@drawable/search"/>
-            <EditText
-                android:id="@+id/et_search"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:textSize="@dimen/search_size"
-                android:editable="false"
-                android:hint="请输入要查找的内容"
-                android:textColorHint="@color/grey"
-                android:textColor="@color/black"
-                android:background="@null" />
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/city_ll"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:gravity="center"
+            android:background="@drawable/color_shape"
             android:orientation="horizontal">
-            <TextView
-                android:id="@+id/city_name"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/ll_search"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_weight="3.5"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:padding="6dp"
+                android:background="@drawable/search_edit_shape">
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginLeft="10dp"
+                    android:src="@drawable/search"/>
+                <EditText
+                    android:id="@+id/et_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:textSize="@dimen/search_size"
+                    android:editable="false"
+                    android:hint="请输入要查找的内容"
+                    android:textColorHint="@color/grey"
+                    android:textColor="@color/black"
+                    android:background="@null" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/city_ll"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="定位中..."
                 android:gravity="center"
-                android:singleLine="true"
-                android:ellipsize="end"
-                android:textSize="@dimen/address_size"
-                android:textColor="@color/white"/>
-            <ImageView
-                android:layout_width="10dp"
-                android:layout_height="10dp"
-                android:layout_marginRight="10dp"
-                android:src="@drawable/daosanjiao"/>
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/city_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="定位中..."
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textSize="@dimen/address_size"
+                    android:textColor="@color/white"/>
+                <ImageView
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_marginRight="10dp"
+                    android:src="@drawable/daosanjiao"/>
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
+    </android.support.v7.widget.Toolbar>
     <com.scwang.smartrefresh.layout.SmartRefreshLayout
         android:id="@+id/refreshLayout"
         android:layout_width="match_parent"

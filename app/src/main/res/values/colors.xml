@@ -153,4 +153,6 @@
     <color name="old_price_color">#808080</color>
     <color name="tv_detail_color">#B02621</color>
     <color name="tv_detail_uncheck_color">#818181</color>
+    <color name="splash">#7ED785</color>
+    <color name="guide">#ACEDB1</color>
 </resources>

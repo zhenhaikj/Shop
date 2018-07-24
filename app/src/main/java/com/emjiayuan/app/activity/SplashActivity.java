@@ -3,18 +3,21 @@ package com.emjiayuan.app.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.emjiayuan.app.BaseActivity;
 import com.emjiayuan.app.MainActivity;
 import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.Utils.SpUtils;
 import com.emjiayuan.app.entity.Global;
+import com.gyf.barlibrary.ImmersionBar;
 import com.tencent.android.tpush.XGPushConfig;
 
 import org.json.JSONObject;
@@ -28,7 +31,7 @@ import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.Response;
 
-public class SplashActivity extends Activity {
+public class SplashActivity extends BaseActivity {
     boolean isFirstIn = false;
 
 
@@ -52,29 +55,47 @@ public class SplashActivity extends Activity {
                     goHome();
                     break;
                 case GO_GUIDE:
-//                    goGuide();
-                    goHome();
+                    goGuide();
+//                    goHome();
                     break;
             }
             super.handleMessage(msg);
         }
     };
 
+    @Override
+    protected int setLayoutId() {
+        return R.layout.activity_splash;
+    }
+
+    protected void initImmersionBar() {
+        //在BaseActivity里初始化
+        mImmersionBar = ImmersionBar.with(this);
+        mImmersionBar.statusBarDarkFont(true, 0.2f); //原理：如果当前设备支持状态栏字体变色，会设置状态栏字体为黑色，如果当前设备不支持状态栏字体变色，会使当前状态栏加上透明度，否则不执行透明度
+        mImmersionBar.statusBarColor(R.color.splash);
+        mImmersionBar.fitsSystemWindows(true);
+        mImmersionBar.init();
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
-        ButterKnife.bind(this);
-//        RequestOptions options=new RequestOptions();
-//        options.dontTransform();
-//        Glide.with(this).load(R.drawable.splash).apply(options).into(img);
+    protected void initData() {
         init();
         Global.token= XGPushConfig.getToken(getApplicationContext());
         if (!"".equals(Global.token)){
             getDevice();
         }
     }
+
+    @Override
+    protected void initView() {
+
+    }
+
+    @Override
+    protected void setListener() {
+
+    }
+
     public void getDevice () {
 
         FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
@@ -139,6 +160,7 @@ public class SplashActivity extends Activity {
 
 
         isFirstIn = preferences.getBoolean("isFirstIn", true);
+//        isFirstIn = true;
         if (!isFirstIn) {
             mHandler.sendEmptyMessageDelayed(GO_HOME, SPLASH_DELAY_MILLIS);
         } else {

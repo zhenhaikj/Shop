@@ -34,6 +34,7 @@ import com.emjiayuan.app.entity.User;
 import com.emjiayuan.app.event.UpdateEvent;
 import com.emjiayuan.app.fragment.BaseLazyFragment;
 import com.google.gson.Gson;
+import com.gyf.barlibrary.ImmersionBar;
 import com.qiyukf.unicorn.api.ConsultSource;
 import com.qiyukf.unicorn.api.Unicorn;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
@@ -112,6 +113,15 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
     @Override
     protected boolean isLazyLoad() {
         return true;
+    }
+
+    /**
+     * 初始化沉浸式
+     */
+    protected void initImmersionBar() {
+        super.initImmersionBar();
+        mImmersionBar.fitsSystemWindows(false);
+        mImmersionBar.keyboardEnable(true).navigationBarWithKitkatEnable(false).init();
     }
 
     @Override
