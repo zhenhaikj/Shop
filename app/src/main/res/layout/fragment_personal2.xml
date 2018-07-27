@@ -49,7 +49,7 @@
                                 android:id="@+id/nickname"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:text="雅静"
+                                android:text="伊穆家园"
                                 android:textColor="@color/white"
                                 android:textSize="22sp" />
 
@@ -152,7 +152,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:padding="5dp"
-                            android:text="800"
+                            android:text="0"
                             android:textColor="@color/black" />
                     </LinearLayout>
 
@@ -176,7 +176,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:padding="5dp"
-                            android:text="528"
+                            android:text="0"
                             android:textColor="@color/black" />
                     </LinearLayout>
 
@@ -200,7 +200,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:padding="5dp"
-                            android:text="5"
+                            android:text="0"
                             android:textColor="@color/black" />
                     </LinearLayout>
                 </LinearLayout>
@@ -233,6 +233,7 @@
                         <ImageView
                             android:layout_width="15dp"
                             android:layout_height="15dp"
+                            android:visibility="gone"
                             android:src="@drawable/go" />
                     </LinearLayout>
 

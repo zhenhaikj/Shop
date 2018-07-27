@@ -68,7 +68,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     protected void initData() {
         mFragments = new ArrayList<>();
         homeFragment = new HomeFragment();
-        classifyFragment2 = new ClassifyFragment2(true);
+        classifyFragment2 = new ClassifyFragment2();
         communityFragment = new CommunityFragment2();
         shoppingCarFragment = new ShoppingCarFragment();
         personalFragment = new PersonalFragment();
@@ -251,4 +251,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     }
 
+    @Override
+    public void onBackPressed()
+    {
+        //按返回键返回桌面
+        moveTaskToBack(true);
+    }
 }

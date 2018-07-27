@@ -16,13 +16,14 @@ import com.gyf.barlibrary.ImmersionBar;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import me.imid.swipebacklayout.lib.app.SwipeBackActivity;
 
 /**
  * Activity基类
  * Created by geyifeng on 2017/5/9.
  */
 
-public abstract class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends SwipeBackActivity {
 
     private InputMethodManager imm;
     protected ImmersionBar mImmersionBar;

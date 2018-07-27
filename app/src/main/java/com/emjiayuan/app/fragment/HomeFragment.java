@@ -213,6 +213,10 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
     @Override
     protected void initView() {
         super.initView();
+        //设置图片加载器
+        bannerTop.setImageLoader(new GlideImageLoader());
+        banner.setImageLoader(new GlideImageLoader());
+        banner2.setImageLoader(new GlideImageLoader());
         requestPermission();
         initMapLocation();
     }
@@ -228,10 +232,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
     @Override
     protected void initData() {
 
-        //设置图片加载器
-        bannerTop.setImageLoader(new GlideImageLoader());
-        banner.setImageLoader(new GlideImageLoader());
-        banner2.setImageLoader(new GlideImageLoader());
+
 
 
 //        setUnderLine();

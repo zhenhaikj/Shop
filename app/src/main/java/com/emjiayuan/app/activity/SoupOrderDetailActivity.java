@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
@@ -28,10 +27,8 @@ import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.adapter.GoodsInAdapter;
-import com.emjiayuan.app.adapter.OrderInAdapter2;
 import com.emjiayuan.app.adapter.SoupOrderInAdapter;
 import com.emjiayuan.app.entity.Global;
-import com.emjiayuan.app.entity.Order;
 import com.emjiayuan.app.entity.SoupOrder;
 import com.emjiayuan.app.entity.WXpayInfo;
 import com.emjiayuan.app.event.UpdateEvent;
@@ -128,6 +125,10 @@ public class SoupOrderDetailActivity extends BaseActivity implements View.OnClic
     TextView btn2;
     @BindView(R.id.handle_ll)
     LinearLayout handleLl;
+    @BindView(R.id.discount)
+    TextView discount;
+    @BindView(R.id.discount_tv)
+    TextView discountTv;
     private SoupOrderInAdapter adapter;
     private GoodsInAdapter goodsInAdapter;
     private String orderid;
@@ -305,11 +306,11 @@ public class SoupOrderDetailActivity extends BaseActivity implements View.OnClic
                             return;
                         }
                         Intent intent = new Intent(mActivity, LogisticsDetailActivity.class);
-                        intent.putExtra("postid",order.getExpressno());
-                        intent.putExtra("postcom",order.getExpresscom());
-                        intent.putExtra("order_no",order.getOrder_no());
-                        intent.putExtra("date",order.getCreatedate());
-                        intent.putExtra("address",order.getAddress());
+                        intent.putExtra("postid", order.getExpressno());
+                        intent.putExtra("postcom", order.getExpresscom());
+                        intent.putExtra("order_no", order.getOrder_no());
+                        intent.putExtra("date", order.getCreatedate());
+                        intent.putExtra("address", order.getAddress());
                         startActivity(intent);
                     }
                 });
@@ -349,10 +350,12 @@ public class SoupOrderDetailActivity extends BaseActivity implements View.OnClic
         cost.setText("¥" + order.getShowmoney());
         totalTv.setText("¥" + order.getTotalmoney());
         totalPay.setText("¥" + order.getTotalmoney());
+        discount.setText(order.getDiscount()+"折");
+        discountTv.setText("-¥" + order.getDiscount_price());
 
         adapter = new SoupOrderInAdapter(mActivity, order);
         lvGoods.setAdapter(adapter);
-        goodsInAdapter=new GoodsInAdapter(mActivity,order.getProduct_list());
+        goodsInAdapter = new GoodsInAdapter(mActivity, order.getProduct_list());
         lvGoodsIn.setAdapter(goodsInAdapter);
     }
 
@@ -369,9 +372,9 @@ public class SoupOrderDetailActivity extends BaseActivity implements View.OnClic
                         String code = jsonObject.getString("code");
                         String message = jsonObject.getString("message");
                         String data = jsonObject.getString("data");
-                        Gson gson=new Gson();
+                        Gson gson = new Gson();
                         if ("200".equals(code)) {
-                            order=gson.fromJson(data.toString(),SoupOrder.class);
+                            order = gson.fromJson(data.toString(), SoupOrder.class);
                             setOrder();
                         } else {
                             MyUtils.showToast(mActivity, message);
@@ -462,7 +465,7 @@ public class SoupOrderDetailActivity extends BaseActivity implements View.OnClic
                 finish();
                 break;
             case R.id.copy:
-                MyUtils.copy(order.getOrder_no(),mActivity);
+                MyUtils.copy(order.getOrder_no(), mActivity);
                 break;
 //            case R.id.up_down:
 //                if (lvGoodsIn.getVisibility()==View.VISIBLE){

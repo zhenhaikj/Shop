@@ -82,8 +82,8 @@ public class IntegralYlActivity extends BaseActivity {
                 finish();
             }
         });
-        gv = findViewById(R.id.gv);
-        banner = findViewById(R.id.banner);
+//        gv = findViewById(R.id.gv);
+//        banner = findViewById(R.id.banner);
         //设置图片加载器
         banner.setImageLoader(new GlideImageLoader());
 

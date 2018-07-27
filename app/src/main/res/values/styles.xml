@@ -13,9 +13,8 @@
         <item name="android:windowExitAnimation">@anim/anim_exit_bottom</item>
         <!-- 指定消失的动画xml -->
     </style>
-    <style name="AppSplash" parent="Theme.AppCompat">
-        <item name="android:windowBackground">@color/splash</item>
+    <style name="AppSplash" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowNoTitle">true</item>
-        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowIsTranslucent">true</item>
     </style>
 </resources>

@@ -179,8 +179,8 @@ public class AddAddressActivity extends BaseActivity implements View.OnClickList
                     MyUtils.showToast(this, "请输入联系电话！");
                     return;
                 }
-                if (!MyUtils.isPhoneNum(phone)){
-                    MyUtils.showToast(this, "请输入正确的联系电话！");
+                if (phone.length()<11){
+                    MyUtils.showToast(this, "请输入11位手机号码！");
                     return;
                 }
                 if ("".equals(ssq)) {

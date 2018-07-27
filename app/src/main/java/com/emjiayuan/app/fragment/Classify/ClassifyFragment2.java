@@ -76,7 +76,6 @@ public class ClassifyFragment2 extends BaseLazyFragment {
     LinearLayout serviceLl;
     @BindView(R.id.line_top)
     View lineTop;
-    private boolean flag;
 
     private CategoryAdapter adapter;
     private CategoryContentAdapter categoryContentAdapter;
@@ -87,13 +86,6 @@ public class ClassifyFragment2 extends BaseLazyFragment {
     private int scrollPosition = -1;
     private boolean flags = true;
 
-    public ClassifyFragment2(Boolean flag) {
-        this.flag = flag;
-    }
-
-    public ClassifyFragment2() {
-
-    }
 
     @Override
     protected int setLayoutId() {
@@ -113,24 +105,13 @@ public class ClassifyFragment2 extends BaseLazyFragment {
 
     @Override
     protected boolean isLazyLoad() {
-        return flag;
+        return true;
     }
 
     @Override
     protected void initData() {
-        back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mActivity.finish();
-            }
-        });
-        if (!flag) {
-            back.setVisibility(View.VISIBLE);
-            title.setText("所有商品");
-        } else {
-            back.setVisibility(View.GONE);
-            title.setText("分类");
-        }
+        back.setVisibility(View.GONE);
+        title.setText("分类");
         stateLayout.setOnNetErrorRetryListener(new StateFrameLayout.OnNetErrorRetryListener() {
             @Override
             public void onNetErrorRetry() {

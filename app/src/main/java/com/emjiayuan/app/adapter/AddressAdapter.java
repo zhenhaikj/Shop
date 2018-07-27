@@ -123,6 +123,15 @@ public class AddressAdapter extends BaseAdapter {
                 setDefault(item.getId(),position);
             }
         });
+        holder.check.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!MyUtils.isFastClick()){
+                    return;
+                }
+                setDefault(item.getId(),position);
+            }
+        });
         holder.edit_ll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

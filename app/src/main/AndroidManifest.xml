@@ -70,7 +70,8 @@
             android:process=":remote"/>-->
 
         <activity android:name=".activity.SplashActivity"
-            android:launchMode="singleTask"
+            android:theme="@style/AppSplash"
+            android:alwaysRetainTaskState="true"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

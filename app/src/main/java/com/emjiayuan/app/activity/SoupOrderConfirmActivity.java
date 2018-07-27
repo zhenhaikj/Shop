@@ -114,6 +114,10 @@ public class SoupOrderConfirmActivity extends BaseActivity implements View.OnCli
     TextView leixing2;
     @BindView(R.id.leixing0)
     TextView leixing0;
+    @BindView(R.id.discount)
+    TextView discount;
+    @BindView(R.id.discount_tv)
+    TextView discountTv;
 
     private PopupWindow mPopupWindow;
     private String remark = "";
@@ -127,7 +131,7 @@ public class SoupOrderConfirmActivity extends BaseActivity implements View.OnCli
     private String orderInfo;
     private String orderid;
     private String soupName = "";
-    private String leixing="";
+    private String leixing = "";
 
     @Override
     protected int setLayoutId() {
@@ -138,7 +142,8 @@ public class SoupOrderConfirmActivity extends BaseActivity implements View.OnCli
     protected void initData() {
 
     }
-    public void setChecked(TextView t1,TextView t2,TextView t3){
+
+    public void setChecked(TextView t1, TextView t2, TextView t3) {
         t1.setBackgroundResource(R.drawable.button_edit_shape);
         t1.setTextColor(Color.WHITE);
         t2.setBackgroundResource(R.drawable.edit_shape);
@@ -146,6 +151,7 @@ public class SoupOrderConfirmActivity extends BaseActivity implements View.OnCli
         t3.setBackgroundResource(R.drawable.edit_shape);
         t3.setTextColor(Color.parseColor("#CCCCCC"));
     }
+
     @Override
     protected void initView() {
         EventBus.getDefault().register(this);
@@ -183,6 +189,8 @@ public class SoupOrderConfirmActivity extends BaseActivity implements View.OnCli
         cost.setText("¥" + soupOrderConfirm.getProductprice());
         totalTv.setText("¥" + soupOrderConfirm.getTotalmoney());
         totalPay.setText("¥" + soupOrderConfirm.getTotalmoney());
+        discount.setText(soupOrderConfirm.getDiscount()+"折");
+        discountTv.setText("-¥" + soupOrderConfirm.getDiscountprice());
     }
 
     @Override
@@ -265,7 +273,7 @@ public class SoupOrderConfirmActivity extends BaseActivity implements View.OnCli
         formBody.add("userid", Global.loginResult.getId());
         formBody.add("addressname", address.getUsername());
         formBody.add("addressphone", address.getTelphone());
-        formBody.add("address",  address.getAddress());
+        formBody.add("address", address.getAddress());
         formBody.add("addressprovince", address.getShengfen());
         formBody.add("val", val);
         formBody.add("danwei", mass);
@@ -455,7 +463,7 @@ public class SoupOrderConfirmActivity extends BaseActivity implements View.OnCli
                             orderInfo = data;
                             alipay();
                         } else {
-                            MyUtils.showToast(mActivity,message);
+                            MyUtils.showToast(mActivity, message);
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -481,8 +489,8 @@ public class SoupOrderConfirmActivity extends BaseActivity implements View.OnCli
                     } else {
                         // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
                         MyUtils.showToast(mActivity, "支付失败");
-                        Intent intent=new Intent(mActivity, SoupOrderDetailActivity.class);
-                        intent.putExtra("orderid",orderid);
+                        Intent intent = new Intent(mActivity, SoupOrderDetailActivity.class);
+                        intent.putExtra("orderid", orderid);
                         mActivity.startActivity(intent);
                         finish();
                     }
@@ -519,8 +527,8 @@ public class SoupOrderConfirmActivity extends BaseActivity implements View.OnCli
                             startActivity(intent);
                             finish();
                         } else {
-                            Intent intent=new Intent(mActivity, SoupOrderDetailActivity.class);
-                            intent.putExtra("orderid",orderid);
+                            Intent intent = new Intent(mActivity, SoupOrderDetailActivity.class);
+                            intent.putExtra("orderid", orderid);
                             mActivity.startActivity(intent);
                             finish();
                             MyUtils.showToast(mActivity, message);
@@ -588,23 +596,23 @@ public class SoupOrderConfirmActivity extends BaseActivity implements View.OnCli
                     MyUtils.showToast(mActivity, "请选择汤料类型！");
                     return;
                 }
-                if (orderid==null){
+                if (orderid == null) {
                     addOrder();
-                }else{
+                } else {
                     showPopupWindow();
                 }
                 break;
             case R.id.leixing0:
-                leixing="0";
-                setChecked(leixing0,leixing2,leixing1);
+                leixing = "0";
+                setChecked(leixing0, leixing2, leixing1);
                 break;
             case R.id.leixing1:
-                leixing="1";
-                setChecked(leixing1,leixing2,leixing0);
+                leixing = "1";
+                setChecked(leixing1, leixing2, leixing0);
                 break;
             case R.id.leixing2:
-                leixing="2";
-                setChecked(leixing2,leixing0,leixing1);
+                leixing = "2";
+                setChecked(leixing2, leixing0, leixing1);
                 break;
         }
     }
@@ -827,14 +835,14 @@ public class SoupOrderConfirmActivity extends BaseActivity implements View.OnCli
                 finish();
             } else if (resp.errCode == -1) {  // -1 错误  可能的原因：签名错误、未注册APPID、项目设置APPID不正确、注册的APPID与设置的不匹配、其他异常等。
                 MyUtils.showToast(mActivity, "支付出错");
-                Intent intent=new Intent(mActivity, SoupOrderDetailActivity.class);
-                intent.putExtra("orderid",orderid);
+                Intent intent = new Intent(mActivity, SoupOrderDetailActivity.class);
+                intent.putExtra("orderid", orderid);
                 mActivity.startActivity(intent);
                 finish();
             } else if (resp.errCode == -2) {  // -2 用户取消    无需处理。发生场景：用户不支付了，点击取消，返回APP。
                 MyUtils.showToast(mActivity, "取消支付");
-                Intent intent=new Intent(mActivity, SoupOrderDetailActivity.class);
-                intent.putExtra("orderid",orderid);
+                Intent intent = new Intent(mActivity, SoupOrderDetailActivity.class);
+                intent.putExtra("orderid", orderid);
                 mActivity.startActivity(intent);
                 finish();
             }
