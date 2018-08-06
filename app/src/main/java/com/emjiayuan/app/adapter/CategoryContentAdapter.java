@@ -75,7 +75,7 @@ public class CategoryContentAdapter extends BaseAdapter {
         final Products item = grouplists.get(position);
         holder.content.setText(item.getName());
 //        if (position==0){
-        GlideUtil.loadImageViewLoding(mContext,item.getBanner(),holder.icon,R.drawable.empty_img,R.drawable.empty_img);
+        GlideUtil.loadImageViewLoding(mContext,item.getBanner(),holder.icon,R.drawable.banner_cate,R.drawable.banner_cate);
 //        Glide.with(mContext).load(item.getBanner()).into(holder.icon);
 //            holder.icon.setImageResource(R.drawable.bg);
 //        }else{

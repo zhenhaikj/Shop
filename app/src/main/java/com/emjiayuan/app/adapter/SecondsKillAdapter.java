@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Handler;
 import android.os.Message;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -114,6 +115,7 @@ public class SecondsKillAdapter extends BaseAdapter {
 //        holder.icon.setImageResource(R.drawable.img1);
         holder.name.setText(item.getName());
         holder.price.setText("¥"+item.getMs_price());
+//        holder.price.setText(Html.fromHtml("<small>¥ </small><big><big>"+item.getMs_price().substring(0,item.getMs_price().indexOf("."))+"</big></big><small>"+item.getMs_price().substring(item.getMs_price().indexOf("."),item.getMs_price().length())+"</small>"));
         holder.old_price.setText("¥"+item.getPreprice());
 
         double yh=Double.parseDouble(item.getPreprice())-Double.parseDouble(item.getMs_price());

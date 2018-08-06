@@ -15,6 +15,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
 import android.support.v4.content.FileProvider;
+import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -290,6 +291,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
         }
         if (flag) {
             stateLayout.changeState(StateFrameLayout.LOADING);
+            flag=false;
         }
         FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
         Log.d("------参数------", formBody.build().toString());
@@ -422,16 +424,25 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                     startActivity(new Intent(getActivity(), SearchActivity.class));
                     break;
                 case R.id.goods1_ll:
+                    if (product1==null){
+                        return;
+                    }
                     intent = new Intent(getActivity(), GoodsDetailActivity.class);
                     intent.putExtra("productid", product1.getId());
                     startActivity(intent);
                     break;
                 case R.id.good2_ll:
+                    if (product2==null){
+                        return;
+                    }
                     intent = new Intent(getActivity(), GoodsDetailActivity.class);
                     intent.putExtra("productid", product2.getId());
                     startActivity(intent);
                     break;
                 case R.id.goods3_ll:
+                    if (product3==null){
+                        return;
+                    }
                     intent = new Intent(getActivity(), GoodsDetailActivity.class);
                     intent.putExtra("productid", product3.getId());
                     startActivity(intent);
@@ -518,6 +529,9 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
 //                                countdownview.setVisibility(View.VISIBLE);
                                 } else if ("2".equals(seckillBean.getStatus())) {
                                     kill_message.setText("已结束");
+                                    gv_xsg.setVisibility(View.GONE);
+                                    noKillImg.setVisibility(View.VISIBLE);
+                                    seckilldata = "null";
 //                                countdownview.setVisibility(View.GONE);
                                 }
                                 MyUtils.e("时间差", MyUtils.getTimeDifference(System.currentTimeMillis() / 1000, Long.parseLong(seckillBean.getEndtime())) + "ms");
@@ -541,9 +555,10 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                                             noKillImg.setVisibility(View.VISIBLE);
                                             seckilldata = "null";
                                         }
+                                        request();
                                     }
                                 });
-                                XsgAdapter xsgAdapter = new XsgAdapter(mActivity, seckillBean.getProduct_list());
+                                XsgAdapter xsgAdapter = new XsgAdapter(mActivity, seckillBean);
                                 gv_xsg.setAdapter(xsgAdapter);
                             } else {
                                 gv_xsg.setVisibility(View.GONE);
@@ -604,18 +619,48 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                             Global.list = list;
                             Global.Productslist = Productslist;
                             ArrayList<Product> recommendlist = getProductList(recommend);
-                            if (recommendlist.size() == 3) {
+                            if (recommendlist.size()==0){
+                                goods1Ll.setVisibility(View.INVISIBLE);
+                                good2Ll.setVisibility(View.INVISIBLE);
+                                goods3Ll.setVisibility(View.INVISIBLE);
+                            }
+                            if (recommendlist.size()==1){
+                                goods1Ll.setVisibility(View.VISIBLE);
+                                good2Ll.setVisibility(View.INVISIBLE);
+                                goods3Ll.setVisibility(View.INVISIBLE);
                                 product1 = recommendlist.get(0);
-                                product2 = recommendlist.get(1);
-                                product3 = recommendlist.get(2);
                                 name1.setText(product1.getName());
-                                price1.setText("¥" + product1.getPrice());
+                                price1.setText(Html.fromHtml("<small>¥ </small><big><b>"+product1.getPrice().substring(0,product1.getPrice().indexOf("."))+"</b></big><small><b>"+product1.getPrice().substring(product1.getPrice().indexOf("."),product1.getPrice().length())+"</b></small>"));
                                 GlideUtil.loadImageViewLoding(mActivity, product1.getImages(), img1, R.drawable.empty_img, R.drawable.empty_img);
+                            }
+                            if (recommendlist.size()==2){
+                                goods1Ll.setVisibility(View.VISIBLE);
+                                good2Ll.setVisibility(View.VISIBLE);
+                                goods3Ll.setVisibility(View.INVISIBLE);
+                                product1 = recommendlist.get(0);
+                                name1.setText(product1.getName());
+                                price1.setText(Html.fromHtml("<small>¥ </small><big><b>"+product1.getPrice().substring(0,product1.getPrice().indexOf("."))+"</b></big><small><b>"+product1.getPrice().substring(product1.getPrice().indexOf("."),product1.getPrice().length())+"</b></small>"));
+                                GlideUtil.loadImageViewLoding(mActivity, product1.getImages(), img1, R.drawable.empty_img, R.drawable.empty_img);
+                                product2 = recommendlist.get(1);
                                 name2.setText(product2.getName());
-                                price2.setText("¥" + product2.getPrice());
+                                price2.setText(Html.fromHtml("<small>¥ </small><big><b>"+product2.getPrice().substring(0,product2.getPrice().indexOf("."))+"</b></big><small><b>"+product2.getPrice().substring(product2.getPrice().indexOf("."),product2.getPrice().length())+"</b></small>"));
                                 GlideUtil.loadImageViewLoding(mActivity, product2.getImages(), img2, R.drawable.empty_img, R.drawable.empty_img);
+                            }
+                            if (recommendlist.size() == 3) {
+                                goods1Ll.setVisibility(View.VISIBLE);
+                                good2Ll.setVisibility(View.VISIBLE);
+                                goods3Ll.setVisibility(View.VISIBLE);
+                                product1 = recommendlist.get(0);
+                                name1.setText(product1.getName());
+                                price1.setText(Html.fromHtml("<small>¥ </small><big><b>"+product1.getPrice().substring(0,product1.getPrice().indexOf("."))+"</b></big><small><b>"+product1.getPrice().substring(product1.getPrice().indexOf("."),product1.getPrice().length())+"</b></small>"));
+                                GlideUtil.loadImageViewLoding(mActivity, product1.getImages(), img1, R.drawable.empty_img, R.drawable.empty_img);
+                                product2 = recommendlist.get(1);
+                                name2.setText(product2.getName());
+                                price2.setText(Html.fromHtml("<small>¥ </small><big><b>"+product2.getPrice().substring(0,product2.getPrice().indexOf("."))+"</b></big><small><b>"+product2.getPrice().substring(product2.getPrice().indexOf("."),product2.getPrice().length())+"</b></small>"));
+                                GlideUtil.loadImageViewLoding(mActivity, product2.getImages(), img2, R.drawable.empty_img, R.drawable.empty_img);
+                                product3 = recommendlist.get(2);
                                 name3.setText(product3.getName());
-                                price3.setText("¥" + product3.getPrice());
+                                price3.setText(Html.fromHtml("<small>¥ </small><big><b>"+product3.getPrice().substring(0,product3.getPrice().indexOf("."))+"</b></big><small><b>"+product3.getPrice().substring(product3.getPrice().indexOf("."),product3.getPrice().length())+"</b></small>"));
                                 GlideUtil.loadImageViewLoding(mActivity, product3.getImages(), img3, R.drawable.empty_img, R.drawable.empty_img);
                             }
 

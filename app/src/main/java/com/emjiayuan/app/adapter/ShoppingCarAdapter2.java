@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -130,6 +131,7 @@ public class ShoppingCarAdapter2 extends BaseAdapter {
         GlideUtil.loadImageViewLoding(mContext,item.getImages(),holder.icon,R.drawable.empty_img,R.drawable.empty_img);
         holder.name.setText(item.getName());
         holder.price.setText("¥"+item.getPrice());
+//        holder.price.setText(Html.fromHtml("<small>¥ </small><big><big>"+item.getPrice().substring(0,item.getPrice().indexOf("."))+"</big></big><small>"+item.getPrice().substring(item.getPrice().indexOf("."),item.getPrice().length())+"</small>"));
         holder.et_count.setText(""+count);
         holder.up.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -20,6 +20,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="今日特价"
+            android:textStyle="bold"
             android:textColor="@color/black" />
 
         <ImageView
@@ -31,7 +32,7 @@
     </LinearLayout>
     <View
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="0.5dp"
         android:background="#C4C4C4"/>
     <LinearLayout
         android:layout_width="match_parent"
@@ -142,7 +143,7 @@
             </LinearLayout>
             <View
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
+                android:layout_height="0.5dp"
                 android:background="#C4C4C4"/>
             <LinearLayout
                 android:id="@+id/goods3_ll"

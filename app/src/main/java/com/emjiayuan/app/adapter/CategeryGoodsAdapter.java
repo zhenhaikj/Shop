@@ -1,6 +1,7 @@
 package com.emjiayuan.app.adapter;
 
 import android.content.Context;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,7 +70,7 @@ public class CategeryGoodsAdapter extends BaseAdapter {
 //        holder.icon.setImageResource(R.drawable.img1);
         holder.name.setText(item.getName());
         holder.yh.setText("¥"+item.getPrice());
-
+//        holder.yh.setText(Html.fromHtml("<small>¥ </small><big><big>"+item.getPrice().substring(0,item.getPrice().indexOf("."))+"</big></big><small>"+item.getPrice().substring(item.getPrice().indexOf("."),item.getPrice().length())+"</small>"));
         return convertView;
     }
 

@@ -90,6 +90,15 @@ public class HomeAdapter extends BaseAdapter {
                 mContext.startActivity(intent);
             }
         });
+//        if (products.getProduct_list().size()<2){
+        if ("0".equals(products.getType())){
+            holder.gvGoods.setNumColumns(1);
+        }else if ("1".equals(products.getType())){
+            holder.gvGoods.setNumColumns(2);
+        }else if ("2".equals(products.getType())){
+            holder.gvGoods.setNumColumns(3);
+        }
+
         holder.gvGoods.setAdapter(new TwzqAdapter(mContext, products.getProduct_list()));
         holder.gvGoods.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

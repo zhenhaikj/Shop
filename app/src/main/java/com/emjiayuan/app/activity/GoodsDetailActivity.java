@@ -7,6 +7,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -210,6 +211,7 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
         if (flag) {
             bean = product.getPromotioninfo();
             price.setText("¥" + bean.getPriceX());
+//            price.setText(Html.fromHtml("<small>¥ </small><big><big>"+bean.getPriceX().substring(0,bean.getPriceX().indexOf("."))+"</big></big><small>"+bean.getPriceX().substring(bean.getPriceX().indexOf("."),bean.getPriceX().length())+"</small>"));
             old_price.setText("¥" + product.getPreprice());
             double yh = Double.parseDouble(product.getPreprice()) - Double.parseDouble(bean.getPriceX());
             youhui.setText("优惠" + yh + "元");
@@ -255,6 +257,7 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
             });
         } else {
             price.setText("¥" + product.getPrice());
+//            price.setText(Html.fromHtml("<small>¥ </small><big><big>"+product.getPrice().substring(0,product.getPrice().indexOf("."))+"</big></big><small>"+product.getPrice().substring(product.getPrice().indexOf("."),product.getPrice().length())+"</small>"));
             old_price.setText("¥" + product.getPreprice());
         }
         name.setText(product.getName());

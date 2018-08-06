@@ -1,6 +1,7 @@
 package com.emjiayuan.app.adapter;
 
 import android.content.Context;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -103,6 +104,7 @@ public class CollectionAdapter extends BaseAdapter {
         holder.name.setText(item.getName());
 //        holder.check.setText(item.getYh());
         holder.price.setText("¥"+item.getPrice());
+//        holder.price.setText(Html.fromHtml("<small>¥ </small><big><big>"+item.getPrice().substring(0,item.getPrice().indexOf("."))+"</big></big><small>"+item.getPrice().substring(item.getPrice().indexOf("."),item.getPrice().length())+"</small>"));
         if (flag){
             holder.check.setVisibility(View.VISIBLE);
         }else{

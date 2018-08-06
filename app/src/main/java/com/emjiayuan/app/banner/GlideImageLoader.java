@@ -4,7 +4,9 @@ import android.content.Context;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.emjiayuan.app.R;
 import com.youth.banner.loader.ImageLoader;
 
 public class GlideImageLoader extends ImageLoader {
@@ -20,10 +22,12 @@ public class GlideImageLoader extends ImageLoader {
 //        eg：
 
         //Glide 加载图片简单用法
-//        RequestOptions options=new RequestOptions();
-//        options.override(750,250);
-//        Glide.with(context).load(path).apply(options).into(imageView);
-        Glide.with(context).load(path).into(imageView);
+        RequestOptions options=new RequestOptions();
+        options.diskCacheStrategy(DiskCacheStrategy.ALL);
+        options.error(R.drawable.banner_home);
+        options.placeholder(R.drawable.banner_home);
+        Glide.with(context).load(path).apply(options).into(imageView);
+//        Glide.with(context).load(path).into(imageView);
 
         //Picasso 加载图片简单用法
 //        Picasso.with(context).load(path).into(imageView);

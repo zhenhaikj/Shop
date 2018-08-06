@@ -2,6 +2,7 @@ package com.emjiayuan.app.adapter;
 
 import android.content.Context;
 import android.graphics.Paint;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,7 +69,7 @@ public class TwzqAdapter extends BaseAdapter {
         GlideUtil.loadImageViewLoding(mContext,item.getImages(),holder.icon,R.drawable.empty_img,R.drawable.empty_img);
         holder.icon.setImageResource(R.drawable.img3);
         holder.name.setText(item.getName());
-        holder.yh.setText("¥"+item.getPrice());
+        holder.yh.setText(Html.fromHtml("<small>¥ </small><big><big>"+item.getPrice().substring(0,item.getPrice().indexOf("."))+"</big></big><small>"+item.getPrice().substring(item.getPrice().indexOf("."),item.getPrice().length())+"</small>"));
 
         return convertView;
     }

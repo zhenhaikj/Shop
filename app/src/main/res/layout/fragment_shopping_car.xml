@@ -129,6 +129,7 @@
                         android:layout_weight="1"
                         android:gravity="right|center"
                         android:text="¥00.00"
+                        android:textStyle="bold"
                         android:textColor="#FE5600"
                         android:textSize="15sp" />
 
