@@ -41,7 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="50dp"
             android:layout_marginTop="10dp"
-            android:textSize="12dp"
+            android:textSize="13sp"
             android:text="伊穆家园 甄选 纯大料 整箱15斤 一箱6袋"
             android:textColor="@color/black" />
 
@@ -58,6 +58,7 @@
                 android:layout_weight="1"
                 android:gravity="left|center"
                 android:text="¥675.00"
+                android:textSize="13sp"
                 android:textColor="#FF5500" />
 
             <LinearLayout
@@ -90,7 +91,7 @@
                     android:gravity="center"
                     android:inputType="number"
                     android:singleLine="true"
-                    android:textSize="15dp"
+                    android:textSize="13sp"
                     android:text="1"
                     android:textColor="@color/black" />
 

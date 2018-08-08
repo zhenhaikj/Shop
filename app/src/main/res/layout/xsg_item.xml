@@ -35,7 +35,7 @@
         <LinearLayout
             android:id="@+id/seckill_ll"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
+            android:layout_height="20dp"
             android:background="@drawable/second_kill_bar"
             android:layout_gravity="bottom"
             android:gravity="center_vertical"
@@ -47,7 +47,7 @@
                 android:text="即将开抢"
                 android:textColor="@color/white"
                 android:layout_marginLeft="10dp"
-                android:textSize="13sp" />
+                android:textSize="10sp" />
             <TextView
                 android:id="@+id/message"
                 android:layout_width="wrap_content"
@@ -58,7 +58,7 @@
                 android:textColor="@color/white"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:textSize="10sp" />
+                android:textSize="7sp" />
 
         </LinearLayout>
     </FrameLayout>

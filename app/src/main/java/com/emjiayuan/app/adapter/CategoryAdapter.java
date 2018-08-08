@@ -71,7 +71,8 @@ public class CategoryAdapter extends BaseAdapter {
         Products item = grouplists.get(position);
         holder.content.setText(item.getName());
         if (selectItem==position) {
-            holder.content.setTextColor(Color.parseColor("#00FF99"));
+//            holder.content.setTextColor(Color.parseColor("#00FF99"));
+            holder.content.setTextColor(Color.parseColor("#52C55A"));
             holder.content.setBackgroundResource(R.drawable.layout_line_left);
         } else {
             holder.content.setTextColor(Color.parseColor("#000000"));

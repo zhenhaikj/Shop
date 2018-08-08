@@ -119,7 +119,7 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:textColor="@drawable/tab_menu_home_text"
-                android:textSize="10dp"
+                android:textSize="10sp"
                 android:text="我的"/>
         </LinearLayout>
 

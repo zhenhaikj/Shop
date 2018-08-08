@@ -87,7 +87,7 @@
                                     android:layout_height="match_parent"
                                     android:text="超级会员"
                                     android:textColor="@color/white"
-                                    android:textSize="15dp" />
+                                    android:textSize="15sp" />
 
                                 <TextView
                                     android:layout_width="match_parent"
@@ -102,7 +102,7 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="60dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:background="@color/white"
                     android:gravity="center"
@@ -129,7 +129,9 @@
 
                     <View
                         android:layout_width="1dp"
-                        android:layout_height="40dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
                         android:background="#DFDFDF" />
 
                     <LinearLayout
@@ -227,7 +229,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="我的订单"
-                            android:textSize="15dp"
+                            android:textSize="15sp"
                             android:textColor="@color/black" />
 
                         <ImageView
@@ -364,7 +366,7 @@
                             android:layout_weight="1"
                             android:text="伊穆工具"
                             android:textColor="@color/black"
-                            android:textSize="15dp"/>
+                            android:textSize="15sp"/>
                     </LinearLayout>
 
                     <View
@@ -417,7 +419,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="10dp"
-                                android:textSize="11dp"
+                                android:textSize="11sp"
                                 android:text="我要吐槽"
                                 android:textColor="#808080" />
                         </LinearLayout>
@@ -439,7 +441,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="10dp"
-                                android:textSize="11dp"
+                                android:textSize="11sp"
                                 android:text="企业介绍"
                                 android:textColor="#808080" />
                         </LinearLayout>
@@ -461,7 +463,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="10dp"
-                                android:textSize="11dp"
+                                android:textSize="11sp"
                                 android:text="物流查询"
                                 android:textColor="#808080" />
                         </LinearLayout>
@@ -495,7 +497,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="10dp"
-                                android:textSize="11dp"
+                                android:textSize="11sp"
                                 android:text="地址"
                                 android:textColor="#808080" />
                         </LinearLayout>
@@ -517,7 +519,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="10dp"
-                                android:textSize="11dp"
+                                android:textSize="11sp"
                                 android:text="客服"
                                 android:textColor="#808080" />
                         </LinearLayout>
@@ -539,7 +541,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="10dp"
-                                android:textSize="11dp"
+                                android:textSize="11sp"
                                 android:text="帮助"
                                 android:textColor="#808080" />
                         </LinearLayout>
@@ -561,7 +563,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="10dp"
-                                android:textSize="11dp"
+                                android:textSize="11sp"
                                 android:text="设置"
                                 android:textColor="#808080" />
                         </LinearLayout>
