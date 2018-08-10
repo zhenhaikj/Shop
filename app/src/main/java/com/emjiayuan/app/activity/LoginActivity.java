@@ -21,6 +21,7 @@ import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.LoginResult;
 import com.emjiayuan.app.event.UpdateEvent;
+import com.umeng.analytics.MobclickAgent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
@@ -130,6 +131,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                         String data = jsonObject.getString("data");
                         if ("200".equals(code)) {
                             Global.loginResult = new Gson().fromJson(data, LoginResult.class);
+                            //当用户使用自有账号登录时，可以这样统计：
+                            MobclickAgent.onProfileSignIn(Global.loginResult.getId());
                             SpUtils.putObject(mActivity,"loginResult",Global.loginResult);
                             MyUtils.showToast(LoginActivity.this, message);
                             EventBus.getDefault().post(new UpdateEvent("update"));

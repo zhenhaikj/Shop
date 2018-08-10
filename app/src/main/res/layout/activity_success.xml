@@ -40,5 +40,13 @@
             android:text="查看订单"
             android:layout_marginTop="10dp"
             android:textColor="#4BC354"/>
+        <Button
+            android:id="@+id/share_order"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:background="@drawable/see_order"
+            android:text="分享"
+            android:layout_marginTop="10dp"
+            android:textColor="#4BC354"/>
     </LinearLayout>
 </LinearLayout>

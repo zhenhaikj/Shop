@@ -543,6 +543,7 @@ public class OrderConfirmActivity extends BaseActivity implements View.OnClickLi
                             MyUtils.showToast(mActivity, message);
                             Intent intent = new Intent(mActivity, SuccessActivity.class);
                             intent.putExtra("orderid", orderid);
+                            intent.putExtra("product", orderComfirm.getProducts().get(0));
 //                            intent.putExtra("type", 0);
                             startActivity(intent);
                             finish();
@@ -868,6 +869,7 @@ public class OrderConfirmActivity extends BaseActivity implements View.OnClickLi
 				builder.show();*/
                 Intent intent = new Intent(mActivity, SuccessActivity.class);
                 intent.putExtra("orderid", orderid);
+                intent.putExtra("product", orderComfirm.getProducts().get(0));
 //                            intent.putExtra("type", 0);
                 startActivity(intent);
                 finish();

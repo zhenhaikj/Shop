@@ -13,6 +13,7 @@ import android.view.inputmethod.InputMethodManager;
 import com.alipay.sdk.app.EnvUtils;
 import com.emjiayuan.app.Utils.HandleBackUtil;
 import com.gyf.barlibrary.ImmersionBar;
+import com.umeng.analytics.MobclickAgent;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -116,4 +117,15 @@ public abstract class BaseActivity extends SwipeBackActivity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MobclickAgent.onResume(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MobclickAgent.onPause(this);
+    }
 }

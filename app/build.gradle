@@ -27,11 +27,29 @@ android {
     buildTypes {
         release {
             minifyEnabled false
+            signingConfig signingConfigs.debug
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            aaptOptions.cruncherEnabled = false
+            aaptOptions.useNewCruncher = false
+        }
+        debug {
+            minifyEnabled false
+            signingConfig signingConfigs.debug
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             aaptOptions.cruncherEnabled = false
             aaptOptions.useNewCruncher = false
         }
     }
+
+    signingConfigs {
+        debug {
+            storeFile file('e5eec8c0a44dd666bc6681da2ee33d05.keystore')
+            storePassword "53LRMyZR"
+            keyAlias "android_emjiayuankey"
+            keyPassword "53LRMyZR"
+        }
+    }
+
     /**位置 要在Android中 百度地图的定位设置*/
     sourceSets {
 
@@ -53,6 +71,7 @@ android {
 }
 
 dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     implementation 'com.android.support:support-v4:26.1.0'
@@ -70,10 +89,10 @@ dependencies {
     compile 'com.camnter.easycountdowntextureview:library:1.1'
     compile 'com.github.castorflex.verticalviewpager:library:19.0.1'
     compile 'com.android.support:recyclerview-v7:25.3.1'
-    compile files('libs/alipaySdk-20180403.jar')
+//    compile files('libs/alipaySdk-20180403.jar')
     implementation project(':CountdownView')
     compile 'com.baoyz.swipemenulistview:library:1.3.0'
-    implementation files('libs/BaiduLBS_Android.jar')
+//    implementation files('libs/BaiduLBS_Android.jar')
     compile 'com.gyf.barlibrary:barlibrary:2.3.0'
     //注解
     implementation 'com.jakewharton:butterknife:8.4.0'
@@ -82,7 +101,7 @@ dependencies {
     compile 'com.lwkandroid:StateFrameLayout:1.0.1'
     //评分控件
     compile 'com.hedgehog.ratingbar:app:1.1.2'
-    implementation files('libs/universal-image-loader-1.9.4-with-sources.jar')
+//    implementation files('libs/universal-image-loader-1.9.4-with-sources.jar')
     compile 'com.github.chrisbanes:PhotoView:1.3.0'
     compile 'pl.droidsonroids.gif:android-gif-drawable:1.2.12'
     //万能适配器
@@ -91,23 +110,22 @@ dependencies {
     compile 'com.github.addappcn:android-pickers:1.0.3'
     //    implementation 'liji.library.dev:citypickerview:3.1.8'
     //    compile 'com.belerweb:pinyin4j:2.5.0'
-    implementation files('libs/pinyin4j-2.5.0.jar')
+//    implementation files('libs/pinyin4j-2.5.0.jar')
     compile 'com.alibaba:fastjson:1.1.56.android'
     //上拉加载下拉刷新
     compile 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.1'
     compile 'com.scwang.smartrefresh:SmartRefreshHeader:1.0.1'
     //如果使用了特殊的Header
-    implementation files('libs/wechat-sdk-android-with-mta-1.0.2.jar')
+//    implementation files('libs/wechat-sdk-android-with-mta-1.0.2.jar')
     implementation 'com.android.support:design:27.1.1'
     compile 'com.github.hackware1993:MagicIndicator:1.5.0'
-    implementation files('libs/tbs_sdk_thirdapp_v3.6.0.1249_43610_sharewithdownload_withoutGame_obfs_20180608_114954.jar')
+//    implementation files('libs/tbs_sdk_thirdapp_v3.6.0.1249_43610_sharewithdownload_withoutGame_obfs_20180608_114954.jar')
     compile 'me.iwf.photopicker:PhotoPicker:0.9.12@aar'
     //图片裁切
     compile 'com.yalantis:ucrop:1.4.1'
-
     // 最新版本可参考 Download 徽章后对应的数值
-    compile 'com.qiyukf.unicorn:unicorn:+'//网易七鱼客服
-
+    compile 'com.qiyukf.unicorn:unicorn:+'
+    //网易七鱼客服
     //信鸽jar
     compile 'com.tencent.xinge:xinge:3.2.3-release'
     //wup包

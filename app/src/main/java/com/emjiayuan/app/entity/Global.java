@@ -7,6 +7,7 @@ import cn.addapp.pickers.entity.Province;
 
 public class Global {
     public static LoginResult loginResult;
+    public static APPTheme appTheme;
     public static String location_name="";
     public static String provinceid="0";
     public static String device_no="";

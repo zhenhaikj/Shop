@@ -34,6 +34,7 @@ import com.emjiayuan.app.Utils.SpUtils;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.User;
 import com.google.gson.Gson;
+import com.umeng.analytics.MobclickAgent;
 import com.yalantis.ucrop.UCrop;
 
 import org.json.JSONObject;
@@ -418,6 +419,8 @@ public class SettingActivity extends BaseActivity {
                 SpUtils.putObject(mActivity, "loginResult", Global.loginResult);
                 startActivity(new Intent(mActivity, LoginActivity.class));
                 finish();
+                //登出
+                MobclickAgent.onProfileSignOff();
             }
         });
         tx.setOnClickListener(new View.OnClickListener() {

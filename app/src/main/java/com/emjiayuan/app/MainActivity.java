@@ -1,36 +1,47 @@
 package com.emjiayuan.app;
 
-import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
-
-import com.baidu.location.BDLocation;
-import com.baidu.location.BDLocationListener;
-import com.baidu.location.LocationClient;
-import com.baidu.location.LocationClientOption;
+import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
+import com.emjiayuan.app.Utils.SpUtils;
 import com.emjiayuan.app.activity.LoginActivity;
+import com.emjiayuan.app.entity.APPTheme;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.fragment.Classify.ClassifyFragment2;
-import com.emjiayuan.app.fragment.Community.CommunityFragment;
 import com.emjiayuan.app.fragment.Community.CommunityFragment2;
 import com.emjiayuan.app.fragment.HomeFragment;
 import com.emjiayuan.app.fragment.Personal.PersonalFragment;
 import com.emjiayuan.app.fragment.ShoppingCar.ShoppingCarFragment;
 import com.emjiayuan.app.widget.CustomViewPager;
+import com.google.gson.Gson;
 
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 import butterknife.BindView;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.Response;
 
 /**
  * Created by geyifeng on 2017/5/8.
@@ -50,13 +61,34 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     LinearLayout ll_car;
     @BindView(R.id.ll_mine)
     LinearLayout ll_mine;
+    @BindView(R.id.img_home)
+    ImageView imgHome;
+    @BindView(R.id.tv_home)
+    TextView tvHome;
+    @BindView(R.id.img_cate)
+    ImageView imgCate;
+    @BindView(R.id.tv_cate)
+    TextView tvCate;
+    @BindView(R.id.img_sq)
+    ImageView imgSq;
+    @BindView(R.id.tv_sq)
+    TextView tvSq;
+    @BindView(R.id.img_cart)
+    ImageView imgCart;
+    @BindView(R.id.tv_cart)
+    TextView tvCart;
+    @BindView(R.id.img_my)
+    ImageView imgMy;
+    @BindView(R.id.tv_my)
+    TextView tvMy;
+    @BindView(R.id.tab_menu)
+    LinearLayout tabMenu;
     private ArrayList<Fragment> mFragments;
     private HomeFragment homeFragment;
     private ClassifyFragment2 classifyFragment2;
     private CommunityFragment2 communityFragment;
     public static ShoppingCarFragment shoppingCarFragment;
     private PersonalFragment personalFragment;
-
 
 
     @Override
@@ -85,6 +117,102 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         viewPager.setOffscreenPageLimit(5);
         viewPager.setScroll(false);
         ll_home.setSelected(true);
+        getAppTheme();
+    }
+
+
+    public void getAppTheme() {
+        FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
+
+        Log.d("------参数------", formBody.build().toString());
+//new call
+        Call call = MyOkHttp.GetCall("system.getAppTheme", formBody);
+//请求加入调度
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("------------", e.toString());
+//                        myHandler.sendEmptyMessage(1);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String result = response.body().string();
+                MyUtils.e("------获取主题结果------", result);
+                Message message = new Message();
+                message.what = 0;
+                Bundle bundle = new Bundle();
+                bundle.putString("result", result);
+                message.setData(bundle);
+                myHandler.sendMessage(message);
+            }
+        });
+    }
+
+    Handler myHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            Bundle bundle = msg.getData();
+            String result = bundle.getString("result");
+            switch (msg.what) {
+                case 0:
+                    try {
+                        JSONObject jsonObject = new JSONObject(result);
+                        String code = jsonObject.getString("code");
+                        String message = jsonObject.getString("message");
+                        String data = jsonObject.getString("data");
+                        Gson gson = new Gson();
+                        if ("200".equals(code)) {
+                            Global.appTheme = gson.fromJson(data, APPTheme.class);
+                            SpUtils.putObject(mActivity, "appTheme", Global.appTheme);
+                            new Thread(new Runnable(){
+                                @Override
+                                public void run() {
+                                    Drawable dw_home = MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_home().getImg());
+                                    Drawable dw_home_active = MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_home().getImg_active());
+                                    Drawable dw_cate = MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_cate().getImg());
+                                    Drawable dw_cate_active = MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_cate().getImg_active());
+                                    Drawable dw_sq = MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_sq().getImg());
+                                    Drawable dw_sq_active = MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_sq().getImg_active());
+                                    Drawable dw_cart = MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_cart().getImg());
+                                    Drawable dw_cart_active = MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_cart().getImg_active());
+                                    Drawable dw_my = MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_my().getImg());
+                                    Drawable dw_my_active = MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_my().getImg_active());
+                                    setSelector(imgHome,MyUtils.newSelector(mActivity,dw_home,dw_home_active));
+                                    setSelector(imgCate,MyUtils.newSelector(mActivity,dw_cate,dw_cate_active));
+                                    setSelector(imgSq,MyUtils.newSelector(mActivity,dw_sq,dw_sq_active));
+                                    setSelector(imgCart,MyUtils.newSelector(mActivity,dw_cart,dw_cart_active));
+                                    setSelector(imgMy,MyUtils.newSelector(mActivity,dw_my,dw_my_active));
+                                }
+
+                            }).start();
+                            ColorStateList csl=new ColorStateList(new int[][]{new int[] { android.R.attr.state_selected },new int[]{}},new int[]{Color.parseColor(Global.appTheme.getHome_bottom_menu_sq().getColor_active()),Color.parseColor(Global.appTheme.getHome_bottom_menu_sq().getColor())});
+                            tvHome.setTextColor(csl);
+                            tvCate.setTextColor(csl);
+                            tvSq.setTextColor(csl);
+                            tvCart.setTextColor(csl);
+                            tvMy.setTextColor(csl);
+//                            imgHome.setBackground(MyUtils.newSelector(mActivity,R.drawable.home,R.drawable.homex));
+                        } else {
+//                            MyUtils.showToast(mActivity, message);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+            }
+        }
+    };
+    public void setSelector(final ImageView iv, final Drawable dw){
+        // post() 特别关键，就是到UI主线程去更新图片
+        iv.post(new Runnable(){
+            @SuppressLint("NewApi")
+            @Override
+            public void run() {
+                // TODO Auto-generated method stub
+                iv.setBackground(dw);
+            }}) ;
     }
 
     @Override
@@ -99,10 +227,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     @Override
     public void onClick(View v) {
-        if (!MyUtils.isFastClick()){
+        if (!MyUtils.isFastClick()) {
             return;
         }
-        Intent intent=null;
+        Intent intent = null;
         switch (v.getId()) {
             case R.id.ll_home:
                 viewPager.setCurrentItem(0);
@@ -116,11 +244,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 break;
             case R.id.ll_community:
                 if (Global.loginResult == null) {
-                    intent=new Intent(mActivity, LoginActivity.class);
+                    intent = new Intent(mActivity, LoginActivity.class);
 //                    intent.putExtra("type",0);
-                    startActivityForResult(intent,0);
+                    startActivityForResult(intent, 0);
                     return;
-                }else{
+                } else {
                     viewPager.setCurrentItem(2);
                     tabSelected(ll_community);
                 }
@@ -128,11 +256,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 break;
             case R.id.ll_car:
                 if (Global.loginResult == null) {
-                    intent=new Intent(mActivity, LoginActivity.class);
+                    intent = new Intent(mActivity, LoginActivity.class);
 //                    intent.putExtra("type",1);
-                    startActivityForResult(intent,1);
+                    startActivityForResult(intent, 1);
                     return;
-                }else{
+                } else {
 //                    shoppingCarFragment.reqCarList();
                     viewPager.setCurrentItem(3);
                     tabSelected(ll_car);
@@ -140,11 +268,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 break;
             case R.id.ll_mine:
                 if (Global.loginResult == null) {
-                    intent=new Intent(mActivity, LoginActivity.class);
+                    intent = new Intent(mActivity, LoginActivity.class);
 //                    intent.putExtra("type",2);
-                    startActivityForResult(intent,2);
+                    startActivityForResult(intent, 2);
                     return;
-                }else{
+                } else {
                     viewPager.setCurrentItem(4);
                     tabSelected(ll_mine);
 //                    personalFragment.user();
@@ -213,8 +341,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode==RESULT_OK){
-            switch (requestCode){
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
                 case 0:
                     viewPager.setCurrentItem(2);
                     tabSelected(ll_community);
@@ -237,7 +365,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     protected void onRestart() {
         super.onRestart();
         if (Global.loginResult == null) {
-            if (viewPager.getCurrentItem()==4){
+            if (viewPager.getCurrentItem() == 4) {
                 viewPager.setCurrentItem(0);
                 tabSelected(ll_home);
                 homeFragment.request();
@@ -252,8 +380,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     }
 
     @Override
-    public void onBackPressed()
-    {
+    public void onBackPressed() {
         //按返回键返回桌面
         moveTaskToBack(true);
     }

@@ -1,6 +1,7 @@
 package com.emjiayuan.app;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.app.ProgressDialog;
@@ -13,6 +14,8 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -56,6 +59,9 @@ import com.emjiayuan.app.entity.Global;
 import com.tencent.android.tpush.XGIOperateCallback;
 import com.tencent.android.tpush.XGPushConfig;
 import com.tencent.android.tpush.XGPushManager;
+import com.umeng.analytics.MobclickAgent;
+import com.umeng.commonsdk.UMConfigure;
+import com.umeng.socialize.PlatformConfig;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -66,8 +72,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
+import java.net.NetworkInterface;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Locale;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -136,10 +146,32 @@ public class AppApplication extends Application {
         initImageLoader();
 //        getCityList();
         request();
+        Global.appTheme= SpUtils.getObject(getApplicationContext(),"appTheme");
         Global.loginResult= SpUtils.getObject(getApplicationContext(),"loginResult");
         //读取已保存的device_no
         Global.device_no = SpUtils.getString(getApplicationContext(),"device_no");
-
+        //友盟分享
+        UMConfigure.init(this,"5b67c1f2f43e486eb700019e"
+                ,"umeng",UMConfigure.DEVICE_TYPE_PHONE,"");
+        // 打开统计SDK调试模式
+        UMConfigure.setLogEnabled(true);
+        MobclickAgent.setScenarioType(getApplicationContext(), MobclickAgent.EScenarioType.E_UM_NORMAL);
+        getDeviceInfo(getApplicationContext());
+        MobclickAgent.setSecret(getApplicationContext(),"5b67c1f2f43e486eb700019e");
+        //豆瓣RENREN平台目前只能在服务器端配置
+        PlatformConfig.setWeixin("wxf2f4119f13622198", "4b5422fa008f91a285a0f35076e390a3");
+        PlatformConfig.setSinaWeibo("1893959379", "8221f68cb023347a4ca82949143eb3c1","http://sns.whalecloud.com");
+        PlatformConfig.setQQZone("101490469", "92359018ad2cd43ef2614b81ef7b781a");
+//        PlatformConfig.setYixin("yxc0614e80c9304c11b0391514d09f13bf");
+//        PlatformConfig.setTwitter("3aIN7fuF685MuZ7jtXkQxalyi", "MK6FEYG63eWcpDFgRYw4w9puJhzDl0tyuqWjZ3M7XJuuG7mMbO");
+//        PlatformConfig.setAlipay("2015111700822536");
+//        PlatformConfig.setLaiwang("laiwangd497e70d4", "d497e70d4c3e4efeab1381476bac4c5e");
+//        PlatformConfig.setPinterest("1439206");
+//        PlatformConfig.setKakao("e4f60e065048eb031e235c806b31c70f");
+//        PlatformConfig.setDing("dingoalmlnohc0wggfedpk");
+//        PlatformConfig.setVKontakte("5764965","5My6SNliAaLxEm3Lyd9J");
+//        PlatformConfig.setDropbox("oz8v5apet3arcdy","h7p2pjbzkkxt02a");
+//        PlatformConfig.setYnote("9c82bf470cba7bd2f1819b0ee26f86c6ce670e9b");
     }
     // 如果返回值为null，则全部使用默认参数。
     private YSFOptions options() {
@@ -281,6 +313,121 @@ public class AppApplication extends Application {
             }
         }
     };
+
+
+    public static String getDeviceInfo(Context context) {
+        try {
+            org.json.JSONObject json = new org.json.JSONObject();
+            android.telephony.TelephonyManager tm = (android.telephony.TelephonyManager) context
+                    .getSystemService(Context.TELEPHONY_SERVICE);
+            String device_id = null;
+            if (checkPermission(context, Manifest.permission.READ_PHONE_STATE)) {
+                device_id = tm.getDeviceId();
+            }
+            String mac = getMac(context);
+
+            json.put("mac", mac);
+            if (TextUtils.isEmpty(device_id)) {
+                device_id = mac;
+            }
+            if (TextUtils.isEmpty(device_id)) {
+                device_id = android.provider.Settings.Secure.getString(context.getContentResolver(),
+                        android.provider.Settings.Secure.ANDROID_ID);
+            }
+            json.put("device_id", device_id);
+            return json.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static String getMac(Context context) {
+        String mac = "";
+        if (context == null) {
+            return mac;
+        }
+        if (Build.VERSION.SDK_INT < 23) {
+            mac = getMacBySystemInterface(context);
+        } else {
+            mac = getMacByJavaAPI();
+            if (TextUtils.isEmpty(mac)){
+                mac = getMacBySystemInterface(context);
+            }
+        }
+        return mac;
+
+    }
+
+    @TargetApi(9)
+    private static String getMacByJavaAPI() {
+        try {
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            while (interfaces.hasMoreElements()) {
+                NetworkInterface netInterface = interfaces.nextElement();
+                if ("wlan0".equals(netInterface.getName()) || "eth0".equals(netInterface.getName())) {
+                    byte[] addr = netInterface.getHardwareAddress();
+                    if (addr == null || addr.length == 0) {
+                        return null;
+                    }
+                    StringBuilder buf = new StringBuilder();
+                    for (byte b : addr) {
+                        buf.append(String.format("%02X:", b));
+                    }
+                    if (buf.length() > 0) {
+                        buf.deleteCharAt(buf.length() - 1);
+                    }
+                    return buf.toString().toLowerCase(Locale.getDefault());
+                }
+            }
+        } catch (Throwable e) {
+        }
+        return null;
+    }
+
+    private static String getMacBySystemInterface(Context context) {
+        if (context == null) {
+            return "";
+        }
+        try {
+            WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+            if (checkPermission(context, Manifest.permission.ACCESS_WIFI_STATE)) {
+                WifiInfo info = wifi.getConnectionInfo();
+                return info.getMacAddress();
+            } else {
+                return "";
+            }
+        } catch (Throwable e) {
+            return "";
+        }
+    }
+
+    public static boolean checkPermission(Context context, String permission) {
+        boolean result = false;
+        if (context == null) {
+            return result;
+        }
+        if (Build.VERSION.SDK_INT >= 23) {
+            try {
+                Class<?> clazz = Class.forName("android.content.Context");
+                Method method = clazz.getMethod("checkSelfPermission", String.class);
+                int rest = (Integer) method.invoke(context, permission);
+                if (rest == PackageManager.PERMISSION_GRANTED) {
+                    result = true;
+                } else {
+                    result = false;
+                }
+            } catch (Throwable e) {
+                result = false;
+            }
+        } else {
+            PackageManager pm = context.getPackageManager();
+            if (pm.checkPermission(permission, context.getPackageName()) == PackageManager.PERMISSION_GRANTED) {
+                result = true;
+            }
+        }
+        return result;
+    }
 
     /**
      * 重写 getResource 方法，防止系统字体影响

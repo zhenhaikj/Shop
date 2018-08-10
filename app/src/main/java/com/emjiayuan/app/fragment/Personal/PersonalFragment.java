@@ -1,8 +1,10 @@
 package com.emjiayuan.app.fragment.Personal;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -40,7 +42,6 @@ import com.emjiayuan.app.entity.User;
 import com.emjiayuan.app.event.UpdateEvent;
 import com.emjiayuan.app.fragment.BaseLazyFragment;
 import com.google.gson.Gson;
-import com.gyf.barlibrary.ImmersionBar;
 import com.qiyukf.unicorn.api.ConsultSource;
 import com.qiyukf.unicorn.api.Unicorn;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
@@ -119,6 +120,8 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
     TextView count;
     @BindView(R.id.refreshLayout)
     SmartRefreshLayout refreshLayout;
+    @BindView(R.id.my_top)
+    LinearLayout myTop;
 
 
     @Override
@@ -157,6 +160,20 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
                 user();
             }
         });
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final Drawable dw=MyUtils.loadImageFromNetwork(Global.appTheme.getUser_top_img());
+                // post() 特别关键，就是到UI主线程去更新图片
+                myTop.post(new Runnable(){
+                    @SuppressLint("NewApi")
+                    @Override
+                    public void run() {
+                        // TODO Auto-generated method stub
+                        myTop.setBackground(dw);
+                    }}) ;
+            }
+        }).start();
     }
 
     @Override
@@ -435,7 +452,7 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
 
     private void setData() {
         nickname.setText(user.getShowname());
-        vip.setText(user.getClassname() + "(购物享受" + Double.parseDouble(user.getDiscount())/10 + "折)");
+        vip.setText(user.getClassname() + "(购物享受" + Double.parseDouble(user.getDiscount()) / 10 + "折)");
         balance.setText(user.getYue());
         integral.setText(user.getJifen());
         count.setText(user.getCouponcount());
@@ -476,7 +493,7 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
 //        Uri sourceUri = Uri.parse("http://star.xiziwang.net/uploads/allimg/140512/19_140512150412_1.jpg");
         //裁剪后保存到文件中
         Uri destinationUri = Uri.fromFile(new File(mActivity.getCacheDir(), "SampleCropImage.png"));
-        UCrop.of(sourceUri, destinationUri).withAspectRatio(1, 1).withMaxResultSize(300, 300).start(mActivity,this);
+        UCrop.of(sourceUri, destinationUri).withAspectRatio(1, 1).withMaxResultSize(300, 300).start(mActivity, this);
     }
 
     @Override

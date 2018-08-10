@@ -1,10 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/fragment_home_bg"
     android:orientation="vertical">
+    <com.scwang.smartrefresh.layout.SmartRefreshLayout
+        android:id="@+id/refreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <com.lwkandroid.stateframelayout.StateFrameLayout
+            android:id="@+id/stateLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:enableContentAnim="true"
+            app:emptyLayoutResId="@layout/layout_empty_car"
+            app:netErrorLayoutResId="@layout/layout_net_error"
+            app:loadingLayoutResId="@layout/layout_loading">
+            <com.emjiayuan.app.widget.ObservableScrollView
+                android:id="@+id/sv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+                    <include layout="@layout/top" />
+                    <include layout="@layout/menu" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/line_height"
+                        android:background="@color/line_color"/>
+                    <include layout="@layout/toutiao" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/line_height"
+                        android:background="@color/line_color"/>
+                    <include layout="@layout/tlzq" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/line_height"
+                        android:background="@color/line_color"/>
+                    <include layout="@layout/specials" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/line_height"
+                        android:background="@color/line_color"/>
+                    <com.emjiayuan.app.widget.MyListView
+                        android:id="@+id/lv_home"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:dividerHeight="10dp"
+                        android:divider="@color/fragment_home_bg"/>
+
+                </LinearLayout>
+            </com.emjiayuan.app.widget.ObservableScrollView>
+        </com.lwkandroid.stateframelayout.StateFrameLayout>
+    </com.scwang.smartrefresh.layout.SmartRefreshLayout>
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -14,7 +70,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:background="@drawable/color_shape"
             android:orientation="horizontal">
             <LinearLayout
                 android:id="@+id/ll_search"
@@ -70,59 +125,4 @@
             </LinearLayout>
         </LinearLayout>
     </android.support.v7.widget.Toolbar>
-    <com.scwang.smartrefresh.layout.SmartRefreshLayout
-        android:id="@+id/refreshLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <com.lwkandroid.stateframelayout.StateFrameLayout
-            android:id="@+id/stateLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            app:enableContentAnim="true"
-            app:emptyLayoutResId="@layout/layout_empty_car"
-            app:netErrorLayoutResId="@layout/layout_net_error"
-            app:loadingLayoutResId="@layout/layout_loading">
-            <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scrollbars="none">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-                    <include layout="@layout/top" />
-                    <include layout="@layout/menu" />
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/line_height"
-                        android:background="@color/line_color"/>
-                    <include layout="@layout/toutiao" />
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/line_height"
-                        android:background="@color/line_color"/>
-                    <include layout="@layout/tlzq" />
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/line_height"
-                        android:background="@color/line_color"/>
-                    <include layout="@layout/specials" />
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/line_height"
-                        android:background="@color/line_color"/>
-                    <com.emjiayuan.app.widget.MyListView
-                        android:id="@+id/lv_home"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:dividerHeight="10dp"
-                        android:divider="@color/fragment_home_bg"/>
-
-                </LinearLayout>
-            </ScrollView>
-        </com.lwkandroid.stateframelayout.StateFrameLayout>
-    </com.scwang.smartrefresh.layout.SmartRefreshLayout>
-</LinearLayout>
+</FrameLayout>

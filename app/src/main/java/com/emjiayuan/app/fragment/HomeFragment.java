@@ -8,13 +8,16 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.support.annotation.RequiresApi;
 import android.support.v4.content.FileProvider;
+import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
@@ -34,6 +37,7 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
+import com.emjiayuan.app.MainActivity;
 import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.DownLoadManager;
 import com.emjiayuan.app.Utils.GlideUtil;
@@ -44,7 +48,6 @@ import com.emjiayuan.app.activity.CityActivity;
 import com.emjiayuan.app.activity.CouponGetActivity;
 import com.emjiayuan.app.activity.GoodsDetailActivity;
 import com.emjiayuan.app.activity.IntegralYlActivity;
-import com.emjiayuan.app.activity.LoginActivity;
 import com.emjiayuan.app.activity.LogisticsActivity;
 import com.emjiayuan.app.activity.MessageActivity;
 import com.emjiayuan.app.activity.MessageDetailActivity;
@@ -56,13 +59,11 @@ import com.emjiayuan.app.activity.SpecialActivity;
 import com.emjiayuan.app.activity.TldzActivity;
 import com.emjiayuan.app.activity.TlzqActivity;
 import com.emjiayuan.app.activity.TopUpActivity;
-import com.emjiayuan.app.activity.address.AddressActivity;
 import com.emjiayuan.app.adapter.HomeAdapter;
 import com.emjiayuan.app.adapter.MenuAdapter;
 import com.emjiayuan.app.adapter.TlzqAdapter;
 import com.emjiayuan.app.adapter.XsgAdapter;
 import com.emjiayuan.app.banner.GlideImageLoader;
-import com.emjiayuan.app.entity.Address;
 import com.emjiayuan.app.entity.BannerItem;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.MenuItem;
@@ -73,10 +74,16 @@ import com.emjiayuan.app.entity.SeckillBean;
 import com.emjiayuan.app.event.UpdateEvent;
 import com.emjiayuan.app.widget.MyGridView;
 import com.emjiayuan.app.widget.MyListView;
+import com.emjiayuan.app.widget.ObservableScrollView;
+import com.emjiayuan.app.widget.OnScrollChangedCallback;
 import com.google.gson.Gson;
 import com.lwkandroid.stateframelayout.StateFrameLayout;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshFooter;
+import com.scwang.smartrefresh.layout.api.RefreshHeader;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.constant.RefreshState;
+import com.scwang.smartrefresh.layout.listener.OnMultiPurposeListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.youth.banner.Banner;
 
@@ -99,7 +106,7 @@ import okhttp3.FormBody;
 import okhttp3.Response;
 
 
-public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItemClickListener, View.OnClickListener {
+public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItemClickListener, View.OnClickListener{
     @BindView(R.id.et_search)
     EditText et_search;
     @BindView(R.id.ll_search)
@@ -179,6 +186,10 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
     LinearLayout tlMoreLl;
     @BindView(R.id.tejia_more_ll)
     LinearLayout tejiaMoreLl;
+    @BindView(R.id.sv)
+    ObservableScrollView sv;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
     private MenuAdapter adapter;
     private Product product1;
     private Product product2;
@@ -204,6 +215,10 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
     private LocationClient mLocClient;
     private String soupname = "";//汤料专区名称
     private boolean flag = true;
+    private Drawable drawable; // 顶部渐变布局需设置的Drawable
+    private int fadingHeight = 600; // 当ScrollView滑动到什么位置时渐变消失（根据需要进行调整）
+    private static final int START_ALPHA = 0;//scrollview滑动开始位置
+    private static final int END_ALPHA = 255;//scrollview滑动结束位置
 
 
     @Override
@@ -211,6 +226,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
         return R.layout.fragment_home;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void initView() {
         super.initView();
@@ -220,6 +236,28 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
         banner2.setImageLoader(new GlideImageLoader());
         requestPermission();
         initMapLocation();
+        sv.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(View view, int x, int y, int i2, int i3) {
+                if (y > fadingHeight) {
+                    y = fadingHeight; // 当滑动到指定位置之后设置颜色为纯色，之前的话要渐变---实现下面的公式即可
+
+//                relativela_id.setBackgroundColor(Color.WHITE);
+                } else if (y < 0) {
+                    y = 0;
+                } else {
+//                relativela_id.setBackgroundColor(0x99FFFFFF);
+                }
+                toolbar.getBackground().setAlpha(y * (END_ALPHA - START_ALPHA) / fadingHeight
+                        + START_ALPHA);
+//                drawable.setAlpha(y * (END_ALPHA - START_ALPHA) / fadingHeight
+//                        + START_ALPHA);
+            }
+        });
+//        drawable = getResources().get;
+//        drawable.setAlpha(START_ALPHA);
+        toolbar.setBackgroundColor(Color.parseColor(Global.appTheme.getHome_top_color()));
+        toolbar.getBackground().setAlpha(START_ALPHA);
     }
 
     @Override
@@ -232,8 +270,6 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
 
     @Override
     protected void initData() {
-
-
 
 
 //        setUnderLine();
@@ -266,12 +302,87 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
         goods1Ll.setOnClickListener(this);
         good2Ll.setOnClickListener(this);
         goods3Ll.setOnClickListener(this);
+
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(RefreshLayout refreshlayout) {
                 flag = false;
                 request();
 
+            }
+        });
+        refreshLayout.setOnMultiPurposeListener(new OnMultiPurposeListener() {
+            @Override
+            public void onHeaderPulling(RefreshHeader header, float percent, int offset, int headerHeight, int extendHeight) {
+//                toolbar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onHeaderReleasing(RefreshHeader header, float percent, int offset, int headerHeight, int extendHeight) {
+//                toolbar.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onHeaderStartAnimator(RefreshHeader header, int headerHeight, int extendHeight) {
+//                toolbar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onHeaderFinish(RefreshHeader header) {
+//                toolbar.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onFooterPulling(RefreshFooter footer, float percent, int offset, int footerHeight, int extendHeight) {
+
+            }
+
+            @Override
+            public void onFooterReleasing(RefreshFooter footer, float percent, int offset, int footerHeight, int extendHeight) {
+
+            }
+
+            @Override
+            public void onFooterStartAnimator(RefreshFooter footer, int footerHeight, int extendHeight) {
+
+            }
+
+            @Override
+            public void onFooterFinish(RefreshFooter footer) {
+
+            }
+
+            @Override
+            public void onLoadmore(RefreshLayout refreshlayout) {
+
+            }
+
+            @Override
+            public void onRefresh(RefreshLayout refreshlayout) {
+
+            }
+
+            @Override
+            public void onStateChanged(RefreshLayout refreshLayout, RefreshState oldState, RefreshState newState) {
+                Log.d("RefreshState",newState.name());
+                if (refreshLayout.getState()== RefreshState.PullDownToRefresh){
+                    toolbar.setVisibility(View.GONE);
+                }
+                if (refreshLayout.getState()== RefreshState.PullDownCanceled){
+                    toolbar.setVisibility(View.VISIBLE);
+                }
+                if (refreshLayout.getState()== RefreshState.Refreshing){
+                    toolbar.setVisibility(View.GONE);
+                }
+                if (refreshLayout.getState()== RefreshState.None){
+                    toolbar.setVisibility(View.VISIBLE);
+                }
+                if (refreshLayout.getState()== RefreshState.ReleaseToRefresh){
+                    toolbar.setVisibility(View.GONE);
+                }
+                if (refreshLayout.getState()== RefreshState.RefreshFinish){
+                    toolbar.setVisibility(View.VISIBLE);
+                }
             }
         });
         refreshLayout.setEnableLoadmore(false);
@@ -291,12 +402,12 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
         }
         if (flag) {
             stateLayout.changeState(StateFrameLayout.LOADING);
-            flag=false;
+            flag = false;
         }
         FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
         Log.d("------参数------", formBody.build().toString());
-        if (!"".equals(provincecode)&&provincecode!=null) {
-            formBody.add("provinceid",Global.provinceid);
+        if (!"".equals(provincecode) && provincecode != null) {
+            formBody.add("provinceid", Global.provinceid);
         }
 //new call
         Call call = MyOkHttp.GetCall("public.appHome", formBody);
@@ -326,7 +437,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
 
     public void getAppVersion() {
         FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
-        formBody.add("versionno",Integer.toString(MyUtils.getAppVersionCode(mActivity)));
+        formBody.add("versionno", Integer.toString(MyUtils.getAppVersionCode(mActivity)));
 //new call
         Call call = MyOkHttp.GetCall("system.getAppVersion", formBody);
 //请求加入调度
@@ -424,7 +535,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                     startActivity(new Intent(getActivity(), SearchActivity.class));
                     break;
                 case R.id.goods1_ll:
-                    if (product1==null){
+                    if (product1 == null) {
                         return;
                     }
                     intent = new Intent(getActivity(), GoodsDetailActivity.class);
@@ -432,7 +543,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                     startActivity(intent);
                     break;
                 case R.id.good2_ll:
-                    if (product2==null){
+                    if (product2 == null) {
                         return;
                     }
                     intent = new Intent(getActivity(), GoodsDetailActivity.class);
@@ -440,7 +551,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                     startActivity(intent);
                     break;
                 case R.id.goods3_ll:
-                    if (product3==null){
+                    if (product3 == null) {
                         return;
                     }
                     intent = new Intent(getActivity(), GoodsDetailActivity.class);
@@ -619,31 +730,31 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                             Global.list = list;
                             Global.Productslist = Productslist;
                             ArrayList<Product> recommendlist = getProductList(recommend);
-                            if (recommendlist.size()==0){
+                            if (recommendlist.size() == 0) {
                                 goods1Ll.setVisibility(View.INVISIBLE);
                                 good2Ll.setVisibility(View.INVISIBLE);
                                 goods3Ll.setVisibility(View.INVISIBLE);
                             }
-                            if (recommendlist.size()==1){
+                            if (recommendlist.size() == 1) {
                                 goods1Ll.setVisibility(View.VISIBLE);
                                 good2Ll.setVisibility(View.INVISIBLE);
                                 goods3Ll.setVisibility(View.INVISIBLE);
                                 product1 = recommendlist.get(0);
                                 name1.setText(product1.getName());
-                                price1.setText(Html.fromHtml("<small>¥ </small><big><b>"+product1.getPrice().substring(0,product1.getPrice().indexOf("."))+"</b></big><small><b>"+product1.getPrice().substring(product1.getPrice().indexOf("."),product1.getPrice().length())+"</b></small>"));
+                                price1.setText(Html.fromHtml("<small>¥ </small><big><b>" + product1.getPrice().substring(0, product1.getPrice().indexOf(".")) + "</b></big><small><b>" + product1.getPrice().substring(product1.getPrice().indexOf("."), product1.getPrice().length()) + "</b></small>"));
                                 GlideUtil.loadImageViewLoding(mActivity, product1.getImages(), img1, R.drawable.empty_img, R.drawable.empty_img);
                             }
-                            if (recommendlist.size()==2){
+                            if (recommendlist.size() == 2) {
                                 goods1Ll.setVisibility(View.VISIBLE);
                                 good2Ll.setVisibility(View.VISIBLE);
                                 goods3Ll.setVisibility(View.INVISIBLE);
                                 product1 = recommendlist.get(0);
                                 name1.setText(product1.getName());
-                                price1.setText(Html.fromHtml("<small>¥ </small><big><b>"+product1.getPrice().substring(0,product1.getPrice().indexOf("."))+"</b></big><small><b>"+product1.getPrice().substring(product1.getPrice().indexOf("."),product1.getPrice().length())+"</b></small>"));
+                                price1.setText(Html.fromHtml("<small>¥ </small><big><b>" + product1.getPrice().substring(0, product1.getPrice().indexOf(".")) + "</b></big><small><b>" + product1.getPrice().substring(product1.getPrice().indexOf("."), product1.getPrice().length()) + "</b></small>"));
                                 GlideUtil.loadImageViewLoding(mActivity, product1.getImages(), img1, R.drawable.empty_img, R.drawable.empty_img);
                                 product2 = recommendlist.get(1);
                                 name2.setText(product2.getName());
-                                price2.setText(Html.fromHtml("<small>¥ </small><big><b>"+product2.getPrice().substring(0,product2.getPrice().indexOf("."))+"</b></big><small><b>"+product2.getPrice().substring(product2.getPrice().indexOf("."),product2.getPrice().length())+"</b></small>"));
+                                price2.setText(Html.fromHtml("<small>¥ </small><big><b>" + product2.getPrice().substring(0, product2.getPrice().indexOf(".")) + "</b></big><small><b>" + product2.getPrice().substring(product2.getPrice().indexOf("."), product2.getPrice().length()) + "</b></small>"));
                                 GlideUtil.loadImageViewLoding(mActivity, product2.getImages(), img2, R.drawable.empty_img, R.drawable.empty_img);
                             }
                             if (recommendlist.size() == 3) {
@@ -652,15 +763,15 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                                 goods3Ll.setVisibility(View.VISIBLE);
                                 product1 = recommendlist.get(0);
                                 name1.setText(product1.getName());
-                                price1.setText(Html.fromHtml("<small>¥ </small><big><b>"+product1.getPrice().substring(0,product1.getPrice().indexOf("."))+"</b></big><small><b>"+product1.getPrice().substring(product1.getPrice().indexOf("."),product1.getPrice().length())+"</b></small>"));
+                                price1.setText(Html.fromHtml("<small>¥ </small><big><b>" + product1.getPrice().substring(0, product1.getPrice().indexOf(".")) + "</b></big><small><b>" + product1.getPrice().substring(product1.getPrice().indexOf("."), product1.getPrice().length()) + "</b></small>"));
                                 GlideUtil.loadImageViewLoding(mActivity, product1.getImages(), img1, R.drawable.empty_img, R.drawable.empty_img);
                                 product2 = recommendlist.get(1);
                                 name2.setText(product2.getName());
-                                price2.setText(Html.fromHtml("<small>¥ </small><big><b>"+product2.getPrice().substring(0,product2.getPrice().indexOf("."))+"</b></big><small><b>"+product2.getPrice().substring(product2.getPrice().indexOf("."),product2.getPrice().length())+"</b></small>"));
+                                price2.setText(Html.fromHtml("<small>¥ </small><big><b>" + product2.getPrice().substring(0, product2.getPrice().indexOf(".")) + "</b></big><small><b>" + product2.getPrice().substring(product2.getPrice().indexOf("."), product2.getPrice().length()) + "</b></small>"));
                                 GlideUtil.loadImageViewLoding(mActivity, product2.getImages(), img2, R.drawable.empty_img, R.drawable.empty_img);
                                 product3 = recommendlist.get(2);
                                 name3.setText(product3.getName());
-                                price3.setText(Html.fromHtml("<small>¥ </small><big><b>"+product3.getPrice().substring(0,product3.getPrice().indexOf("."))+"</b></big><small><b>"+product3.getPrice().substring(product3.getPrice().indexOf("."),product3.getPrice().length())+"</b></small>"));
+                                price3.setText(Html.fromHtml("<small>¥ </small><big><b>" + product3.getPrice().substring(0, product3.getPrice().indexOf(".")) + "</b></big><small><b>" + product3.getPrice().substring(product3.getPrice().indexOf("."), product3.getPrice().length()) + "</b></small>"));
                                 GlideUtil.loadImageViewLoding(mActivity, product3.getImages(), img3, R.drawable.empty_img, R.drawable.empty_img);
                             }
 
@@ -690,9 +801,9 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                         String message = jsonObject.getString("message");
                         String data = jsonObject.getString("data");
                         if ("200".equals(code)) {
-                            JSONObject object=new JSONObject(data);
-                            provincecode=object.getString("id");
-                            Global.provinceid=provincecode;
+                            JSONObject object = new JSONObject(data);
+                            provincecode = object.getString("id");
+                            Global.provinceid = provincecode;
                             request();
                         } else {
 //                            MyUtils.showToast(mActivity, message);
@@ -725,7 +836,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                             final String app_download_url = jsonObject1.getString("download_url");
 //                            String appcode = "234";
 //                            final String app_download_url = "http://pz0.3dn.mse.sogou.com/semob5.13.5_154189_R14189_121106002_build47127_2.1.0.2133.apk";
-                            if("1".equals(is_update)) {
+                            if ("1".equals(is_update)) {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
                                 builder.setTitle("更新");
                                 builder.setMessage("检测到有更新,是否立刻更新？");
@@ -739,7 +850,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
 
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        if(MyUtils.isWifi(mActivity)) {
+                                        if (MyUtils.isWifi(mActivity)) {
                                             AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
                                             builder.setTitle("提示");
                                             builder.setMessage("您当前正在使用移动网络，继续下载将消耗流量");
@@ -758,13 +869,13 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                                                 }
                                             });
                                             builder.create().show();
-                                        } else{
+                                        } else {
                                             downLoadApk(app_download_url);
                                         }
                                     }
                                 });
                                 builder.create().show();
-                            } else{
+                            } else {
 //                                MyUtils.showToast(mActivity, "当前已是最新版本");
                             }
 
@@ -865,7 +976,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
         if (data != null) {
             city_name.setText(data.getStringExtra("name"));
             provincecode = data.getStringExtra("provincecode");
-            Global.provinceid=provincecode;
+            Global.provinceid = provincecode;
             request();
         }
     }
@@ -892,6 +1003,12 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
 
     }
 
+//    @Override
+//    public void onScroll(int l, int t) {
+//        int newAlpha = t/500;
+//        drawable.setAlpha(newAlpha);
+//    }
+
     /**
      * 定位相关:定位SDK监听函数
      */
@@ -901,8 +1018,8 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
         public void onReceiveLocation(BDLocation location) {//得到未知信息
             //得到城市
             String curCity = location.getCity();
-            latitude=Double.toString(location.getLatitude());
-            longtitude=Double.toString(location.getLongitude());
+            latitude = Double.toString(location.getLatitude());
+            longtitude = Double.toString(location.getLongitude());
             getProviceid();
 //            String curCity = location.getProvince();
             if (TextUtils.isEmpty(curCity)) {
@@ -965,12 +1082,12 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
         new Thread() {
             @Override
             public void run() {
-                try{
+                try {
                     File file = DownLoadManager.getFileFromServer(url, pd);
                     sleep(3000);
                     installApk(file);
                     pd.dismiss(); //结束掉进度条对话框
-                } catch(Exception e) {
+                } catch (Exception e) {
 //                    Toast.makeText(mActivity, "下载失败!",
 //                            Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
@@ -987,21 +1104,21 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
         //执行的数据类型
         //判断是否是AndroidN以及更高的版本
 
-        if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.N) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 
-            Uri contentUri = FileProvider.getUriForFile(mActivity,"com.emjiayuan.app.fileProvider",file);
+            Uri contentUri = FileProvider.getUriForFile(mActivity, "com.emjiayuan.app.fileProvider", file);
 
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-            intent.setDataAndType(contentUri,"application/vnd.android.package-archive");
+            intent.setDataAndType(contentUri, "application/vnd.android.package-archive");
 
-        }else{
+        } else {
 
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-            intent.setDataAndType(Uri.fromFile(file),"application/vnd.android.package-archive");
+            intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
 
         }
         startActivity(intent);

@@ -8,7 +8,7 @@
     <com.emjiayuan.app.widget.RatioLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:ratios="3">
+        app:ratios="2">
         <com.youth.banner.Banner
             android:id="@+id/banner_top"
             android:layout_width="match_parent"
