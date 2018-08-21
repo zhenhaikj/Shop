@@ -2,47 +2,33 @@ package com.emjiayuan.app;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.app.AlertDialog;
 import android.app.Application;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.baidu.location.BDLocation;
-import com.baidu.location.BDLocationListener;
-import com.baidu.location.LocationClient;
-import com.baidu.location.LocationClientOption;
-import com.emjiayuan.app.Utils.DownLoadManager;
 import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.Utils.SpUtils;
-import com.emjiayuan.app.activity.CityActivity;
-import com.emjiayuan.app.banner.GlideImageLoader2;
+import com.emjiayuan.app.imageloader.GlideImageLoader2;
 import com.emjiayuan.app.entity.CityBean;
+import com.emjiayuan.app.imageloader.TestImageLoader;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.lwkandroid.stateframelayout.StateFrameLayout;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.previewlibrary.ZoomMediaLoader;
 import com.qiyukf.unicorn.api.StatusBarNotificationConfig;
 import com.qiyukf.unicorn.api.Unicorn;
-import com.qiyukf.unicorn.api.UnicornImageLoader;
 import com.qiyukf.unicorn.api.YSFOptions;
 import com.scwang.smartrefresh.header.MaterialHeader;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
@@ -53,7 +39,6 @@ import com.scwang.smartrefresh.layout.api.RefreshHeader;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.constant.SpinnerStyle;
 import com.scwang.smartrefresh.layout.footer.ClassicsFooter;
-import com.scwang.smartrefresh.layout.header.ClassicsHeader;
 import com.emjiayuan.app.entity.AreaModel;
 import com.emjiayuan.app.entity.Global;
 import com.tencent.android.tpush.XGIOperateCallback;
@@ -68,7 +53,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
@@ -93,6 +77,7 @@ public class AppApplication extends Application {
 
     private String resultString;
     private boolean first=true;
+    private static Context mContext;
 
 
 
@@ -121,6 +106,8 @@ public class AppApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        ZoomMediaLoader.getInstance().init(new TestImageLoader());
+        mContext = getApplicationContext();
         //腾讯信鸽开启debug日志数据
         XGPushConfig.enableDebug(this,true);
         //token注册
@@ -449,5 +436,8 @@ public class AppApplication extends Application {
         config.setToDefaults();
         res.updateConfiguration(config,res.getDisplayMetrics());
         return res;
+    }
+    public static Context getContext(){
+        return mContext;
     }
 }

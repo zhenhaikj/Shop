@@ -9,8 +9,10 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.emjiayuan.app.R;
+import com.emjiayuan.app.Utils.GlideUtil;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by cyl on 2018年5月10日 09:52:49.
@@ -18,16 +20,33 @@ import java.util.ArrayList;
 
 public class IconsAdapter extends BaseAdapter {
     private Context mContext;
-    private static String TAG = "MenuAdapter";
 
-    private ArrayList<String> grouplists = new ArrayList<>();
+    private List<String> grouplists = new ArrayList<>();
     private LayoutInflater mInflater;
+    private int noMovePosition=-1;
 
-    public IconsAdapter(Context mContext, ArrayList<String> grouplists) {
+    public IconsAdapter(Context mContext, List<String> grouplists) {
         super();
         this.mContext = mContext;
         this.grouplists = grouplists;
         this.mInflater = LayoutInflater.from(mContext);
+    }
+
+    public List<String> getGrouplists() {
+        return grouplists;
+    }
+
+    public void setGrouplists(List<String> grouplists) {
+        this.grouplists = grouplists;
+        notifyDataSetChanged();
+    }
+
+    public int getNoMovePosition() {
+        return noMovePosition;
+    }
+
+    public void setNoMovePosition(int noMovePosition) {
+        this.noMovePosition = noMovePosition;
     }
 
     @Override
@@ -46,19 +65,37 @@ public class IconsAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHolder holder = null;
         if (convertView == null) {// 如果是第一次显示该页面(要记得保存到viewholder中供下次直接从缓存中调用)
             holder = new ViewHolder();
             convertView = mInflater.inflate(R.layout.icons_item, null);
             holder.icon = (ImageView) convertView.findViewById(R.id.icon);
+            holder.delete = (ImageView) convertView.findViewById(R.id.delete);
             convertView.setTag(holder);
         } else {// 如果之前已经显示过该页面，则用viewholder中的缓存直接刷屏
             holder = (ViewHolder) convertView.getTag();
         }
 
         String item = grouplists.get(position);
-        Glide.with(mContext).load(item).into(holder.icon);
+        if (item.equals("add")) {
+            setNoMovePosition(position);
+            holder.icon.setImageResource(R.drawable.add_img2);
+            holder.delete.setVisibility(View.GONE);
+        } else {
+            holder.delete.setVisibility(View.VISIBLE);
+            GlideUtil.loadImageViewLoding(mContext,item,holder.icon,R.drawable.empty_img,R.drawable.empty_img);
+        }
+        holder.delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                grouplists.remove(position);
+                if (!grouplists.contains("add")){
+                    grouplists.add("add");
+                }
+                notifyDataSetChanged();
+            }
+        });
 
 
         return convertView;
@@ -66,5 +103,6 @@ public class IconsAdapter extends BaseAdapter {
 
     public class ViewHolder {
         public ImageView icon;
+        public ImageView delete;
     }
 }

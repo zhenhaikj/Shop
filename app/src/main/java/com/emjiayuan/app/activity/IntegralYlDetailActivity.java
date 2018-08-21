@@ -14,14 +14,12 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.emjiayuan.app.BaseActivity;
 import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.adapter.CommentAdapter;
-import com.emjiayuan.app.banner.GlideImageLoader;
+import com.emjiayuan.app.imageloader.GlideImageLoader;
 import com.emjiayuan.app.entity.Comment;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.OrderComfirm;

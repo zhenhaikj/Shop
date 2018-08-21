@@ -103,16 +103,12 @@ public class NineGridTestAdapter extends BaseAdapter {
 //        NineGridTestLayout layoutNineGrid;
         @BindView(R.id.label)
         TextView label;
-        @BindView(R.id.time_icon)
-        ImageView timeIcon;
         @BindView(R.id.time)
         TextView time;
         @BindView(R.id.zan_icon)
         ImageView zanIcon;
         @BindView(R.id.zan_count)
         TextView zanCount;
-        @BindView(R.id.pl_icon)
-        ImageView plIcon;
         @BindView(R.id.pl_count)
         TextView plCount;
         @BindView(R.id.ll_content)

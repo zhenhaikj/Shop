@@ -1,14 +1,15 @@
 package com.emjiayuan.app.widget;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.DensityUtil;
 import com.emjiayuan.app.entity.PhotoInfo;
@@ -39,6 +40,7 @@ public class MultiImageView extends LinearLayout {
 	private LayoutParams onePicPara;
 	private LayoutParams morePara, moreParaColumnFirst;
 	private LayoutParams rowPara;
+	private ImageView imageView;
 
 	private OnItemClickListener mOnItemClickListener;
 	public void setOnItemClickListener(OnItemClickListener onItemClickListener){
@@ -173,45 +175,61 @@ public class MultiImageView extends LinearLayout {
 		}
 	}
 
-	private ImageView createImageView(int position, final boolean isMultiImage) {
-		PhotoInfo photoInfo = imagesList.get(position);
-		ImageView imageView = new ColorFilterImageView(getContext());
-		if(isMultiImage){
-			imageView.setScaleType(ScaleType.CENTER_CROP);
-			imageView.setLayoutParams(position % MAX_PER_ROW_COUNT == 0 ?moreParaColumnFirst : morePara);
-		}else {
-			imageView.setAdjustViewBounds(true);
-			imageView.setScaleType(ScaleType.CENTER_INSIDE);
-			//imageView.setMaxHeight(pxOneMaxWandH);
-
-            int expectW = photoInfo.w;
-            int expectH = photoInfo.h;
-
-            if(expectW == 0 || expectH == 0){
-                imageView.setLayoutParams(onePicPara);
-            }else{
-                int actualW = 0;
-                int actualH = 0;
-                float scale = ((float) expectH)/((float) expectW);
-                if(expectW > pxOneMaxWandH){
-                    actualW = pxOneMaxWandH;
-                    actualH = (int)(actualW * scale);
-                } else if(expectW < pxMoreWandH){
-                    actualW = pxMoreWandH;
-                    actualH = (int)(actualW * scale);
-                }else{
-                    actualW = expectW;
-                    actualH = expectH;
-                }
-                imageView.setLayoutParams(new LayoutParams(actualW, actualH));
-            }
-		}
-
-		imageView.setId(photoInfo.url.hashCode());
-		imageView.setOnClickListener(new ImageOnClickListener(position));
+	private ImageView createImageView(final int position, final boolean isMultiImage) {
+		final PhotoInfo photoInfo = imagesList.get(position);
+		imageView = new ColorFilterImageView(getContext());
+		if (photoInfo!=null) {
+//		final ImageView imageView = new ColorFilterImageView(getContext());
 //		imageView.setBackgroundColor(getResources().getColor(R.color.im_font_color_text_hint));
-//		Glide.with(getContext()).load(photoInfo.url).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
+//		if (!photoInfo.equals(imageView.getTag(R.id.tag_group))){
 
+//			Glide.with(getContext()).load(photoInfo).into(new SimpleTarget<Drawable>() {
+//				@Override
+//				public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
+			if (isMultiImage) {
+				imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+				imageView.setLayoutParams(position % MAX_PER_ROW_COUNT == 0 ? moreParaColumnFirst : morePara);
+			} else {
+				imageView.setAdjustViewBounds(true);
+				imageView.setScaleType(ImageView.ScaleType.FIT_START);
+				//imageView.setMaxHeight(pxOneMaxWandH);
+
+				int expectW = photoInfo.w;
+				int expectH = photoInfo.h;
+//						int expectW = resource.getIntrinsicWidth();
+//						int expectH = resource.getIntrinsicHeight();
+//						int expectW = 300;
+//						int expectH = 500;
+
+				if (expectW == 0 || expectH == 0) {
+					imageView.setLayoutParams(onePicPara);
+				} else {
+					int actualW = 0;
+					int actualH = 0;
+					float scale = ((float) expectH) / ((float) expectW);
+					if (expectW > pxOneMaxWandH) {
+						actualW = pxOneMaxWandH;
+						actualH = (int) (actualW * scale);
+					} else if (expectW < pxMoreWandH) {
+						actualW = pxMoreWandH;
+						actualH = (int) (actualW * scale);
+					} else {
+						actualW = expectW;
+						actualH = expectH;
+					}
+					imageView.setLayoutParams(new LayoutParams(actualW, actualH));
+				}
+			}
+
+//					imageView.setId(photoInfo.hashCode());
+			imageView.setOnClickListener(new ImageOnClickListener(position));
+//					imageView.setImageDrawable(resource);
+//					imageView.setTag(R.id.tag_group,photoInfo);
+//				}
+//			});
+			Glide.with(getContext()).load(photoInfo.url).into(imageView);
+//		}
+		}
 		return imageView;
 	}
 

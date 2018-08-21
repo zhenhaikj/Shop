@@ -7,6 +7,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.net.ConnectivityManager;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.GridView;
 import android.widget.ListAdapter;
 import android.widget.Toast;
@@ -38,6 +40,43 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MyUtils {
+    /**
+     * 获取状态栏的高度
+     *
+     * @param context
+     * @return
+     */
+    public static int getStatusHeight(Context context) {
+        int statusHeight = 0;
+        Rect localRect = new Rect();
+        ((Activity) context).getWindow().getDecorView()
+                .getWindowVisibleDisplayFrame(localRect);
+        statusHeight = localRect.top;
+        if (0 == statusHeight) {
+            Class<?> localClass;
+            try {
+                localClass = Class.forName("com.android.internal.R$dimen");
+                Object localObject = localClass.newInstance();
+                int i5 = Integer.parseInt(localClass
+                        .getField("status_bar_height").get(localObject)
+                        .toString());
+                statusHeight = context.getResources().getDimensionPixelSize(i5);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return statusHeight;
+    }
+    public static void showSoftInput(Context context, View view){
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+        //imm.showSoftInput(view, InputMethodManager.SHOW_FORCED);
+    }
+
+    public static void hideSoftInput(Context context, View view){
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0); //强制隐藏键盘
+    }
 
     /**
      * 实现文本复制功能

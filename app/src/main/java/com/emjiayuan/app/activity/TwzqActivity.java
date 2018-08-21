@@ -10,13 +10,9 @@ import android.widget.TextView;
 import com.emjiayuan.app.BaseActivity;
 import com.emjiayuan.app.R;
 import com.emjiayuan.app.adapter.GoodsAdapter;
-import com.emjiayuan.app.banner.GlideImageLoader;
+import com.emjiayuan.app.imageloader.GlideImageLoader;
 import com.emjiayuan.app.entity.Global;
 import com.youth.banner.Banner;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import butterknife.BindView;
 

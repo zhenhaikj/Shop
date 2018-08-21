@@ -25,7 +25,7 @@ import com.emjiayuan.app.activity.LoginActivity;
 import com.emjiayuan.app.entity.APPTheme;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.fragment.Classify.ClassifyFragment2;
-import com.emjiayuan.app.fragment.Community.CommunityFragment2;
+import com.emjiayuan.app.fragment.Community.CommunityFragment;
 import com.emjiayuan.app.fragment.HomeFragment;
 import com.emjiayuan.app.fragment.Personal.PersonalFragment;
 import com.emjiayuan.app.fragment.ShoppingCar.ShoppingCarFragment;
@@ -86,7 +86,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     private ArrayList<Fragment> mFragments;
     private HomeFragment homeFragment;
     private ClassifyFragment2 classifyFragment2;
-    private CommunityFragment2 communityFragment;
+    private CommunityFragment communityFragment;
     public static ShoppingCarFragment shoppingCarFragment;
     private PersonalFragment personalFragment;
 
@@ -101,7 +101,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         mFragments = new ArrayList<>();
         homeFragment = new HomeFragment();
         classifyFragment2 = new ClassifyFragment2();
-        communityFragment = new CommunityFragment2();
+        communityFragment = new CommunityFragment();
         shoppingCarFragment = new ShoppingCarFragment();
         personalFragment = new PersonalFragment();
         mFragments.add(homeFragment);

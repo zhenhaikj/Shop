@@ -1,4 +1,4 @@
-package com.emjiayuan.app.banner;
+package com.emjiayuan.app.imageloader;
 
 import android.content.Context;
 import android.widget.ImageView;

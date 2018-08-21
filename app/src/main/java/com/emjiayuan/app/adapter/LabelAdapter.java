@@ -1,6 +1,7 @@
 package com.emjiayuan.app.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.emjiayuan.app.R;
+import com.emjiayuan.app.entity.Label;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,16 +21,26 @@ import java.util.List;
 
 public class LabelAdapter extends BaseAdapter {
     private Context mContext;
-    private static String TAG = "MenuAdapter";
 
-    private List<String> grouplists = new ArrayList<>();
+    private List<Label> grouplists = new ArrayList<>();
     private LayoutInflater mInflater;
 
-    public LabelAdapter(Context mContext, List<String> grouplists) {
+    public LabelAdapter(Context mContext, List<Label> grouplists) {
         super();
         this.mContext = mContext;
         this.grouplists = grouplists;
         this.mInflater = LayoutInflater.from(mContext);
+    }
+
+    private int selected=-1;
+
+    public int getSelected() {
+        return selected;
+    }
+
+    public void setSelected(int selected) {
+        this.selected = selected;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -37,7 +49,7 @@ public class LabelAdapter extends BaseAdapter {
     }
 
     @Override
-    public String getItem(int position) {
+    public Label getItem(int position) {
         return grouplists.get(position);
     }
 
@@ -58,9 +70,15 @@ public class LabelAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        String item = grouplists.get(position);
-        holder.label.setText(item);
-
+        Label item = grouplists.get(position);
+        holder.label.setText(item.getType());
+        if (selected==position){
+            holder.label.setBackgroundResource(R.drawable.label_shape_selected);
+            holder.label.setTextColor(Color.parseColor("#ffffff"));
+        }else{
+            holder.label.setBackgroundResource(R.drawable.label_shape);
+            holder.label.setTextColor(Color.parseColor("#9C9C9C"));
+        }
 
         return convertView;
     }

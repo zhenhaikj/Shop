@@ -1,4 +1,4 @@
-package com.emjiayuan.app.banner;
+package com.emjiayuan.app.imageloader;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -7,8 +7,6 @@ import android.support.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
-import com.bumptech.glide.request.Request;
-import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.qiyukf.unicorn.api.ImageLoaderListener;

@@ -5,74 +5,30 @@
     android:background="@color/white"
     android:orientation="vertical">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@color/white">
-
-        <LinearLayout
-            android:id="@+id/ll_back"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:id="@+id/icon_back"
-                android:layout_width="30dp"
-                android:layout_height="20dp"
-                android:src="@drawable/back" />
-
-            <TextView
-                android:id="@+id/back"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="返回"
-                android:textColor="#49C252" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="发布圈子"
-            android:textSize="20dp"
-            android:textColor="#49C252" />
-
-        <TextView
-            android:id="@+id/add"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="15dp"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:text="发布"
-            android:textColor="#49C252" />
-    </RelativeLayout>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#DBDBDB"/>
+    <include layout="@layout/tool_bar"/>
     <EditText
         android:id="@+id/et_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:lines="6"
-        android:background="@color/white"
+        android:background="@null"
         android:hint="这一刻的 想法..."
         android:textColorHint="#D3D3D3"
+        android:textColor="@color/black"
         android:gravity="top"
         android:padding="20dp"/>
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#DBDBDB"/>
-    <com.emjiayuan.app.widget.MyGridView
+    <com.emjiayuan.app.widget.DragGridView
         android:id="@+id/gv_icons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:numColumns="4"/>
+        android:layout_margin="10dp"
+        android:horizontalSpacing="5dp"
+        android:verticalSpacing="5dp"
+        android:numColumns="3"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -87,7 +43,40 @@
         <com.emjiayuan.app.widget.MyGridView
             android:id="@+id/gv_label"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="200dp"
+            android:background="#F0F0F0"
+            android:layout_marginTop="10dp"
+            android:horizontalSpacing="5dp"
+            android:verticalSpacing="5dp"
             android:numColumns="4"/>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/ll_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:padding="20dp"
+        android:orientation="horizontal">
+        <CheckBox
+            android:id="@+id/check_address"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:button="@null"
+            android:background="@drawable/check_selector_address"
+            android:layout_marginLeft="10dp"/>
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/address_icon"
+            android:layout_marginLeft="20dp"/>
+        <TextView
+            android:id="@+id/address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="1"
+            android:textColor="#333333"
+            android:textSize="15sp"
+            android:text="显示位置"/>
     </LinearLayout>
 </LinearLayout>

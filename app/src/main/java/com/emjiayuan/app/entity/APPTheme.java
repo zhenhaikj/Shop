@@ -15,7 +15,7 @@ public class APPTheme implements Serializable{
      * user_top_img : http://qiniu.emjiayuan.com/icon1516957748771
      */
 
-    private String home_top_color;
+    private String home_top_color="#1f7f4b";
     private HomeBottomMenuMyBean home_bottom_menu_my;
     private HomeBottomMenuCartBean home_bottom_menu_cart;
     private HomeBottomMenuCateBean home_bottom_menu_cate;

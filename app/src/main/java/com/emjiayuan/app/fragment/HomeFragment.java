@@ -37,7 +37,6 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
-import com.emjiayuan.app.MainActivity;
 import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.DownLoadManager;
 import com.emjiayuan.app.Utils.GlideUtil;
@@ -63,7 +62,7 @@ import com.emjiayuan.app.adapter.HomeAdapter;
 import com.emjiayuan.app.adapter.MenuAdapter;
 import com.emjiayuan.app.adapter.TlzqAdapter;
 import com.emjiayuan.app.adapter.XsgAdapter;
-import com.emjiayuan.app.banner.GlideImageLoader;
+import com.emjiayuan.app.imageloader.GlideImageLoader;
 import com.emjiayuan.app.entity.BannerItem;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.MenuItem;
@@ -75,7 +74,6 @@ import com.emjiayuan.app.event.UpdateEvent;
 import com.emjiayuan.app.widget.MyGridView;
 import com.emjiayuan.app.widget.MyListView;
 import com.emjiayuan.app.widget.ObservableScrollView;
-import com.emjiayuan.app.widget.OnScrollChangedCallback;
 import com.google.gson.Gson;
 import com.lwkandroid.stateframelayout.StateFrameLayout;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
@@ -256,7 +254,11 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
         });
 //        drawable = getResources().get;
 //        drawable.setAlpha(START_ALPHA);
-        toolbar.setBackgroundColor(Color.parseColor(Global.appTheme.getHome_top_color()));
+        if (Global.appTheme!=null){
+            toolbar.setBackgroundColor(Color.parseColor(Global.appTheme.getHome_top_color()));
+        }else{
+            toolbar.setBackgroundColor(Color.parseColor("#1f7f4b"));
+        }
         toolbar.getBackground().setAlpha(START_ALPHA);
     }
 

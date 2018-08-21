@@ -1,1 +1,1 @@
-include ':app', 'CountdownView'
+include ':app', 'CountdownView','ImagePreview'

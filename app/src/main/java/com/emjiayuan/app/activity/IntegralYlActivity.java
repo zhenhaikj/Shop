@@ -21,9 +21,8 @@ import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.adapter.IntegralYlAdapter;
-import com.emjiayuan.app.banner.GlideImageLoader;
+import com.emjiayuan.app.imageloader.GlideImageLoader;
 import com.emjiayuan.app.entity.Global;
-import com.emjiayuan.app.entity.Integral;
 import com.emjiayuan.app.entity.Product;
 import com.youth.banner.Banner;
 

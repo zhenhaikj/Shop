@@ -7,7 +7,6 @@ import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -21,7 +20,7 @@ import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.adapter.GoodsAdapter;
-import com.emjiayuan.app.banner.GlideImageLoader;
+import com.emjiayuan.app.imageloader.GlideImageLoader;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.Product;
 import com.emjiayuan.app.entity.Products;
@@ -34,7 +33,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
