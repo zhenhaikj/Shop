@@ -2,13 +2,17 @@ package com.emjiayuan.app.activity;
 
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.emjiayuan.app.BaseActivity;
@@ -18,6 +22,7 @@ import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.adapter.PostsAdapter;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.Post;
+import com.emjiayuan.app.event.CommentEvent;
 import com.emjiayuan.app.event.UpdateEvent;
 import com.emjiayuan.app.widget.MyListView;
 import com.google.gson.Gson;
@@ -58,15 +63,25 @@ public class MyPostActivity extends BaseActivity implements AdapterView.OnItemCl
     MyListView lvPost;
     @BindView(R.id.refreshLayout)
     SmartRefreshLayout refreshLayout;
+    @BindView(R.id.et_pl)
+    EditText etPl;
+    @BindView(R.id.send)
+    TextView send;
+    @BindView(R.id.ll_pl)
+    LinearLayout llPl;
+    @BindView(R.id.sv)
+    ScrollView sv;
     private int pageindex = 1;
-    private ArrayList<Post> list=new ArrayList<>();
+    private ArrayList<Post> list = new ArrayList<>();
     private PostsAdapter adapter;
+    private Post.ReplylistBean bean;
 
     @Override
     protected int setLayoutId() {
         return R.layout.activity_my_post;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void initData() {
         refreshLayout.setEnableHeaderTranslationContent(false);
@@ -84,6 +99,13 @@ public class MyPostActivity extends BaseActivity implements AdapterView.OnItemCl
             public void onLoadmore(RefreshLayout refreshlayout) {
                 pageindex++;
                 getWeiboList();
+            }
+        });
+        sv.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(View view, int i, int i1, int i2, int i3) {
+                llPl.setVisibility(View.GONE);
+                MyUtils.hideSoftInput(mActivity, etPl);
             }
         });
     }
@@ -147,6 +169,40 @@ public class MyPostActivity extends BaseActivity implements AdapterView.OnItemCl
         });
     }
 
+    /**
+     * 评论
+     */
+    public void addWeiboReply(String weiboid, String content, String rid) {
+        FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
+        formBody.add("weiboid", weiboid);//传递键值对参数
+        formBody.add("userid", Global.loginResult.getId());//传递键值对参数
+        formBody.add("content", content);//传递键值对参数
+        formBody.add("rid", rid);//传递键值对参数
+//new call
+        Call call = MyOkHttp.GetCall("weibo.addWeiboReply", formBody);
+//请求加入调度
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("------------", e.toString());
+//                myHandler.sendEmptyMessage(1);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+
+                String result = response.body().string();
+                MyUtils.e("------评论------", result);
+                Message message = new Message();
+                message.what = 3;
+                Bundle bundle = new Bundle();
+                bundle.putString("result", result);
+                message.setData(bundle);
+                myHandler.sendMessage(message);
+            }
+        });
+    }
+
 
     Handler myHandler = new Handler() {
         @Override
@@ -168,10 +224,10 @@ public class MyPostActivity extends BaseActivity implements AdapterView.OnItemCl
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 list.add(gson.fromJson(jsonArray.getJSONObject(i).toString(), Post.class));
                             }
-                            if (adapter==null){
-                                adapter = new PostsAdapter(mActivity, list,true);
+                            if (adapter == null) {
+                                adapter = new PostsAdapter(mActivity, list, true);
                                 lvPost.setAdapter(adapter);
-                            }else{
+                            } else {
                                 adapter.notifyDataSetChanged();
                             }
                             lvPost.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -191,6 +247,26 @@ public class MyPostActivity extends BaseActivity implements AdapterView.OnItemCl
                         e.printStackTrace();
                     }
                     break;
+                case 3://评论
+                    try {
+                        JSONObject jsonObject = new JSONObject(result);
+                        String code = jsonObject.getString("code");
+                        String message = jsonObject.getString("message");
+                        String data = jsonObject.getString("data");
+                        Gson gson = new Gson();
+                        if ("200".equals(code)) {
+                            etPl.setText("");
+                            llPl.setVisibility(View.GONE);
+                            MyUtils.hideSoftInput(mActivity, etPl);
+                            list.clear();
+                            getWeiboList();
+                        } else {
+                            MyUtils.showToast(mActivity, message);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
 
             }
         }
@@ -199,14 +275,49 @@ public class MyPostActivity extends BaseActivity implements AdapterView.OnItemCl
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void Event(UpdateEvent event) {
         list.clear();
-        pageindex=1;
+        pageindex = 1;
         getWeiboList();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void Event(final CommentEvent event) {
+        final Post post = event.getPost();
+        final int position = event.getPosition();
+        if (position == -1) {
+            etPl.setHint("可以留言哦~");
+        } else if (position == -2) {
+            etPl.setHint("私信" + post.getUsername());
+        } else {
+            bean = post.getReplylist().get(position);
+            etPl.setHint("回复" + bean.getUsername() + ":");
+        }
+        llPl.setVisibility(View.VISIBLE);
+        etPl.requestFocus();
+        MyUtils.showSoftInput(mActivity, etPl);
+        send.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String content = etPl.getText().toString();
+                if ("".equals(content)) {
+                    MyUtils.showToast(mActivity, "请输入内容！");
+                    return;
+                }
+                if (position == -2) {
+//                    addWeiboLetter(post.getUserid(), content);
+                } else if (position == -1) {
+                    addWeiboReply(post.getId(), content, "");
+                } else {
+                    addWeiboReply(post.getId(), content, bean.getUserid());
+                }
+
+            }
+        });
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (EventBus.getDefault().isRegistered(this)){
+        if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
         }
     }

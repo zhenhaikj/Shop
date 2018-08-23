@@ -88,7 +88,8 @@ public class MyUtils {
 // 得到剪贴板管理器
         ClipboardManager cmb = (ClipboardManager)context.getSystemService(Context.CLIPBOARD_SERVICE);
         cmb.setText(content.trim());
-        showToast(context,"订单编号"+content+"已复制到剪切板。");
+//        showToast(context,"订单编号"+content+"已复制到剪切板。");
+        showToast(context,"已复制到剪切板。");
     }
 
     /**

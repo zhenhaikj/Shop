@@ -98,6 +98,7 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
     MyGridView gvLabel;
     private ArrayList<String> list = new ArrayList<>();
     private Map<Integer,String> imageslist = new HashMap<>();
+    private Map<Integer,String> httpimageslist = new HashMap<>();
     private List<Label> labelList = new ArrayList<>();
     private List<Boolean> isOkList = new ArrayList<>();
     private IconsAdapter adapter;
@@ -439,6 +440,7 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
                             finish();
                         } else {
                             imageslist.clear();
+                            httpimageslist.clear();
                             isOkList.clear();
                             images="";
                             MyUtils.showToast(mActivity, message);
@@ -547,11 +549,15 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
 //        String token = <从服务端SDK获取>;
         UploadManager uploadManager = new UploadManager(config);
         for (int i = 0; i < (list.contains("add")?list.size()-1:list.size()); i++) {
+            if (list.get(i).contains("http")){
+                imageslist.put(i,list.get(i));
+                httpimageslist.put(i,list.get(i));
+            }
+        }
+        for (int i = 0; i < (list.contains("add")?list.size()-1:list.size()); i++) {
             String RandomFileName=getRandomFileName();
             final int finalI = i;
-            if (list.get(i).contains("http")){
-                imageslist.put(finalI,list.get(i));
-            }else{
+            if (!list.get(i).contains("http")){
                 uploadManager.put(list.get(i), "upload_file/app/"+RandomFileName, token,new UpCompletionHandler() {
                             @Override
                             public void complete(String key, ResponseInfo info, JSONObject res) {
@@ -560,7 +566,7 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
                                     isOkList.add(info.isOK());
                                     imageslist.put(finalI,"http://qiniu.emjiayuan.com/"+key);
                                     Log.i("qiniu", "Upload Success");
-                                    if (isOkList.size()==(list.contains("add")?list.size()-1:list.size())){
+                                    if (isOkList.size()==(list.contains("add")?list.size()-1-httpimageslist.size():list.size()-httpimageslist.size())){
                                         if (post == null) {
                                             addWeibo();
                                         }else{
@@ -569,6 +575,7 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
                                     }
                                 } else {
                                     imageslist.clear();
+                                    httpimageslist.clear();
                                     isOkList.clear();
                                     images="";
                                     MyUtils.showToast(mActivity,"发布失败！");
@@ -584,6 +591,15 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
                                         Log.i("qiniu", key + ": " + percent);
                                     }
                                 }, null));
+            }else{
+                if (imageslist.size()==(list.contains("add")?list.size()-1:list.size())){
+                    if (post == null) {
+                        addWeibo();
+                    }else{
+                        editWeibo();
+                    }
+                    break;//避免重复提交
+                }
             }
 
         }

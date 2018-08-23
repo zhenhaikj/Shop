@@ -5,10 +5,13 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -26,10 +29,13 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 import com.emjiayuan.app.MainActivity;
 import com.emjiayuan.app.R;
+import com.emjiayuan.app.Utils.DownLoadImage;
 import com.emjiayuan.app.Utils.GlideUtil;
+import com.emjiayuan.app.Utils.ImageDownLoadCallBack;
 import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.activity.CustomImagePreviewActivity;
@@ -57,13 +63,16 @@ import com.umeng.socialize.utils.ShareBoardlistener;
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
 import java.util.Random;
+import java.util.function.Consumer;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -185,7 +194,7 @@ public class PostsAdapter extends BaseAdapter {
         final ViewHolder finalHolder1 = holder;
         holder.multiimageview.setOnItemClickListener(new MultiImageView.OnItemClickListener() {
             @Override
-            public void onItemClick(View view, int position) {
+            public void onItemClick(View view, final int position) {
                 if (!MyUtils.isFastClick()) {
                     return;
                 }
@@ -220,7 +229,7 @@ public class PostsAdapter extends BaseAdapter {
                         .setOnLongClickListener(new OnLongClickListener() {
                             @Override
                             public boolean onLongClick(View view) {
-                                showPopupWindow(context);
+                                showPopupWindow(context,photos.get(position).url);
                                 return false;
                             }
 
@@ -247,6 +256,13 @@ public class PostsAdapter extends BaseAdapter {
                 EventBus.getDefault().post(new CommentEvent(post, -1));
             }
         });
+        holder.llLetter.setVisibility(post.getUserid().equals(Global.loginResult.getId())?View.GONE:View.VISIBLE);
+        holder.llLetter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EventBus.getDefault().post(new CommentEvent(post, -2));
+            }
+        });
         holder.llEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -259,7 +275,8 @@ public class PostsAdapter extends BaseAdapter {
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                builder.setTitle("提醒");
+                builder.setIcon(android.R.drawable.stat_notify_error);
+                builder.setTitle("系统提醒");
                 builder.setMessage("确定删除吗？");
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
 
@@ -313,7 +330,17 @@ public class PostsAdapter extends BaseAdapter {
         holder.commentList.setOnItemClickListener(new CommentListView.OnItemClickListener() {
             @Override
             public void onItemClick(int commentPosition) {
-                EventBus.getDefault().post(new CommentEvent(post, commentPosition));
+                if (post.getReplylist().get(commentPosition).getUserid().equals(Global.loginResult.getId())){
+                    showPopupWindow(post,post.getReplylist().get(commentPosition).getContent(),post.getReplylist().get(commentPosition).getId());
+                }else{
+                    EventBus.getDefault().post(new CommentEvent(post, commentPosition));
+                }
+            }
+        });
+        holder.commentList.setOnItemLongClickListener(new CommentListView.OnItemLongClickListener() {
+            @Override
+            public void onItemLongClick(int position) {
+                showPopupWindow(post,post.getReplylist().get(position).getContent(),post.getReplylist().get(position).getId());
             }
         });
         if (post.getIszan() == 1) {
@@ -491,6 +518,36 @@ public class PostsAdapter extends BaseAdapter {
             }
         });
     }
+    /**
+     * 帖子删评论
+     */
+    public void removeWeiboReply(String replyid) {
+        FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
+        formBody.add("replyid", replyid);//传递键值对参数
+//new call
+        Call call = MyOkHttp.GetCall("weibo.removeWeiboReply", formBody);
+//请求加入调度
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("------------", e.toString());
+//                myHandler.sendEmptyMessage(1);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+
+                String result = response.body().string();
+                MyUtils.e("------删帖------", result);
+                Message message = new Message();
+                message.what = 1;
+                Bundle bundle = new Bundle();
+                bundle.putString("result", result);
+                message.setData(bundle);
+                myHandler.sendMessage(message);
+            }
+        });
+    }
 
     Handler myHandler = new Handler() {
         @Override
@@ -541,16 +598,28 @@ public class PostsAdapter extends BaseAdapter {
     /**
      * 弹出Popupwindow
      */
-    public void showPopupWindow(final Context context) {
+    public void showPopupWindow(final Context context, final String path) {
         View popupWindow_view = LayoutInflater.from(context).inflate(R.layout.pop_layout, null);
         Button save_btn = popupWindow_view.findViewById(R.id.save_btn);
         Button zxing_btn = popupWindow_view.findViewById(R.id.zxing_btn);
         save_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MyUtils.showToast(context, "保存图片");
+                new DownLoadImage(mContext, path, new ImageDownLoadCallBack() {
+                    @Override
+                    public void onDownLoadSuccess(Bitmap bitmap) {
+                        MyUtils.showToast(mContext,"图片保存成功！");
+                    }
+
+                    @Override
+                    public void onDownLoadFailed() {
+                        MyUtils.showToast(mContext,"图片保存失败！");
+                    }
+                });
+                mPopupWindow.dismiss();
             }
         });
+        zxing_btn.setVisibility(View.GONE);
         zxing_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -572,6 +641,46 @@ public class PostsAdapter extends BaseAdapter {
             mPopupWindow.showAtLocation(popupWindow_view, Gravity.BOTTOM, 0, 0);
         }
         MyUtils.setWindowAlpa(context, true);
+    }
+    /**
+     * 弹出Popupwindow
+     */
+    public void showPopupWindow(Post post,final String content, final String replyid) {
+        View popupWindow_view = LayoutInflater.from(mContext).inflate(R.layout.pop_layout, null);
+        Button save_btn = popupWindow_view.findViewById(R.id.save_btn);
+        Button zxing_btn = popupWindow_view.findViewById(R.id.zxing_btn);
+        save_btn.setVisibility(post.getUserid().equals(Global.loginResult.getId())?View.VISIBLE:View.GONE);
+        save_btn.setText("删除");
+        zxing_btn.setText("复制");
+        save_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                removeWeiboReply(replyid);
+                mPopupWindow.dismiss();
+            }
+        });
+        zxing_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MyUtils.copy(content,mContext);
+                mPopupWindow.dismiss();
+            }
+        });
+        mPopupWindow = new PopupWindow(popupWindow_view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        mPopupWindow.setAnimationStyle(R.style.popwindow_anim_style);
+        mPopupWindow.setBackgroundDrawable(new BitmapDrawable());
+        mPopupWindow.setFocusable(true);
+        mPopupWindow.setOutsideTouchable(true);
+        mPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                MyUtils.setWindowAlpa(mContext, false);
+            }
+        });
+        if (mPopupWindow != null && !mPopupWindow.isShowing()) {
+            mPopupWindow.showAtLocation(popupWindow_view, Gravity.BOTTOM, 0, 0);
+        }
+        MyUtils.setWindowAlpa(mContext, true);
     }
     private static class CustomShareListener implements UMShareListener {
 

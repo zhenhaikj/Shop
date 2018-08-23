@@ -1,13 +1,11 @@
 package com.emjiayuan.app.activity;
 
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -16,9 +14,10 @@ import com.emjiayuan.app.BaseActivity;
 import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
-import com.emjiayuan.app.adapter.MyLetterAdapter;
+import com.emjiayuan.app.adapter.MyLetterDetailAdapter;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.MyLetter;
+import com.emjiayuan.app.entity.MyLetterDetail;
 import com.emjiayuan.app.widget.MyListView;
 import com.google.gson.Gson;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
@@ -36,7 +35,7 @@ import okhttp3.FormBody;
 import okhttp3.Response;
 
 
-public class MyLetterActivity extends BaseActivity implements View.OnClickListener {
+public class MyLetterDetailActivity extends BaseActivity implements View.OnClickListener {
 
     @BindView(R.id.back)
     LinearLayout back;
@@ -49,7 +48,7 @@ public class MyLetterActivity extends BaseActivity implements View.OnClickListen
     @BindView(R.id.line_top)
     View lineTop;
     @BindView(R.id.lv_post)
-    MyListView lvMyLetter;
+    MyListView lvMyLetterDetail;
     @BindView(R.id.refreshLayout)
     SmartRefreshLayout refreshLayout;
     @BindView(R.id.et_pl)
@@ -59,8 +58,10 @@ public class MyLetterActivity extends BaseActivity implements View.OnClickListen
     @BindView(R.id.ll_pl)
     LinearLayout llPl;
     private int pageindex = 1;
-    private ArrayList<MyLetter> list = new ArrayList<>();
-    private MyLetterAdapter adapter;
+    private ArrayList<MyLetterDetail> list = new ArrayList<>();
+    private MyLetterDetailAdapter adapter;
+    private MyLetter letter;
+    private String content="";
 
     @Override
     protected int setLayoutId() {
@@ -69,31 +70,34 @@ public class MyLetterActivity extends BaseActivity implements View.OnClickListen
 
     @Override
     protected void initData() {
-        llPl.setVisibility(View.GONE);
-        lvMyLetter.setDividerHeight(1);
         refreshLayout.setEnableRefresh(false);
         refreshLayout.setEnableLoadmore(false);
     }
 
     @Override
     protected void initView() {
-        title.setText("我的私信");
-        getWeiboLetterNew();
+        letter = (MyLetter) getIntent().getSerializableExtra("letter");
+        title.setText(letter.getFrom_nickname());
+        getWeiboLetterList();
     }
 
     @Override
     protected void setListener() {
         back.setOnClickListener(this);
+        send.setOnClickListener(this);
     }
 
     /**
-     * 我的私信
+     * 私信详情列表
      */
-    public void getWeiboLetterNew() {
+    public void getWeiboLetterList() {
         FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
         formBody.add("touserid", Global.loginResult.getId());//传递键值对参数
+        formBody.add("fromuserid", letter.getFrom_userid());//传递键值对参数
+        formBody.add("pageindex", Integer.toString(pageindex));//传递键值对参数
+        formBody.add("pagesize", "20");//传递键值对参数
 //new call
-        Call call = MyOkHttp.GetCall("weibo.getWeiboLetterNew", formBody);
+        Call call = MyOkHttp.GetCall("weibo.getWeiboLetterList", formBody);
 //请求加入调度
         call.enqueue(new Callback() {
             @Override
@@ -106,9 +110,41 @@ public class MyLetterActivity extends BaseActivity implements View.OnClickListen
             public void onResponse(Call call, Response response) throws IOException {
 
                 String result = response.body().string();
-                MyUtils.e("------我的私信------", result);
+                MyUtils.e("------私信详情列表------", result);
                 Message message = new Message();
                 message.what = 0;
+                Bundle bundle = new Bundle();
+                bundle.putString("result", result);
+                message.setData(bundle);
+                myHandler.sendMessage(message);
+            }
+        });
+    }
+    /**
+     * 回复私信
+     */
+    public void addWeiboLetter() {
+        FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
+        formBody.add("fromuserid", Global.loginResult.getId());//传递键值对参数
+        formBody.add("touserid", letter.getFrom_userid());//传递键值对参数
+        formBody.add("content", content);//传递键值对参数
+//new call
+        Call call = MyOkHttp.GetCall("weibo.addWeiboLetter", formBody);
+//请求加入调度
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("------------", e.toString());
+//                myHandler.sendEmptyMessage(1);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+
+                String result = response.body().string();
+                MyUtils.e("------回复私信------", result);
+                Message message = new Message();
+                message.what = 1;
                 Bundle bundle = new Bundle();
                 bundle.putString("result", result);
                 message.setData(bundle);
@@ -126,7 +162,7 @@ public class MyLetterActivity extends BaseActivity implements View.OnClickListen
             String result = bundle.getString("result");
             switch (msg.what) {
 
-                case 0://我的私信
+                case 0://私信详情列表
                     try {
                         JSONObject jsonObject = new JSONObject(result);
                         String code = jsonObject.getString("code");
@@ -135,19 +171,11 @@ public class MyLetterActivity extends BaseActivity implements View.OnClickListen
                         Gson gson = new Gson();
                         if ("200".equals(code)) {
                             JSONArray jsonArray = new JSONArray(data);
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                list.add(gson.fromJson(jsonArray.getJSONObject(i).toString(), MyLetter.class));
+                            for (int i = jsonArray.length()-1; i >= 0; i--) {
+                                list.add(gson.fromJson(jsonArray.getJSONObject(i).toString(), MyLetterDetail.class));
                             }
-                            adapter = new MyLetterAdapter(mActivity, list);
-                            lvMyLetter.setAdapter(adapter);
-                            lvMyLetter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                                @Override
-                                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                                    Intent intent = new Intent(mActivity, MyLetterDetailActivity.class);
-                                    intent.putExtra("letter", list.get(i));
-                                    startActivity(intent);
-                                }
-                            });
+                            adapter = new MyLetterDetailAdapter(mActivity, list);
+                            lvMyLetterDetail.setAdapter(adapter);
                         } else {
                             MyUtils.showToast(mActivity, message);
                         }
@@ -155,7 +183,25 @@ public class MyLetterActivity extends BaseActivity implements View.OnClickListen
                         e.printStackTrace();
                     }
                     break;
-
+                case 1://回复私信
+                    try {
+                        JSONObject jsonObject = new JSONObject(result);
+                        String code = jsonObject.getString("code");
+                        String message = jsonObject.getString("message");
+                        String data = jsonObject.getString("data");
+                        Gson gson = new Gson();
+                        if ("200".equals(code)) {
+                            MyUtils.showToast(mActivity, message);
+                            etPl.setText("");
+                            list.clear();
+                            getWeiboLetterList();
+                        } else {
+                            MyUtils.showToast(mActivity, message);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
             }
         }
     };
@@ -167,7 +213,14 @@ public class MyLetterActivity extends BaseActivity implements View.OnClickListen
             case R.id.back:
                 finish();
                 break;
-
+            case R.id.send:
+                content=etPl.getText().toString();
+                if ("".equals(content)){
+                    MyUtils.showToast(mActivity,"请输入内容！");
+                    return;
+                }
+                addWeiboLetter();
+                break;
         }
     }
 

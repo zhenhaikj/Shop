@@ -284,6 +284,38 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
             }
         });
     }
+    /**
+     * 私信
+     */
+    public void addWeiboLetter(String touserid, String content) {
+        FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
+        formBody.add("touserid", touserid);//传递键值对参数
+        formBody.add("content", content);//传递键值对参数
+        formBody.add("fromuserid", Global.loginResult.getId());//传递键值对参数
+//new call
+        Call call = MyOkHttp.GetCall("weibo.addWeiboLetter", formBody);
+//请求加入调度
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("------------", e.toString());
+//                myHandler.sendEmptyMessage(1);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+
+                String result = response.body().string();
+                MyUtils.e("------私信------", result);
+                Message message = new Message();
+                message.what = 4;
+                Bundle bundle = new Bundle();
+                bundle.putString("result", result);
+                message.setData(bundle);
+                myHandler.sendMessage(message);
+            }
+        });
+    }
 
 
     /**
@@ -417,6 +449,25 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
                         e.printStackTrace();
                     }
                     break;
+                case 4://私信
+                    try {
+                        JSONObject jsonObject = new JSONObject(result);
+                        String code = jsonObject.getString("code");
+                        String message = jsonObject.getString("message");
+                        String data = jsonObject.getString("data");
+                        Gson gson = new Gson();
+                        if ("200".equals(code)) {
+                            MyUtils.showToast(mActivity, message);
+                            etPl.setText("");
+                            llPl.setVisibility(View.GONE);
+                            MyUtils.hideSoftInput(mActivity, etPl);
+                        } else {
+                            MyUtils.showToast(mActivity, message);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
             }
         }
     };
@@ -482,11 +533,13 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
     public void Event(final CommentEvent event) {
         final Post post = event.getPost();
         final int position = event.getPosition();
-        if (position != -1) {
+        if (position == -1){
+            etPl.setHint("可以留言哦~");
+        }else if (position==-2){
+            etPl.setHint("私信"+post.getUsername());
+        }else{
             bean = post.getReplylist().get(position);
             etPl.setHint("回复" + bean.getUsername() + ":");
-        } else {
-            etPl.setHint("可以留言哦~");
         }
         llPl.setVisibility(View.VISIBLE);
         etPl.requestFocus();
@@ -499,24 +552,26 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
                     MyUtils.showToast(mActivity, "请输入内容！");
                     return;
                 }
-                if (position != -1) {
-                    addWeiboReply(post.getId(), content, bean.getUserid());
-                } else {
+                if (position == -2) {
+                    addWeiboLetter(post.getUserid(),content);
+                } else if (position == -1){
                     addWeiboReply(post.getId(), content, "");
+                }else{
+                    addWeiboReply(post.getId(), content, bean.getUserid());
                 }
 
             }
         });
     }
 
-    @Override
-    protected void onVisible() {
-        super.onVisible();
-        list.clear();
-        pageindex = 1;
-        getWeiboList();
-        getWeiboMessage();
-        GlideUtil.loadImageViewLoding(mActivity, Global.loginResult.getHeadimg(), profileImage, R.drawable.default_tx, R.drawable.default_tx);
-        username.setText(Global.loginResult.getNickname());
-    }
+//    @Override
+//    protected void onVisible() {
+//        super.onVisible();
+//        list.clear();
+//        pageindex = 1;
+//        getWeiboList();
+//        getWeiboMessage();
+//        GlideUtil.loadImageViewLoding(mActivity, Global.loginResult.getHeadimg(), profileImage, R.drawable.default_tx, R.drawable.default_tx);
+//        username.setText(Global.loginResult.getNickname());
+//    }
 }

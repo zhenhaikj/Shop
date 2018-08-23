@@ -5,16 +5,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -130,6 +136,7 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
     List<String> PraiseList = new ArrayList<>();
     private CustomShareListener mShareListener;
     private ShareAction mShareAction;
+    private PopupWindow mPopupWindow;
 
     @Override
     protected int setLayoutId() {
@@ -162,7 +169,9 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
         views.setText(post.getVisit_pv());
         address.setText(post.getAddress());
         address.setVisibility((post.getAddress() ==null ? View.INVISIBLE : View.VISIBLE));
+        llLetter.setVisibility((post.getUserid().equals(Global.loginResult.getId()) ? View.GONE : View.VISIBLE));
         label.setText(post.getWeibotype());
+        PraiseList=new ArrayList<>();
         for (int i = 0; i < post.getZanlist().size(); i++) {
             PraiseList.add(post.getZanlist().get(i).getHeadimg());
         }
@@ -359,8 +368,19 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
             @Override
             public void onItemClick(int commentPosition) {
                 bean = post.getReplylist().get(commentPosition);
-                etPl.setHint("回复" + bean.getUsername());
-                reply = 1;
+                if (bean.getUserid().equals(Global.loginResult.getId())){
+                    showPopupWindow(bean.getContent(),bean.getId());
+                }else{
+                    etPl.setHint("回复" + bean.getNickname());
+                    reply = 1;
+                }
+            }
+        });
+        commentList.setOnItemLongClickListener(new CommentListView.OnItemLongClickListener() {
+            @Override
+            public void onItemLongClick(int position) {
+                bean = post.getReplylist().get(position);
+                showPopupWindow(bean.getContent(),bean.getId());
             }
         });
     }
@@ -416,7 +436,8 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
                 mShareAction.open();
                 break;
             case R.id.ll_letter:
-                zanWeibo();
+                reply = 2;
+                etPl.setHint("私信"+post.getNickname());
                 break;
             case R.id.ll_pl:
                 reply = 0;
@@ -430,7 +451,9 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
                 }
                 if (reply == 0) {
                     addWeiboReply(content, "");
-                } else {
+                } else if (reply==2){
+                    addWeiboLetter(post.getUserid(),content);
+                }else{
                     addWeiboReply(content, bean.getUserid());
                 }
                 break;
@@ -493,6 +516,68 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
 
                 String result = response.body().string();
                 MyUtils.e("------评论------", result);
+                Message message = new Message();
+                message.what = 1;
+                Bundle bundle = new Bundle();
+                bundle.putString("result", result);
+                message.setData(bundle);
+                myHandler.sendMessage(message);
+            }
+        });
+    }
+    /**
+     * 帖子删评论
+     */
+    public void removeWeiboReply(String replyid) {
+        FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
+        formBody.add("replyid", replyid);//传递键值对参数
+//new call
+        Call call = MyOkHttp.GetCall("weibo.removeWeiboReply", formBody);
+//请求加入调度
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("------------", e.toString());
+//                myHandler.sendEmptyMessage(1);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+
+                String result = response.body().string();
+                MyUtils.e("------删评论------", result);
+                Message message = new Message();
+                message.what = 0;
+                Bundle bundle = new Bundle();
+                bundle.putString("result", result);
+                message.setData(bundle);
+                myHandler.sendMessage(message);
+            }
+        });
+    }
+    /**
+     * 私信
+     */
+    public void addWeiboLetter(String touserid, String content) {
+        FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
+        formBody.add("touserid", touserid);//传递键值对参数
+        formBody.add("content", content);//传递键值对参数
+        formBody.add("fromuserid", Global.loginResult.getId());//传递键值对参数
+//new call
+        Call call = MyOkHttp.GetCall("weibo.addWeiboLetter", formBody);
+//请求加入调度
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("------------", e.toString());
+//                myHandler.sendEmptyMessage(1);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+
+                String result = response.body().string();
+                MyUtils.e("------私信------", result);
                 Message message = new Message();
                 message.what = 1;
                 Bundle bundle = new Bundle();
@@ -571,7 +656,9 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
                             MyUtils.showToast(mActivity, message);
                             etPl.setText("");
                             MyUtils.hideSoftInput(mActivity, etPl);
-                            getWeiboDetail();
+//                            if (reply!=1){
+                                getWeiboDetail();
+//                            }
                         } else {
                             MyUtils.showToast(mActivity, message);
                         }
@@ -684,5 +771,45 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
     protected void onDestroy() {
         super.onDestroy();
         UMShareAPI.get(this).release();
+    }
+    /**
+     * 弹出Popupwindow
+     */
+    public void showPopupWindow(final String content, final String replyid) {
+        View popupWindow_view = LayoutInflater.from(mActivity).inflate(R.layout.pop_layout, null);
+        Button save_btn = popupWindow_view.findViewById(R.id.save_btn);
+        Button zxing_btn = popupWindow_view.findViewById(R.id.zxing_btn);
+        save_btn.setVisibility(post.getUserid().equals(Global.loginResult.getId())?View.VISIBLE:View.GONE);
+        save_btn.setText("删除");
+        zxing_btn.setText("复制");
+        save_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                removeWeiboReply(replyid);
+                mPopupWindow.dismiss();
+            }
+        });
+        zxing_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MyUtils.copy(content,mActivity);
+                mPopupWindow.dismiss();
+            }
+        });
+        mPopupWindow = new PopupWindow(popupWindow_view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        mPopupWindow.setAnimationStyle(R.style.popwindow_anim_style);
+        mPopupWindow.setBackgroundDrawable(new BitmapDrawable());
+        mPopupWindow.setFocusable(true);
+        mPopupWindow.setOutsideTouchable(true);
+        mPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                MyUtils.setWindowAlpa(mActivity, false);
+            }
+        });
+        if (mPopupWindow != null && !mPopupWindow.isShowing()) {
+            mPopupWindow.showAtLocation(popupWindow_view, Gravity.BOTTOM, 0, 0);
+        }
+        MyUtils.setWindowAlpa(mActivity, true);
     }
 }

@@ -165,7 +165,7 @@ public class BasePhotoFragment extends Fragment {
         imageView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                showPopupWindow(getContext());
+                showPopupWindow(getContext(),beanViewInfo.getUrl());
                 return false;
             }
         });
@@ -320,16 +320,28 @@ public class BasePhotoFragment extends Fragment {
     /**
      * 弹出Popupwindow
      */
-    public void showPopupWindow(final Context context) {
+    public void showPopupWindow(final Context context, final String path) {
         View popupWindow_view = LayoutInflater.from(context).inflate(R.layout.pop_layout, null);
         Button save_btn = popupWindow_view.findViewById(R.id.save_btn);
         Button zxing_btn = popupWindow_view.findViewById(R.id.zxing_btn);
         save_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MyUtils.showToast(context,"保存图片");
+                new DownLoadImage(context, path, new ImageDownLoadCallBack() {
+                    @Override
+                    public void onDownLoadSuccess(Bitmap bitmap) {
+                        MyUtils.showToast(context,"图片保存成功！");
+                    }
+
+                    @Override
+                    public void onDownLoadFailed() {
+                        MyUtils.showToast(context,"图片保存失败！");
+                    }
+                });
+                mPopupWindow.dismiss();
             }
         });
+        zxing_btn.setVisibility(View.GONE);
         zxing_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

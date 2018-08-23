@@ -184,6 +184,7 @@ public class FlowLayout extends ViewGroup {
     }
 
     public void setUrls(List<String> listVals) {
+        allUrls.clear();
         allUrls.addAll(listVals);
         //开始绘制view
         setViews();

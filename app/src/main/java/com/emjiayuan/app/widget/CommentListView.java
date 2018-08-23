@@ -119,11 +119,11 @@ public class CommentListView extends LinearLayout {
         final CircleMovementMethod circleMovementMethod = new CircleMovementMethod(itemSelectorColor, itemSelectorColor);
 
         final Post.ReplylistBean bean = mDatas.get(position);
-        String name = bean.getUsername();
+        String name = bean.getNickname();
         String id = bean.getId();
         String toReplyName = "";
-        if (bean.getReplyusername() != null) {
-            toReplyName = bean.getReplyusername();
+        if (bean.getReplynickname() != null) {
+            toReplyName = bean.getReplynickname();
         }
 
         SpannableStringBuilder builder = new SpannableStringBuilder();
@@ -173,7 +173,7 @@ public class CommentListView extends LinearLayout {
         subjectSpanText.setSpan(new SpannableClickable(itemColor){
                                     @Override
                                     public void onClick(View widget) {
-                                        Toast.makeText(AppApplication.getContext(), textStr + " &id = " + id, Toast.LENGTH_SHORT).show();
+//                                        Toast.makeText(AppApplication.getContext(), textStr + " &id = " + id, Toast.LENGTH_SHORT).show();
                                     }
                                 }, 0, subjectSpanText.length(),
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
