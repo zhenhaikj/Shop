@@ -38,6 +38,7 @@ import com.emjiayuan.app.activity.SpitActivity;
 import com.emjiayuan.app.activity.VipActivity;
 import com.emjiayuan.app.activity.address.AddressActivity;
 import com.emjiayuan.app.entity.Global;
+import com.emjiayuan.app.entity.LoginResult;
 import com.emjiayuan.app.entity.User;
 import com.emjiayuan.app.event.UpdateEvent;
 import com.emjiayuan.app.fragment.BaseLazyFragment;
@@ -393,6 +394,7 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
                         Gson gson = new Gson();
                         if ("200".equals(code)) {
                             user = gson.fromJson(data, User.class);
+                            Global.loginResult=gson.fromJson(data, LoginResult.class);
                             setData();
                         } else {
                             MyUtils.showToast(mActivity, message);

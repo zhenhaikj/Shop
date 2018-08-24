@@ -30,7 +30,9 @@ import com.emjiayuan.app.entity.Label;
 import com.emjiayuan.app.entity.NineGridTestModel;
 import com.emjiayuan.app.entity.Post;
 import com.emjiayuan.app.event.CommentEvent;
+import com.emjiayuan.app.event.DeletePostEvent;
 import com.emjiayuan.app.event.UpdateEvent;
+import com.emjiayuan.app.event.ZanEvent;
 import com.emjiayuan.app.fragment.BaseLazyFragment;
 import com.emjiayuan.app.widget.MyGridView;
 import com.emjiayuan.app.widget.MyListView;
@@ -99,6 +101,7 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
 
     private LabelAdapter labelAdapter;
     private PostsAdapter mAdapter;
+    private Post post;
     private ArrayList<Post> list = new ArrayList<>();
     private ArrayList<Label> labels = new ArrayList<>();
     private List<NineGridTestModel> mList = new ArrayList<>();
@@ -116,6 +119,7 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
     private int pageindex = 1;
     private String type = "";//帖子类型
     Post.ReplylistBean bean;
+    private int position;
 
 
     @Override
@@ -146,6 +150,7 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(RefreshLayout refreshlayout) {
+                mAdapter.notifyDataSetChanged();
                 list.clear();
                 pageindex = 1;
                 refreshLayout.setLoadmoreFinished(false);
@@ -219,7 +224,37 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
         });
     }
 
+    /**
+     * 详情
+     */
+    public void getWeiboDetail(String weiboid) {
+        FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
+        formBody.add("weiboid", weiboid);//传递键值对参数
+        formBody.add("loginuserid", Global.loginResult.getId());//传递键值对参数
+//new call
+        Call call = MyOkHttp.GetCall("weibo.getWeiboDetail", formBody);
+//请求加入调度
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("------------", e.toString());
+//                myHandler.sendEmptyMessage(1);
+            }
 
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+
+                String result = response.body().string();
+                MyUtils.e("------帖子详情------", result);
+                Message message = new Message();
+                message.what = 5;
+                Bundle bundle = new Bundle();
+                bundle.putString("result", result);
+                message.setData(bundle);
+                myHandler.sendMessage(message);
+            }
+        });
+    }
     /**
      * 帖子类型
      */
@@ -440,8 +475,7 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
                             etPl.setText("");
                             llPl.setVisibility(View.GONE);
                             MyUtils.hideSoftInput(mActivity, etPl);
-                            list.clear();
-                            getWeiboList();
+                            getWeiboDetail(list.get(position).getId());
                         } else {
                             MyUtils.showToast(mActivity, message);
                         }
@@ -461,6 +495,24 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
                             etPl.setText("");
                             llPl.setVisibility(View.GONE);
                             MyUtils.hideSoftInput(mActivity, etPl);
+                        } else {
+                            MyUtils.showToast(mActivity, message);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case 5://详情
+                    try {
+                        JSONObject jsonObject = new JSONObject(result);
+                        String code = jsonObject.getString("code");
+                        String message = jsonObject.getString("message");
+                        String data = jsonObject.getString("data");
+                        Gson gson = new Gson();
+                        if ("200".equals(code)) {
+                            post = gson.fromJson(data, Post.class);
+                            list.set(position,post);
+                            mAdapter.notifyDataSetChanged();
                         } else {
                             MyUtils.showToast(mActivity, message);
                         }
@@ -528,18 +580,31 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
         pageindex=1;
         getWeiboList();
     }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void Event(ZanEvent event) {
+        position=event.getPosition();
+        getWeiboDetail(list.get(position).getId());
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void Event(DeletePostEvent event) {
+        position=event.getPosition();
+        list.remove(position);
+        mAdapter.notifyDataSetChanged();
+    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void Event(final CommentEvent event) {
         final Post post = event.getPost();
-        final int position = event.getPosition();
-        if (position == -1){
+        final int commentposition = event.getCommentposition();
+        position = event.getPosition();
+        if (commentposition == -1){
             etPl.setHint("可以留言哦~");
-        }else if (position==-2){
-            etPl.setHint("私信"+post.getUsername());
+        }else if (commentposition==-2){
+            etPl.setHint("私信"+post.getNickname());
         }else{
-            bean = post.getReplylist().get(position);
-            etPl.setHint("回复" + bean.getUsername() + ":");
+            bean = post.getReplylist().get(commentposition);
+            etPl.setHint("回复" + bean.getNickname() + ":");
         }
         llPl.setVisibility(View.VISIBLE);
         etPl.requestFocus();
@@ -552,9 +617,9 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
                     MyUtils.showToast(mActivity, "请输入内容！");
                     return;
                 }
-                if (position == -2) {
+                if (commentposition == -2) {
                     addWeiboLetter(post.getUserid(),content);
-                } else if (position == -1){
+                } else if (commentposition == -1){
                     addWeiboReply(post.getId(), content, "");
                 }else{
                     addWeiboReply(post.getId(), content, bean.getUserid());

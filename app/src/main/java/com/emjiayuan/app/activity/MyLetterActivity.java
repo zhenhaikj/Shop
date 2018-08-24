@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.emjiayuan.app.BaseActivity;
@@ -28,6 +29,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import okhttp3.Call;
@@ -49,7 +51,7 @@ public class MyLetterActivity extends BaseActivity implements View.OnClickListen
     @BindView(R.id.line_top)
     View lineTop;
     @BindView(R.id.lv_post)
-    MyListView lvMyLetter;
+    ListView lvMyLetter;
     @BindView(R.id.refreshLayout)
     SmartRefreshLayout refreshLayout;
     @BindView(R.id.et_pl)

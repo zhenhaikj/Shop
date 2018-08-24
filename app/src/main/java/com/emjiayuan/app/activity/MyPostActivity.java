@@ -23,7 +23,9 @@ import com.emjiayuan.app.adapter.PostsAdapter;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.Post;
 import com.emjiayuan.app.event.CommentEvent;
+import com.emjiayuan.app.event.DeletePostEvent;
 import com.emjiayuan.app.event.UpdateEvent;
+import com.emjiayuan.app.event.ZanEvent;
 import com.emjiayuan.app.widget.MyListView;
 import com.google.gson.Gson;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
@@ -75,6 +77,8 @@ public class MyPostActivity extends BaseActivity implements AdapterView.OnItemCl
     private ArrayList<Post> list = new ArrayList<>();
     private PostsAdapter adapter;
     private Post.ReplylistBean bean;
+    private int position;
+    private Post post;
 
     @Override
     protected int setLayoutId() {
@@ -168,6 +172,37 @@ public class MyPostActivity extends BaseActivity implements AdapterView.OnItemCl
             }
         });
     }
+    /**
+     * 详情
+     */
+    public void getWeiboDetail(String weiboid) {
+        FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
+        formBody.add("weiboid", weiboid);//传递键值对参数
+        formBody.add("loginuserid", Global.loginResult.getId());//传递键值对参数
+//new call
+        Call call = MyOkHttp.GetCall("weibo.getWeiboDetail", formBody);
+//请求加入调度
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("------------", e.toString());
+//                myHandler.sendEmptyMessage(1);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+
+                String result = response.body().string();
+                MyUtils.e("------帖子详情------", result);
+                Message message = new Message();
+                message.what = 5;
+                Bundle bundle = new Bundle();
+                bundle.putString("result", result);
+                message.setData(bundle);
+                myHandler.sendMessage(message);
+            }
+        });
+    }
 
     /**
      * 评论
@@ -202,6 +237,7 @@ public class MyPostActivity extends BaseActivity implements AdapterView.OnItemCl
             }
         });
     }
+
 
 
     Handler myHandler = new Handler() {
@@ -258,8 +294,7 @@ public class MyPostActivity extends BaseActivity implements AdapterView.OnItemCl
                             etPl.setText("");
                             llPl.setVisibility(View.GONE);
                             MyUtils.hideSoftInput(mActivity, etPl);
-                            list.clear();
-                            getWeiboList();
+                            getWeiboDetail(list.get(position).getId());
                         } else {
                             MyUtils.showToast(mActivity, message);
                         }
@@ -267,7 +302,24 @@ public class MyPostActivity extends BaseActivity implements AdapterView.OnItemCl
                         e.printStackTrace();
                     }
                     break;
-
+                case 5://详情
+                    try {
+                        JSONObject jsonObject = new JSONObject(result);
+                        String code = jsonObject.getString("code");
+                        String message = jsonObject.getString("message");
+                        String data = jsonObject.getString("data");
+                        Gson gson = new Gson();
+                        if ("200".equals(code)) {
+                            post = gson.fromJson(data, Post.class);
+                            list.set(position,post);
+                            adapter.notifyDataSetChanged();
+                        } else {
+                            MyUtils.showToast(mActivity, message);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
             }
         }
     };
@@ -278,18 +330,31 @@ public class MyPostActivity extends BaseActivity implements AdapterView.OnItemCl
         pageindex = 1;
         getWeiboList();
     }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void Event(ZanEvent event) {
+        position=event.getPosition();
+        getWeiboDetail(list.get(position).getId());
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void Event(DeletePostEvent event) {
+        position=event.getPosition();
+        list.remove(position);
+        adapter.notifyDataSetChanged();
+    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void Event(final CommentEvent event) {
         final Post post = event.getPost();
-        final int position = event.getPosition();
+        position=event.getPosition();
+        final int position = event.getCommentposition();
         if (position == -1) {
             etPl.setHint("可以留言哦~");
         } else if (position == -2) {
-            etPl.setHint("私信" + post.getUsername());
+            etPl.setHint("私信" + post.getNickname());
         } else {
             bean = post.getReplylist().get(position);
-            etPl.setHint("回复" + bean.getUsername() + ":");
+            etPl.setHint("回复" + bean.getNickname() + ":");
         }
         llPl.setVisibility(View.VISIBLE);
         etPl.requestFocus();

@@ -5,8 +5,13 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -37,13 +42,27 @@ public class DownLoadImage implements Runnable {
 //                    .get();
             bitmap = Glide.with(context)
                     .asBitmap()
+                    .listener(new RequestListener<Bitmap>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                            callBack.onDownLoadFailed();
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                            saveImageToGallery(context,resource);
+                            if (resource != null && currentFile.exists()) {
+                                callBack.onDownLoadSuccess(currentFile);
+                            } else {
+                                callBack.onDownLoadFailed();
+                            }
+                            return false;
+                        }
+                    })
                     .load(url)
                     .into(200, 200)
                     .get();
-            if (bitmap != null){
-                // 在这里执行图片保存方法
-                saveImageToGallery(context,bitmap);
-            }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -52,18 +71,18 @@ public class DownLoadImage implements Runnable {
 //            } else {
 //                callBack.onDownLoadFailed();
 //            }
-            if (bitmap != null && currentFile.exists()) {
-                callBack.onDownLoadSuccess(bitmap);
-            } else {
-                callBack.onDownLoadFailed();
-            }
+//            if (bitmap != null && currentFile.exists()) {
+//                callBack.onDownLoadSuccess(currentFile);
+//            } else {
+//                callBack.onDownLoadFailed();
+//            }
         }
     }
 
     public void saveImageToGallery(Context context, Bitmap bmp) {
         // 首先保存图片
         File file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsoluteFile();//注意小米手机必须这样获得public绝对路径
-        String fileName = "ningjing";
+        String fileName = "伊穆家园";
         File appDir = new File(file ,fileName);
         if (!appDir.exists()) {
             appDir.mkdirs();

@@ -286,6 +286,8 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
                 images+=imageslist.get(i)+",";
             }
             formBody.add("images",images.substring(0,images.lastIndexOf(",")));
+        }else{
+            formBody.add("images","");
         }
         if (addressIsChecked){
             formBody.add("address",addressStr);
@@ -328,6 +330,8 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
                 images+=imageslist.get(i)+",";
             }
             formBody.add("images",images.substring(0,images.lastIndexOf(",")));
+        }else{
+            formBody.add("images","");
         }
         if (addressIsChecked){
             formBody.add("address",addressStr);

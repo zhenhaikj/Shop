@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.emjiayuan.app.BaseActivity;
@@ -21,6 +23,10 @@ import com.emjiayuan.app.entity.MyLetterDetail;
 import com.emjiayuan.app.widget.MyListView;
 import com.google.gson.Gson;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
+import com.tencent.android.tpush.XGPushClickedResult;
+import com.tencent.android.tpush.XGPushManager;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -48,7 +54,7 @@ public class MyLetterDetailActivity extends BaseActivity implements View.OnClick
     @BindView(R.id.line_top)
     View lineTop;
     @BindView(R.id.lv_post)
-    MyListView lvMyLetterDetail;
+    ListView lvMyLetterDetail;
     @BindView(R.id.refreshLayout)
     SmartRefreshLayout refreshLayout;
     @BindView(R.id.et_pl)
@@ -57,11 +63,15 @@ public class MyLetterDetailActivity extends BaseActivity implements View.OnClick
     TextView send;
     @BindView(R.id.ll_pl)
     LinearLayout llPl;
+//    @BindView(R.id.sv)
+//    ScrollView sv;
     private int pageindex = 1;
     private ArrayList<MyLetterDetail> list = new ArrayList<>();
     private MyLetterDetailAdapter adapter;
     private MyLetter letter;
-    private String content="";
+    private String content = "";
+    private String nickname = "";
+    private String id = "";
 
     @Override
     protected int setLayoutId() {
@@ -70,15 +80,45 @@ public class MyLetterDetailActivity extends BaseActivity implements View.OnClick
 
     @Override
     protected void initData() {
-        refreshLayout.setEnableRefresh(false);
         refreshLayout.setEnableLoadmore(false);
+        refreshLayout.setEnableHeaderTranslationContent(false);
+        refreshLayout.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(RefreshLayout refreshlayout) {
+                pageindex++;
+                getWeiboLetterList();
+            }
+        });
     }
 
     @Override
     protected void initView() {
         letter = (MyLetter) getIntent().getSerializableExtra("letter");
-        title.setText(letter.getFrom_nickname());
-        getWeiboLetterList();
+        if (letter!=null){
+//            nickname=letter.getFrom_nickname();
+            id=letter.getFrom_userid();
+//            title.setText(nickname);
+            getWeiboLetterList();
+        }else{
+            //this必须为点击消息要跳转到页面的上下文。
+            XGPushClickedResult clickedResult = XGPushManager.onActivityStarted(this);
+            if (clickedResult!=null){
+                //获取消息附近参数
+                String ster = clickedResult.getCustomContent();
+                try {
+                    JSONObject jsonObject=new JSONObject(ster);
+                    id=jsonObject.getString("event_val");
+                    getWeiboLetterList();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+//获取消息标题
+                String set = clickedResult.getTitle();
+//获取消息内容
+                String s = clickedResult.getContent();
+                MyUtils.e("推送",ster+"|"+set+"|"+s);
+            }
+        }
     }
 
     @Override
@@ -93,7 +133,7 @@ public class MyLetterDetailActivity extends BaseActivity implements View.OnClick
     public void getWeiboLetterList() {
         FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
         formBody.add("touserid", Global.loginResult.getId());//传递键值对参数
-        formBody.add("fromuserid", letter.getFrom_userid());//传递键值对参数
+        formBody.add("fromuserid", id);//传递键值对参数
         formBody.add("pageindex", Integer.toString(pageindex));//传递键值对参数
         formBody.add("pagesize", "20");//传递键值对参数
 //new call
@@ -120,13 +160,14 @@ public class MyLetterDetailActivity extends BaseActivity implements View.OnClick
             }
         });
     }
+
     /**
      * 回复私信
      */
     public void addWeiboLetter() {
         FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
         formBody.add("fromuserid", Global.loginResult.getId());//传递键值对参数
-        formBody.add("touserid", letter.getFrom_userid());//传递键值对参数
+        formBody.add("touserid", id);//传递键值对参数
         formBody.add("content", content);//传递键值对参数
 //new call
         Call call = MyOkHttp.GetCall("weibo.addWeiboLetter", formBody);
@@ -170,15 +211,24 @@ public class MyLetterDetailActivity extends BaseActivity implements View.OnClick
                         String data = jsonObject.getString("data");
                         Gson gson = new Gson();
                         if ("200".equals(code)) {
+                            nickname = jsonObject.getString("from_showname");
+                            title.setText(nickname);
                             JSONArray jsonArray = new JSONArray(data);
-                            for (int i = jsonArray.length()-1; i >= 0; i--) {
-                                list.add(gson.fromJson(jsonArray.getJSONObject(i).toString(), MyLetterDetail.class));
+//                            for (int i = jsonArray.length() - 1; i >= 0; i--) {
+                            for (int i = 0; i <jsonArray.length(); i++) {
+                                list.add(0,gson.fromJson(jsonArray.getJSONObject(i).toString(), MyLetterDetail.class));
                             }
-                            adapter = new MyLetterDetailAdapter(mActivity, list);
-                            lvMyLetterDetail.setAdapter(adapter);
+                            if (adapter==null){
+                                adapter = new MyLetterDetailAdapter(mActivity, list);
+                                lvMyLetterDetail.setAdapter(adapter);
+                                lvMyLetterDetail.setSelection(list.size()-1);
+                            }else{
+                                adapter.notifyDataSetChanged();
+                            }
                         } else {
                             MyUtils.showToast(mActivity, message);
                         }
+                        refreshLayout.finishRefresh();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -193,6 +243,8 @@ public class MyLetterDetailActivity extends BaseActivity implements View.OnClick
                         if ("200".equals(code)) {
                             MyUtils.showToast(mActivity, message);
                             etPl.setText("");
+                            pageindex=1;
+                            adapter=null;
                             list.clear();
                             getWeiboLetterList();
                         } else {
@@ -214,9 +266,9 @@ public class MyLetterDetailActivity extends BaseActivity implements View.OnClick
                 finish();
                 break;
             case R.id.send:
-                content=etPl.getText().toString();
-                if ("".equals(content)){
-                    MyUtils.showToast(mActivity,"请输入内容！");
+                content = etPl.getText().toString();
+                if ("".equals(content)) {
+                    MyUtils.showToast(mActivity, "请输入内容！");
                     return;
                 }
                 addWeiboLetter();

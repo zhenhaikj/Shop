@@ -70,10 +70,19 @@ public class Post implements Serializable{
     private boolean isoneimage;
     private int iszan;
     private int isreplymore;
+    private int position;
     private List<String> images;
     private List<ZanlistBean> zanlist;
     private List<ReplylistBean> replylist;
     private boolean expand=false;
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
 
     public String getAddress() {
         return address;

@@ -30,6 +30,8 @@ import com.previewlibrary.loader.OnLongClickListener;
 import com.previewlibrary.loader.VideoClickListener;
 import com.previewlibrary.wight.SmoothImageView;
 
+import java.io.File;
+
 import uk.co.senab2.photoview2.PhotoViewAttacher;
 
 /**
@@ -329,15 +331,15 @@ public class BasePhotoFragment extends Fragment {
             public void onClick(View view) {
                 new DownLoadImage(context, path, new ImageDownLoadCallBack() {
                     @Override
-                    public void onDownLoadSuccess(Bitmap bitmap) {
-                        MyUtils.showToast(context,"图片保存成功！");
+                    public void onDownLoadSuccess(File file) {
+                        MyUtils.showToast(context,"图片保存成功！"+file.getAbsolutePath());
                     }
 
                     @Override
                     public void onDownLoadFailed() {
                         MyUtils.showToast(context,"图片保存失败！");
                     }
-                });
+                }).run();
                 mPopupWindow.dismiss();
             }
         });

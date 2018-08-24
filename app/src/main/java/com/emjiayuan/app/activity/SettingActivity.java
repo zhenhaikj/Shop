@@ -32,6 +32,7 @@ import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.Utils.SpUtils;
 import com.emjiayuan.app.entity.Global;
+import com.emjiayuan.app.entity.LoginResult;
 import com.emjiayuan.app.entity.User;
 import com.google.gson.Gson;
 import com.umeng.analytics.MobclickAgent;
@@ -238,6 +239,7 @@ public class SettingActivity extends BaseActivity {
                         Gson gson = new Gson();
                         if ("200".equals(code)) {
                             user = gson.fromJson(data, User.class);
+                            Global.loginResult=gson.fromJson(data, LoginResult.class);
                             setData();
                         } else {
                             MyUtils.showToast(mActivity, message);

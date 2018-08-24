@@ -45,7 +45,9 @@ import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.PhotoInfo;
 import com.emjiayuan.app.entity.Post;
 import com.emjiayuan.app.event.CommentEvent;
+import com.emjiayuan.app.event.DeletePostEvent;
 import com.emjiayuan.app.event.UpdateEvent;
+import com.emjiayuan.app.event.ZanEvent;
 import com.emjiayuan.app.widget.CommentListView;
 import com.emjiayuan.app.widget.MultiImageView;
 import com.emjiayuan.app.widget.PraiseListView;
@@ -127,7 +129,7 @@ public class PostsAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, final ViewGroup parent) {
+    public View getView(final int position, View convertView, final ViewGroup parent) {
         ViewHolder holder = null;
         if (convertView == null || convertView.getTag() == null) {
             convertView = mInflater.inflate(R.layout.post_item, parent, false);
@@ -247,20 +249,20 @@ public class PostsAdapter extends BaseAdapter {
         holder.llZan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                zanWeibo(post.getId());
+                zanWeibo(post.getId(),position);
             }
         });
         holder.llPl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                EventBus.getDefault().post(new CommentEvent(post, -1));
+                EventBus.getDefault().post(new CommentEvent(post, position,-1));
             }
         });
         holder.llLetter.setVisibility(post.getUserid().equals(Global.loginResult.getId())?View.GONE:View.VISIBLE);
         holder.llLetter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                EventBus.getDefault().post(new CommentEvent(post, -2));
+                EventBus.getDefault().post(new CommentEvent(post, position,-2));
             }
         });
         holder.llEdit.setOnClickListener(new View.OnClickListener() {
@@ -288,7 +290,7 @@ public class PostsAdapter extends BaseAdapter {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        removeWeibo(post.getId());
+                        removeWeibo(post.getId(),position);
                     }
                 });
                 builder.create().show();
@@ -331,16 +333,16 @@ public class PostsAdapter extends BaseAdapter {
             @Override
             public void onItemClick(int commentPosition) {
                 if (post.getReplylist().get(commentPosition).getUserid().equals(Global.loginResult.getId())){
-                    showPopupWindow(post,post.getReplylist().get(commentPosition).getContent(),post.getReplylist().get(commentPosition).getId());
+                    showPopupWindow(post,post.getReplylist().get(commentPosition).getContent(),post.getReplylist().get(commentPosition).getId(),position);
                 }else{
-                    EventBus.getDefault().post(new CommentEvent(post, commentPosition));
+                    EventBus.getDefault().post(new CommentEvent(post, position,commentPosition));
                 }
             }
         });
         holder.commentList.setOnItemLongClickListener(new CommentListView.OnItemLongClickListener() {
             @Override
-            public void onItemLongClick(int position) {
-                showPopupWindow(post,post.getReplylist().get(position).getContent(),post.getReplylist().get(position).getId());
+            public void onItemLongClick(int commentposition) {
+                showPopupWindow(post,post.getReplylist().get(commentposition).getContent(),post.getReplylist().get(commentposition).getId(),position);
             }
         });
         if (post.getIszan() == 1) {
@@ -459,7 +461,7 @@ public class PostsAdapter extends BaseAdapter {
     /**
      * 帖子点赞
      */
-    public void zanWeibo(String weiboid) {
+    public void zanWeibo(String weiboid, final int position) {
         FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
         formBody.add("weiboid", weiboid);//传递键值对参数
         formBody.add("userid", Global.loginResult.getId());//传递键值对参数
@@ -482,15 +484,16 @@ public class PostsAdapter extends BaseAdapter {
                 message.what = 0;
                 Bundle bundle = new Bundle();
                 bundle.putString("result", result);
+                bundle.putInt("position", position);
                 message.setData(bundle);
                 myHandler.sendMessage(message);
             }
         });
     }
     /**
-     * 帖子点赞
+     * 帖子删除
      */
-    public void removeWeibo(String weiboid) {
+    public void removeWeibo(String weiboid, final int position) {
         FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
         formBody.add("weiboid", weiboid);//传递键值对参数
         formBody.add("userid", Global.loginResult.getId());//传递键值对参数
@@ -513,6 +516,7 @@ public class PostsAdapter extends BaseAdapter {
                 message.what = 1;
                 Bundle bundle = new Bundle();
                 bundle.putString("result", result);
+                bundle.putInt("position", position);
                 message.setData(bundle);
                 myHandler.sendMessage(message);
             }
@@ -521,7 +525,7 @@ public class PostsAdapter extends BaseAdapter {
     /**
      * 帖子删评论
      */
-    public void removeWeiboReply(String replyid) {
+    public void removeWeiboReply(String replyid, final int position) {
         FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
         formBody.add("replyid", replyid);//传递键值对参数
 //new call
@@ -538,11 +542,12 @@ public class PostsAdapter extends BaseAdapter {
             public void onResponse(Call call, Response response) throws IOException {
 
                 String result = response.body().string();
-                MyUtils.e("------删帖------", result);
+                MyUtils.e("------删评论------", result);
                 Message message = new Message();
-                message.what = 1;
+                message.what = 0;
                 Bundle bundle = new Bundle();
                 bundle.putString("result", result);
+                bundle.putInt("position", position);
                 message.setData(bundle);
                 myHandler.sendMessage(message);
             }
@@ -555,6 +560,7 @@ public class PostsAdapter extends BaseAdapter {
             super.handleMessage(msg);
             Bundle bundle = msg.getData();
             String result = bundle.getString("result");
+            int position = bundle.getInt("position");
             switch (msg.what) {
 
                 case 0://点赞
@@ -566,7 +572,7 @@ public class PostsAdapter extends BaseAdapter {
                         Gson gson = new Gson();
                         if ("200".equals(code)) {
                             MyUtils.showToast(mContext, message);
-                            EventBus.getDefault().post(new UpdateEvent(""));
+                            EventBus.getDefault().post(new ZanEvent(position));
                         } else {
                             MyUtils.showToast(mContext, message);
                         }
@@ -583,7 +589,7 @@ public class PostsAdapter extends BaseAdapter {
                         Gson gson = new Gson();
                         if ("200".equals(code)) {
                             MyUtils.showToast(mContext, message);
-                            EventBus.getDefault().post(new UpdateEvent(""));
+                            EventBus.getDefault().post(new DeletePostEvent(position));
                         } else {
                             MyUtils.showToast(mContext, message);
                         }
@@ -645,7 +651,7 @@ public class PostsAdapter extends BaseAdapter {
     /**
      * 弹出Popupwindow
      */
-    public void showPopupWindow(Post post,final String content, final String replyid) {
+    public void showPopupWindow(Post post,final String content, final String replyid,final int position) {
         View popupWindow_view = LayoutInflater.from(mContext).inflate(R.layout.pop_layout, null);
         Button save_btn = popupWindow_view.findViewById(R.id.save_btn);
         Button zxing_btn = popupWindow_view.findViewById(R.id.zxing_btn);
@@ -655,7 +661,7 @@ public class PostsAdapter extends BaseAdapter {
         save_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                removeWeiboReply(replyid);
+                removeWeiboReply(replyid,position);
                 mPopupWindow.dismiss();
             }
         });
