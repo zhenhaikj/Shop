@@ -385,6 +385,9 @@ public class MyPostActivity extends BaseActivity implements AdapterView.OnItemCl
         if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
         }
+        if (adapter!=null){
+            adapter.releasePlayer();
+        }
     }
 
     @Override

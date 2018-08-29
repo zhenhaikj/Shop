@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import butterknife.BindView;
+import cn.jzvd.JZVideoPlayer;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -379,9 +380,22 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     }
 
+//    @Override
+//    public void onBackPressed() {
+//        //按返回键返回桌面
+//        moveTaskToBack(true);
+//    }
     @Override
     public void onBackPressed() {
-        //按返回键返回桌面
-        moveTaskToBack(true);
+        if (JZVideoPlayer.backPress()) {
+            return;
+        }
+        super.onBackPressed();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        JZVideoPlayer.releaseAllVideos();
     }
 }

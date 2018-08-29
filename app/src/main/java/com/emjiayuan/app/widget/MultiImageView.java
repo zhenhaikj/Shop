@@ -3,7 +3,9 @@ package com.emjiayuan.app.widget;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -40,7 +42,7 @@ public class MultiImageView extends LinearLayout {
 	private LayoutParams onePicPara;
 	private LayoutParams morePara, moreParaColumnFirst;
 	private LayoutParams rowPara;
-	private ImageView imageView;
+	private ColorFilterImageView imageView;
 
 	private OnItemClickListener mOnItemClickListener;
 	public void setOnItemClickListener(OnItemClickListener onItemClickListener){
@@ -175,9 +177,12 @@ public class MultiImageView extends LinearLayout {
 		}
 	}
 
-	private ImageView createImageView(final int position, final boolean isMultiImage) {
+	private View createImageView(final int position, final boolean isMultiImage) {
 		final PhotoInfo photoInfo = imagesList.get(position);
+//		View view=LayoutInflater.from(getContext()).inflate(R.layout.sq_icon_item,null);
 		imageView = new ColorFilterImageView(getContext());
+//		imageView = view.findViewById(R.id.cfimg);
+//		ImageView btnVideo = view.findViewById(R.id.btnVideo);
 		if (photoInfo!=null) {
 //		final ImageView imageView = new ColorFilterImageView(getContext());
 //		imageView.setBackgroundColor(getResources().getColor(R.color.im_font_color_text_hint));
@@ -227,7 +232,13 @@ public class MultiImageView extends LinearLayout {
 //					imageView.setTag(R.id.tag_group,photoInfo);
 //				}
 //			});
-			Glide.with(getContext()).load(photoInfo.url).into(imageView);
+			if (!"".equals(photoInfo.getVideoUrl())){
+//				btnVideo.setVisibility(VISIBLE);
+				Glide.with(getContext()).load(photoInfo.getVideoUrl()).into(imageView);
+			}else{
+//				btnVideo.setVisibility(GONE);
+				Glide.with(getContext()).load(photoInfo.url).into(imageView);
+			}
 //		}
 		}
 		return imageView;

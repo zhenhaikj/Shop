@@ -9,11 +9,13 @@ import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -21,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -28,6 +31,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
@@ -41,6 +47,7 @@ import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.activity.CustomImagePreviewActivity;
 import com.emjiayuan.app.activity.GoodsDetailActivity;
 import com.emjiayuan.app.activity.PostActivity;
+import com.emjiayuan.app.activity.VideoPlayerActivity;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.PhotoInfo;
 import com.emjiayuan.app.entity.Post;
@@ -52,6 +59,7 @@ import com.emjiayuan.app.widget.CommentListView;
 import com.emjiayuan.app.widget.MultiImageView;
 import com.emjiayuan.app.widget.PraiseListView;
 import com.google.gson.Gson;
+import com.previewlibrary.GPVideoPlayerActivity;
 import com.previewlibrary.GPreviewBuilder;
 import com.previewlibrary.loader.OnLongClickListener;
 import com.umeng.socialize.ShareAction;
@@ -78,6 +86,8 @@ import java.util.function.Consumer;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import cn.jzvd.JZVideoPlayer;
+import cn.jzvd.JZVideoPlayerStandard;
 import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -103,6 +113,8 @@ public class PostsAdapter extends BaseAdapter {
     private CustomShareListener mShareListener;
     private ShareAction mShareAction;
     private boolean isMine=false;
+    private MediaPlayer mPlayer;
+    private int playPosition=-1;
 
     public PostsAdapter(Context mContext, ArrayList<Post> grouplists,boolean isMine) {
         super();
@@ -152,15 +164,15 @@ public class PostsAdapter extends BaseAdapter {
         holder.address.setVisibility((post.getAddress() ==null ? View.INVISIBLE : View.VISIBLE));
         holder.llEdit.setVisibility((isMine ? View.VISIBLE : View.GONE));
         holder.llDelete.setVisibility((isMine ? View.VISIBLE : View.GONE));
-        final ViewHolder finalHolder2 = holder;
+        final ViewHolder finalHolder = holder;
         holder.more.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if ("查看更多...".equals(finalHolder2.more.getText().toString())){
-                    finalHolder2.more.setText("收起");
+                if ("查看更多...".equals(finalHolder.more.getText().toString())){
+                    finalHolder.more.setText("收起");
                     post.setExpand(true);
                 }else{
-                    finalHolder2.more.setText("查看更多...");
+                    finalHolder.more.setText("查看更多...");
                     post.setExpand(false);
                 }
                 notifyDataSetChanged();
@@ -178,22 +190,113 @@ public class PostsAdapter extends BaseAdapter {
         }
         final List<PhotoInfo> photos = new ArrayList<PhotoInfo>();
         if (post.getImages().size() == 1) {
-            final ViewHolder finalHolder = holder;
             Glide.with(mContext).load(post.getImages().get(0)).into(new SimpleTarget<Drawable>() {
                 @Override
                 public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
-                    photos.add(new PhotoInfo(post.getImages().get(0), resource.getIntrinsicWidth(), resource.getIntrinsicHeight()));
+                    photos.add(new PhotoInfo(post.getImages().get(0),"", resource.getIntrinsicWidth(), resource.getIntrinsicHeight()));
                     finalHolder.multiimageview.setList(photos);
                 }
             });
         } else {
             for (int i = 0; i < post.getImages().size(); i++) {
-                photos.add(new PhotoInfo(post.getImages().get(i), 0, 0));
+                photos.add(new PhotoInfo(post.getImages().get(i),"", 0, 0));
             }
             holder.multiimageview.setList(photos);
         }
+        if (post.getShowtype()==3){
+//            Glide.with(mContext).load(post.getVideo()).into(new SimpleTarget<Drawable>() {
+//                @Override
+//                public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
+//                    photos.add(new PhotoInfo("",post.getVideo(), resource.getIntrinsicWidth(), resource.getIntrinsicHeight()));
+//                    finalHolder.multiimageview.setList(photos);
+//                }
+//            });
+            finalHolder.multiimageview.setVisibility(View.GONE);
+            finalHolder.videoplayer.setVisibility(View.VISIBLE);
+            finalHolder.content.setVisibility(View.VISIBLE);
+            finalHolder.audioLl.setVisibility(View.GONE);
+            finalHolder.videoplayer.setUp(
+                    post.getVideo(), JZVideoPlayer.SCREEN_WINDOW_LIST,
+                    "");
+            Glide.with(convertView.getContext())
+                    .load(post.getVideo())
+//                    .listener(new RequestListener<Drawable>() {
+//                        @Override
+//                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+//                            return false;
+//                        }
+//
+//                        @Override
+//                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+//                            finalHolder.videoplayer.setLayoutParams(new LinearLayout.LayoutParams(resource.getIntrinsicWidth(),resource.getIntrinsicHeight()));
+//                            return false;
+//                        }
+//                    })
+                    .into(finalHolder.videoplayer.thumbImageView);
+            finalHolder.videoplayer.positionInList = position;
+        }else if (post.getShowtype()==2){
+            finalHolder.audioLl.setVisibility(View.VISIBLE);
+            finalHolder.videoplayer.setVisibility(View.GONE);
+            finalHolder.multiimageview.setVisibility(View.GONE);
+            finalHolder.content.setVisibility(View.GONE);
+//            finalHolder.second.setText(post.getAud);
+            final MediaPlayer mediaPlayer=new MediaPlayer();
+            try {
+                mediaPlayer.reset();
+                mediaPlayer.setDataSource(post.getAudio());
+                mediaPlayer.prepare();
+                finalHolder.second.setText(mediaPlayer.getDuration()/1000+"''");
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            if (post.isPlaying()){
+                Glide.with(mContext).asGif().load(R.drawable.soud).into(finalHolder.soudImg);
+            }else{
+                Glide.with(mContext).asBitmap().load(R.drawable.soud).into(finalHolder.soudImg);
+            }
+            finalHolder.audioLl.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (playPosition==position){
+                        mPlayer.stop();
+                        mPlayer.release();
+                        mPlayer=null;
+                        playPosition=-1;
+                        setPlay();
+                        return;
+                    }
+                    if (mPlayer==null){
+                        mPlayer=new MediaPlayer();
+                    }
+                    try {
+                        mPlayer.reset();
+                        mPlayer.setDataSource(post.getAudio());
+                        mPlayer.prepare();
+                        mPlayer.start();
+                        playPosition=position;
+                        mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                            @Override
+                            public void onCompletion(MediaPlayer mediaPlayer) {
+                                mPlayer.stop();
+                                mPlayer.release();
+                                mPlayer=null;
+                                playPosition=-1;
+                                setPlay();
+                            }
+                        });
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                    setPlay();
+                }
+            });
+        }else{
+            finalHolder.multiimageview.setVisibility(View.VISIBLE);
+            finalHolder.content.setVisibility(View.VISIBLE);
+            finalHolder.videoplayer.setVisibility(View.GONE);
+            finalHolder.audioLl.setVisibility(View.GONE);
+        }
 
-        final ViewHolder finalHolder1 = holder;
         holder.multiimageview.setOnItemClickListener(new MultiImageView.OnItemClickListener() {
             @Override
             public void onItemClick(View view, final int position) {
@@ -203,47 +306,55 @@ public class PostsAdapter extends BaseAdapter {
                 //imagesize是作为loading时的图片size
 //                ImagePagerActivity.ImageSize imageSize = new ImagePagerActivity.ImageSize(view.getMeasuredWidth(), view.getMeasuredHeight());
 //                ImagePagerActivity.startImagePagerActivity(mContext, post.getImages(), position, imageSize);
-                List<View> viewList = new ArrayList<>();
-                for (int i = 0; i < finalHolder1.multiimageview.getChildCount(); i++) {
-                    View itemView = finalHolder1.multiimageview.getChildAt(i);
-                    if (itemView != null) {
-                        if (itemView instanceof LinearLayout) {
-                            LinearLayout thumbView = (LinearLayout) itemView;
-                            for (int j = 0; j < thumbView.getChildCount(); j++) {
-                                View iconView = thumbView.getChildAt(j);
-                                viewList.add(iconView);
-                            }
+                if ("".equals(post.getVideo())){
+                    List<View> viewList = new ArrayList<>();
+                    for (int i = 0; i < finalHolder.multiimageview.getChildCount(); i++) {
+                        View itemView = finalHolder.multiimageview.getChildAt(i);
+                        if (itemView != null) {
+                            if (itemView instanceof LinearLayout) {
+                                LinearLayout thumbView = (LinearLayout) itemView;
+                                for (int j = 0; j < thumbView.getChildCount(); j++) {
+                                    View iconView = thumbView.getChildAt(j);
+                                    viewList.add(iconView);
+                                }
 
-                        } else {
-                            viewList.add(itemView);
+                            } else {
+                                viewList.add(itemView);
+                            }
                         }
                     }
-                }
-                for (int j = 0; j < viewList.size(); j++) {
-                    Rect bounds = new Rect();
-                    viewList.get(j).getGlobalVisibleRect(bounds);
-                    photos.get(j).setStatusBarH(MyUtils.getStatusHeight(mContext));
-                    photos.get(j).setmBounds(bounds);
-                    photos.get(j).setUrl(photos.get(j).getUrl());
-                }
-                GPreviewBuilder.from((Activity) mContext)
-                        .to(CustomImagePreviewActivity.class)
-                        .setOnLongClickListener(new OnLongClickListener() {
-                            @Override
-                            public boolean onLongClick(View view) {
-                                showPopupWindow(context,photos.get(position).url);
-                                return false;
-                            }
+                    for (int j = 0; j < viewList.size(); j++) {
+                        Rect bounds = new Rect();
+                        viewList.get(j).getGlobalVisibleRect(bounds);
+                        photos.get(j).setStatusBarH(MyUtils.getStatusHeight(mContext));
+                        photos.get(j).setmBounds(bounds);
+                        photos.get(j).setUrl(photos.get(j).getUrl());
+                        photos.get(j).setVideoUrl(photos.get(j).getVideoUrl());
+                    }
+                    GPreviewBuilder.from((Activity) mContext)
+                            .to(CustomImagePreviewActivity.class)
+                            .setOnLongClickListener(new OnLongClickListener() {
+                                @Override
+                                public boolean onLongClick(View view) {
+                                    showPopupWindow(context,photos.get(position).url);
+                                    return false;
+                                }
 
-                            @Override
-                            public void getContext(Context context) {
-                                PostsAdapter.this.context = context;
-                            }
-                        })
-                        .setData(photos)
-                        .setCurrentIndex(position)
-                        .setType(GPreviewBuilder.IndicatorType.Number)
-                        .start();//启动
+                                @Override
+                                public void getContext(Context context) {
+                                    PostsAdapter.this.context = context;
+                                }
+                            })
+                            .setData(photos)
+                            .setCurrentIndex(position)
+                            .setType(GPreviewBuilder.IndicatorType.Number)
+                            .start();//启动
+                }else{
+//                    VideoPlayerActivity.startActivity(mContext, post.getVideo());
+//                    GPVideoPlayerActivity.startActivity(mContext, post.getVideo());
+                    JZVideoPlayerStandard.startFullscreen(mContext, JZVideoPlayerStandard.class, post.getVideo(), "饺子辛苦了");
+                }
+
             }
         });
         holder.llZan.setOnClickListener(new View.OnClickListener() {
@@ -367,6 +478,17 @@ public class PostsAdapter extends BaseAdapter {
         return result;
     }
 
+    public void setPlay(){
+        for (int i = 0; i < grouplists.size(); i++) {
+            if (i==playPosition){
+                grouplists.get(i).setPlaying(true);
+            }else{
+                grouplists.get(i).setPlaying(false);
+            }
+        }
+        notifyDataSetChanged();
+    }
+
 
     public List<PhotoInfo> createPhotos(final List<String> list) {
         /*PhotoInfo p1 = new PhotoInfo();
@@ -450,7 +572,7 @@ public class PostsAdapter extends BaseAdapter {
             Glide.with(mContext).load(list.get(i)).into(new SimpleTarget<Drawable>() {
                 @Override
                 public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
-                    photos.add(new PhotoInfo(list.get(finalI), resource.getIntrinsicWidth(), resource.getIntrinsicHeight()));
+                    photos.add(new PhotoInfo(list.get(finalI),"", resource.getIntrinsicWidth(), resource.getIntrinsicHeight()));
                 }
             });
         }
@@ -765,6 +887,8 @@ public class PostsAdapter extends BaseAdapter {
         TextView content;
         @BindView(R.id.multiimageview)
         MultiImageView multiimageview;
+        @BindView(R.id.videoplayer)
+        JZVideoPlayerStandard videoplayer;
         @BindView(R.id.label)
         TextView label;
         @BindView(R.id.address)
@@ -803,9 +927,24 @@ public class PostsAdapter extends BaseAdapter {
         LinearLayout llPost;
         @BindView(R.id.more)
         TextView more;
+        @BindView(R.id.audio_ll)
+        LinearLayout audioLl;
+        @BindView(R.id.soud_img)
+        ImageView soudImg;
+        @BindView(R.id.second)
+        TextView second;
 
         ViewHolder(View view) {
             ButterKnife.bind(this, view);
+        }
+    }
+    public void releasePlayer(){
+        if (mPlayer!=null){
+            mPlayer.release();
+            mPlayer=null;
+            playPosition=-1;
+            setPlay();
+            return;
         }
     }
 }

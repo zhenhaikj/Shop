@@ -227,7 +227,12 @@ public class BasePhotoFragment extends Fragment {
                 ZoomMediaLoader.getInstance().getLoader().displayGifImage(this, beanViewInfo.getUrl(),imageView, mySimpleTarget);
             }else {
                 //加载图
-                ZoomMediaLoader.getInstance().getLoader().displayImage(this, beanViewInfo.getUrl(),mySimpleTarget);
+                if ("".equals(beanViewInfo.getVideoUrl())){
+                    ZoomMediaLoader.getInstance().getLoader().displayImage(this, beanViewInfo.getUrl(),mySimpleTarget);
+                }else{
+                    ZoomMediaLoader.getInstance().getLoader().displayImage(this, beanViewInfo.getVideoUrl(),mySimpleTarget);
+                }
+
             }
 
         }

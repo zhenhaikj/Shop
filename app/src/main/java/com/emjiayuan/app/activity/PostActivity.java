@@ -4,6 +4,7 @@ package com.emjiayuan.app.activity;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -23,6 +24,9 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
+import com.dmcbig.mediapicker.PickerActivity;
+import com.dmcbig.mediapicker.PickerConfig;
+import com.dmcbig.mediapicker.entity.Media;
 import com.emjiayuan.app.BaseActivity;
 import com.emjiayuan.app.MainActivity;
 import com.emjiayuan.app.R;
@@ -101,6 +105,7 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
     private Map<Integer,String> httpimageslist = new HashMap<>();
     private List<Label> labelList = new ArrayList<>();
     private List<Boolean> isOkList = new ArrayList<>();
+    ArrayList<Media> select;
     private IconsAdapter adapter;
     private LabelAdapter labelAdapter;
     private String token;
@@ -143,11 +148,12 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if ("add".equals(adapter.getItem(i))){
-                    PhotoPicker.builder()
-                            .setPhotoCount(9-(list.size()-1))
-                            .setShowGif(true)
-                            .setPreviewEnabled(true)
-                            .start(PostActivity.this);
+                    go();
+//                    PhotoPicker.builder()
+//                            .setPhotoCount(9-(list.size()-1))
+//                            .setShowGif(true)
+//                            .setPreviewEnabled(true)
+//                            .start(PostActivity.this);
                 }else{
                     if (list.contains("add")){
                         list.remove("add");
@@ -191,6 +197,16 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
             }
         });
 
+    }
+
+    void go(){
+        Intent intent =new Intent(PostActivity.this, PickerActivity.class);
+        intent.putExtra(PickerConfig.SELECT_MODE,PickerConfig.PICKER_IMAGE_VIDEO);//default image and video (Optional)
+        long maxSize=188743680L;//long long long
+        intent.putExtra(PickerConfig.MAX_SELECT_SIZE,maxSize); //default 180MB (Optional)
+        intent.putExtra(PickerConfig.MAX_SELECT_COUNT,15);  //default 40 (Optional)
+        intent.putExtra(PickerConfig.DEFAULT_SELECTED_LIST,select); // (Optional)
+        PostActivity.this.startActivityForResult(intent,200);
     }
 
     @Override
@@ -285,7 +301,11 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
             for (int i = 0; i < imageslist.size(); i++) {
                 images+=imageslist.get(i)+",";
             }
-            formBody.add("images",images.substring(0,images.lastIndexOf(",")));
+            if (images.contains("mp4")){
+                formBody.add("video",images.substring(0,images.lastIndexOf(",")));
+            }else{
+                formBody.add("images",images.substring(0,images.lastIndexOf(",")));
+            }
         }else{
             formBody.add("images","");
         }
@@ -462,8 +482,11 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
             list.remove("add");
         }
         for (int i = 0; i < paths.size(); i++) {
-            String RandomFileName=getRandomFileName();
-            list.add(ImageCompress.compressImage(paths.get(i), Environment.getExternalStorageDirectory().getPath()+"/ymjy/"+RandomFileName+".jpg",30));
+            if (paths.get(i).contains("mp4")){
+                list.add(paths.get(i));
+            }else{
+                list.add(ImageCompress.compressImage(paths.get(i), Environment.getExternalStorageDirectory().getPath()+"/ymjy/temp.jpg",30));
+            }
         }
         if (list.size() == 9) {
             if (list.contains("add")) {
@@ -503,7 +526,20 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
                     ArrayList<String> ListExtra = data.getStringArrayListExtra("SELECTED_PHOTOS");
                     loadAdpater2(ListExtra);
                     break;
+                // 预览
             }
+        }
+        if(requestCode==200&&resultCode==PickerConfig.RESULT_CODE){
+            select=data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
+            ArrayList<String> list=new ArrayList<>();
+            Log.i("select","select.size"+select.size());
+            for(Media media:select){
+                list.add(media.path);
+                Log.i("media",media.path);
+                Log.e("media","s:"+media.size);
+//                    imageView.setImageURI(Uri.parse(media.path));
+            }
+            loadAdpater(list);
         }
     }
 
@@ -560,6 +596,11 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
         }
         for (int i = 0; i < (list.contains("add")?list.size()-1:list.size()); i++) {
             String RandomFileName=getRandomFileName();
+            if (list.get(i).contains("mp4")){
+                RandomFileName+=".mp4";
+            }else{
+                RandomFileName+=".jpg";
+            }
             final int finalI = i;
             if (!list.get(i).contains("http")){
                 uploadManager.put(list.get(i), "upload_file/app/"+RandomFileName, token,new UpCompletionHandler() {

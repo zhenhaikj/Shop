@@ -84,7 +84,11 @@ public class IconsAdapter extends BaseAdapter {
             holder.delete.setVisibility(View.GONE);
         } else {
             holder.delete.setVisibility(View.VISIBLE);
-            GlideUtil.loadImageViewLoding(mContext,item,holder.icon,R.drawable.empty_img,R.drawable.empty_img);
+            if (item.contains("mp4")){
+                Glide.with(mContext).load(item).into(holder.icon);
+            }else{
+                GlideUtil.loadImageViewLoding(mContext,item,holder.icon,R.drawable.empty_img,R.drawable.empty_img);
+            }
         }
         holder.delete.setOnClickListener(new View.OnClickListener() {
             @Override

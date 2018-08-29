@@ -186,13 +186,13 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
             Glide.with(mActivity).load(post.getImages().get(0)).into(new SimpleTarget<Drawable>() {
                 @Override
                 public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
-                    photos.add(new PhotoInfo(post.getImages().get(0), resource.getIntrinsicWidth(), resource.getIntrinsicHeight()));
+                    photos.add(new PhotoInfo(post.getImages().get(0),"", resource.getIntrinsicWidth(), resource.getIntrinsicHeight()));
                     multiimageview.setList(photos);
                 }
             });
         } else {
             for (int i = 0; i < post.getImages().size(); i++) {
-                photos.add(new PhotoInfo(post.getImages().get(i), 0, 0));
+                photos.add(new PhotoInfo(post.getImages().get(i),"", 0, 0));
             }
             multiimageview.setList(photos);
         }
@@ -348,7 +348,7 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
             Glide.with(mActivity).load(list.get(i)).into(new SimpleTarget<Drawable>() {
                 @Override
                 public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
-                    photos.add(new PhotoInfo(list.get(finalI), resource.getIntrinsicWidth(), resource.getIntrinsicHeight()));
+                    photos.add(new PhotoInfo(list.get(finalI),"", resource.getIntrinsicWidth(), resource.getIntrinsicHeight()));
                 }
             });
         }

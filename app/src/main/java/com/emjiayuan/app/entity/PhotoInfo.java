@@ -27,11 +27,13 @@ public class PhotoInfo implements IThumbViewInfo {
         this.statusBarH = statusBarH;
     }
 
-    public PhotoInfo(String url, int w, int h) {
+    public PhotoInfo(String url,String videoUrl, int w, int h) {
         this.url = url;
+        this.videoUrl = videoUrl;
         this.w = w;
         this.h = h;
     }
+
 
     public void setmBounds(Rect mBounds) {
         mBounds.bottom+= getStatusBarH();

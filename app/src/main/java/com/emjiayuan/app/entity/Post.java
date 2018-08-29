@@ -66,6 +66,7 @@ public class Post implements Serializable{
     private String date_day;
     private String date_year;
     private String address;
+    private String audio;
     private int showtype;
     private boolean isoneimage;
     private int iszan;
@@ -75,6 +76,23 @@ public class Post implements Serializable{
     private List<ZanlistBean> zanlist;
     private List<ReplylistBean> replylist;
     private boolean expand=false;
+    private boolean isPlaying=false;
+
+    public boolean isPlaying() {
+        return isPlaying;
+    }
+
+    public void setPlaying(boolean playing) {
+        isPlaying = playing;
+    }
+
+    public String getAudio() {
+        return audio;
+    }
+
+    public void setAudio(String audio) {
+        this.audio = audio;
+    }
 
     public int getPosition() {
         return position;

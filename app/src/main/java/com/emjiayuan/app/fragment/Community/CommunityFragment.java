@@ -1,16 +1,23 @@
 package com.emjiayuan.app.fragment.Community;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -21,6 +28,7 @@ import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.activity.MyMessageActivity;
 import com.emjiayuan.app.activity.PostActivity;
+import com.emjiayuan.app.activity.PostAudioActivity;
 import com.emjiayuan.app.activity.PostDetailActivity;
 import com.emjiayuan.app.activity.SqMineActivity;
 import com.emjiayuan.app.adapter.LabelAdapter;
@@ -38,6 +46,8 @@ import com.emjiayuan.app.widget.MyGridView;
 import com.emjiayuan.app.widget.MyListView;
 import com.google.gson.Gson;
 import com.gyf.barlibrary.ImmersionBar;
+import com.previewlibrary.view.DownLoadImage;
+import com.previewlibrary.view.ImageDownLoadCallBack;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnLoadmoreListener;
@@ -48,6 +58,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -120,6 +131,7 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
     private String type = "";//帖子类型
     Post.ReplylistBean bean;
     private int position;
+    private PopupWindow mPopupWindow;
 
 
     @Override
@@ -546,7 +558,8 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
                 sv.smoothScrollTo(0, 0);
                 break;
             case R.id.write:
-                startActivity(new Intent(getActivity(), PostActivity.class));
+                showPopupWindow();
+//                startActivity(new Intent(getActivity(), PostActivity.class));
                 break;
             case R.id.ll_mine:
                 startActivity(new Intent(getActivity(), SqMineActivity.class));
@@ -639,4 +652,66 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
 //        GlideUtil.loadImageViewLoding(mActivity, Global.loginResult.getHeadimg(), profileImage, R.drawable.default_tx, R.drawable.default_tx);
 //        username.setText(Global.loginResult.getNickname());
 //    }
+    /**
+     * 弹出Popupwindow
+     */
+    public void showPopupWindow() {
+        View popupWindow_view = LayoutInflater.from(mActivity).inflate(R.layout.add_layout, null);
+        LinearLayout bg_ll = popupWindow_view.findViewById(R.id.bg_ll);
+//        bg_ll.getBackground().setAlpha(100);
+        LinearLayout pic_ll = popupWindow_view.findViewById(R.id.pic_ll);
+        LinearLayout video_ll = popupWindow_view.findViewById(R.id.video_ll);
+        LinearLayout audio_ll = popupWindow_view.findViewById(R.id.audio_ll);
+        Button cancel = popupWindow_view.findViewById(R.id.cancel_btn);
+        pic_ll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(mActivity,PostActivity.class));
+                mPopupWindow.dismiss();
+            }
+        });
+        video_ll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(mActivity,PostActivity.class));
+                mPopupWindow.dismiss();
+            }
+        });
+        audio_ll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(mActivity,PostAudioActivity.class));
+                mPopupWindow.dismiss();
+            }
+        });
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mPopupWindow.dismiss();
+            }
+        });
+        mPopupWindow = new PopupWindow(popupWindow_view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        mPopupWindow.setAnimationStyle(R.style.popwindow_anim_style);
+        mPopupWindow.setBackgroundDrawable(new BitmapDrawable());
+        mPopupWindow.setFocusable(true);
+        mPopupWindow.setOutsideTouchable(true);
+        mPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                MyUtils.setWindowAlpa(mActivity, false);
+            }
+        });
+        if (mPopupWindow != null && !mPopupWindow.isShowing()) {
+            mPopupWindow.showAtLocation(popupWindow_view, Gravity.BOTTOM, 0, 0);
+        }
+        MyUtils.setWindowAlpa(mActivity, true);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mAdapter!=null){
+            mAdapter.releasePlayer();
+        }
+    }
 }

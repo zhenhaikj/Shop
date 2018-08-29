@@ -1,1 +1,1 @@
-include ':app', 'CountdownView','ImagePreview'
+include ':app', 'CountdownView','ImagePreview',"jiaozivideoplayer"
