@@ -2,22 +2,30 @@ package com.emjiayuan.app.activity;
 
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.baidu.location.BDLocation;
@@ -26,6 +34,7 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.dmcbig.mediapicker.PickerActivity;
 import com.dmcbig.mediapicker.PickerConfig;
+import com.dmcbig.mediapicker.PreviewActivity;
 import com.dmcbig.mediapicker.entity.Media;
 import com.emjiayuan.app.BaseActivity;
 import com.emjiayuan.app.MainActivity;
@@ -57,6 +66,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -101,11 +111,12 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
     @BindView(R.id.gv_label)
     MyGridView gvLabel;
     private ArrayList<String> list = new ArrayList<>();
+    private ArrayList<String> camera = new ArrayList<>();
     private Map<Integer,String> imageslist = new HashMap<>();
     private Map<Integer,String> httpimageslist = new HashMap<>();
     private List<Label> labelList = new ArrayList<>();
     private List<Boolean> isOkList = new ArrayList<>();
-    ArrayList<Media> select;
+    ArrayList<Media> select=new ArrayList<>();
     private IconsAdapter adapter;
     private LabelAdapter labelAdapter;
     private String token;
@@ -120,7 +131,12 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
     private LocationClient mLocClient;
     private Post post;
     private Intent intent;
+    private int addType;
     private static final int BAIDU_ACCESS_FINE_LOCATION = 100;//定位申请跳转
+    private PopupWindow mPopupWindow;
+    private View popupWindow_view;
+    private String FilePath;
+    private ProgressDialog pd;
 
     @Override
     protected int setLayoutId() {
@@ -139,30 +155,49 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
         save.setText("发布");
         intent=getIntent();
         post= (Post) intent.getSerializableExtra("post");
+        addType=intent.getIntExtra("addType",0);
         getQnToken();
         getWeiboTypeList();
         requestPermission();
         initMapLocation();
-
+        showPopupWindow();
         gvIcons.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if ("add".equals(adapter.getItem(i))){
-                    go();
+                    if (mPopupWindow != null && !mPopupWindow.isShowing()) {
+                        mPopupWindow.showAtLocation(popupWindow_view, Gravity.BOTTOM, 0, 0);
+                    }
+                    MyUtils.setWindowAlpa(mActivity,true);
+//                    switch (addType){
+//                        case 0:
+//                            goImage();
+//                            break;
+//                        case 1:
+//                            goVideo();
+//                            break;
+//                    }
 //                    PhotoPicker.builder()
 //                            .setPhotoCount(9-(list.size()-1))
 //                            .setShowGif(true)
 //                            .setPreviewEnabled(true)
 //                            .start(PostActivity.this);
                 }else{
-                    if (list.contains("add")){
-                        list.remove("add");
-                    }
-                    PhotoPreview.builder()
-                            .setPhotos(list)
-                            .setCurrentItem(i)
-                            .setShowDeleteButton(true)
-                            .start(PostActivity.this);
+//                    if (list.contains("add")){
+//                        list.remove("add");
+//                    }
+//                    if (addType==1){
+                        goPreviewActivity();
+//                    }else{
+//                        if (list.contains("add")){
+//                            list.remove("add");
+//                        }
+//                        PhotoPreview.builder()
+//                                .setPhotos(list)
+//                                .setCurrentItem(i)
+//                                .setShowDeleteButton(true)
+//                                .start(PostActivity.this);
+//                    }
                 }
             }
         });
@@ -177,20 +212,23 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
 //				dataSourceList.set(from, dataSourceList.get(to));
 //				dataSourceList.set(to, temp);
 //				dataSourceList.set(to, temp);
-
+                Media tempMedia=select.get(from);
 
                 //这里的处理需要注意下
                 if(from < to){
                     for(int i=from; i<to; i++){
                         Collections.swap(list, i, i+1);
+                        Collections.swap(select, i, i+1);
                     }
                 }else if(from > to){
                     for(int i=from; i>to; i--){
                         Collections.swap(list, i, i-1);
+                        Collections.swap(select, i, i-1);
                     }
                 }
 
                 list.set(to, temp);
+                select.set(to, tempMedia);
 
                 adapter.notifyDataSetChanged();
 //                gvIcons.setIgnoreDragPosition(new int[]{adapter.getNoMovePosition()});
@@ -199,14 +237,29 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
 
     }
 
-    void go(){
+    void goImage(){
         Intent intent =new Intent(PostActivity.this, PickerActivity.class);
-        intent.putExtra(PickerConfig.SELECT_MODE,PickerConfig.PICKER_IMAGE_VIDEO);//default image and video (Optional)
+        intent.putExtra(PickerConfig.SELECT_MODE,PickerConfig.PICKER_IMAGE);//default image and video (Optional)
         long maxSize=188743680L;//long long long
         intent.putExtra(PickerConfig.MAX_SELECT_SIZE,maxSize); //default 180MB (Optional)
-        intent.putExtra(PickerConfig.MAX_SELECT_COUNT,15);  //default 40 (Optional)
-        intent.putExtra(PickerConfig.DEFAULT_SELECTED_LIST,select); // (Optional)
+        intent.putExtra(PickerConfig.MAX_SELECT_COUNT,9-select.size());  //default 40 (Optional)
+//        intent.putExtra(PickerConfig.DEFAULT_SELECTED_LIST,select); // (Optional)
         PostActivity.this.startActivityForResult(intent,200);
+    }
+    void goVideo(){
+        Intent intent =new Intent(PostActivity.this, PickerActivity.class);
+        intent.putExtra(PickerConfig.SELECT_MODE,PickerConfig.PICKER_VIDEO);//default image and video (Optional)
+        long maxSize=20971520L;//long long long20Mb
+        intent.putExtra(PickerConfig.MAX_SELECT_SIZE,maxSize); //default 180MB (Optional)
+        intent.putExtra(PickerConfig.MAX_SELECT_COUNT,1);  //default 40 (Optional)
+//        intent.putExtra(PickerConfig.DEFAULT_SELECTED_LIST,select); // (Optional)
+        PostActivity.this.startActivityForResult(intent,200);
+    }
+    void goPreviewActivity(){
+        Intent intent =new Intent(PostActivity.this, PreviewActivity.class);
+        intent.putExtra(PickerConfig.PRE_RAW_LIST,select);//default image and video (Optional)
+        intent.putExtra(PickerConfig.MAX_SELECT_COUNT,select.size());//default image and video (Optional)
+        PostActivity.this.startActivityForResult(intent,300);
     }
 
     @Override
@@ -301,7 +354,7 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
             for (int i = 0; i < imageslist.size(); i++) {
                 images+=imageslist.get(i)+",";
             }
-            if (images.contains("mp4")){
+            if (addType==1){
                 formBody.add("video",images.substring(0,images.lastIndexOf(",")));
             }else{
                 formBody.add("images",images.substring(0,images.lastIndexOf(",")));
@@ -478,6 +531,7 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
     };
 
     private void loadAdpater(List<String> paths) {
+        list.clear();
         if (list.contains("add")){
             list.remove("add");
         }
@@ -485,10 +539,14 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
             if (paths.get(i).contains("mp4")){
                 list.add(paths.get(i));
             }else{
-                list.add(ImageCompress.compressImage(paths.get(i), Environment.getExternalStorageDirectory().getPath()+"/ymjy/temp.jpg",30));
+                list.add(ImageCompress.compressImage(paths.get(i), Environment.getExternalStorageDirectory().getPath()+"/ymjytemp/"+getRandomFileName()+".jpg",30));
             }
         }
-        if (list.size() == 9) {
+        if (list.size() == 9&&addType==0) {
+            if (list.contains("add")) {
+                list.remove("add");
+            }
+        }else if (list.size()==1&&addType==1){
             if (list.contains("add")) {
                 list.remove("add");
             }
@@ -503,12 +561,15 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
     private void loadAdpater2(ArrayList<String> paths) {
         list.clear();
         list.addAll(paths);
-        if (list.size() != 9) {
+        if ((list.size() != 9&&addType==0)||list.size()==0) {
             list.add("add");
         }
         adapter = new IconsAdapter(mActivity,list);
         gvIcons.setAdapter(adapter);
         adapter.notifyDataSetChanged();
+    }
+    public void remove(int position){
+        select.remove(position);
     }
 
     @Override
@@ -530,7 +591,7 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
             }
         }
         if(requestCode==200&&resultCode==PickerConfig.RESULT_CODE){
-            select=data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
+            select.addAll((ArrayList)data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT));
             ArrayList<String> list=new ArrayList<>();
             Log.i("select","select.size"+select.size());
             for(Media media:select){
@@ -540,6 +601,52 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
 //                    imageView.setImageURI(Uri.parse(media.path));
             }
             loadAdpater(list);
+        }
+        if(requestCode==300){
+            select=data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
+            ArrayList<String> list=new ArrayList<>();
+            Log.i("select","select.size"+select.size());
+            for(Media media:select){
+                list.add(media.path);
+                Log.i("media",media.path);
+                Log.e("media","s:"+media.size);
+//                    imageView.setImageURI(Uri.parse(media.path));
+            }
+            loadAdpater2(list);
+        }
+        if (requestCode==0){
+            if (resultCode==RESULT_OK){
+                select.add(new Media(FilePath,"",0,0,0,0,""));
+                ArrayList<String> list=new ArrayList<>();
+                Log.i("select","select.size"+select.size());
+                for(Media media:select){
+                    list.add(media.path);
+                    Log.i("media",media.path);
+                    Log.e("media","s:"+media.size);
+//                    imageView.setImageURI(Uri.parse(media.path));
+                }
+                loadAdpater(list);
+            }else{
+                File file=new File(FilePath);
+                if (file.exists()){
+                    file.delete();
+                }
+            }
+        }
+        if(requestCode==222){
+            if (resultCode==102){
+                FilePath=data.getStringExtra("videopath");
+                select.add(new Media(FilePath,"",0,0,0,0,""));
+                ArrayList<String> list=new ArrayList<>();
+                Log.i("select","select.size"+select.size());
+                for(Media media:select){
+                    list.add(media.path);
+                    Log.i("media",media.path);
+                    Log.e("media","s:"+media.size);
+//                    imageView.setImageURI(Uri.parse(media.path));
+                }
+                loadAdpater(list);
+            }
         }
     }
 
@@ -559,13 +666,18 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
                     MyUtils.showToast(mActivity,"请选择类型!");
                     return;
                 }
-                if (list.size()==1){
+                if (list.size()==1&&list.contains("add")){
                     if (post == null) {
                         addWeibo();
                     }else{
                         editWeibo();
                     }
                 }else{
+                    pd = new ProgressDialog(mActivity);
+                    pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                    pd.setTitle("正在上传");
+                    pd.setMessage("请稍后。。。");
+                    pd.show();
                     upload();
                 }
                 break;
@@ -608,6 +720,7 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
                             public void complete(String key, ResponseInfo info, JSONObject res) {
                                 //res包含hash、key等信息，具体字段取决于上传策略的设置
                                 if(info.isOK()) {
+                                    pd.dismiss();
                                     isOkList.add(info.isOK());
                                     imageslist.put(finalI,"http://qiniu.emjiayuan.com/"+key);
                                     Log.i("qiniu", "Upload Success");
@@ -633,7 +746,8 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
                         new UploadOptions(null, null, false,
                                 new UpProgressHandler(){
                                     public void progress(String key, double percent){
-                                        Log.i("qiniu", key + ": " + percent);
+                                        MyUtils.e("上传进度啊", key + ": " + percent);
+//                                        pd.setProgress((int) (percent*100));
                                     }
                                 }, null));
             }else{
@@ -728,6 +842,28 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
             }
         }
     }
+    //请求权限
+    private void requestPermissions(){
+        if (Build.VERSION.SDK_INT >= 23) {
+            ArrayList<String> permissions = new ArrayList<>();
+            if (mActivity.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+            }
+            if (mActivity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            }
+            if (mActivity.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                permissions.add(Manifest.permission.CAMERA);
+            }
+
+            if (permissions.size() == 0) {
+                return;
+            } else {
+                requestPermissions(permissions.toArray(new String[permissions.size()]), 10001);
+            }
+        }
+    }
+
 
     //申请地图相关权限:返回监听
     @Override
@@ -742,9 +878,157 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
                     MyUtils.showToast(mActivity, "定位权限未开启");
                 }
                 break;
+            case 10001:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {//允许
+                    Intent intent = new Intent();
+                    switch (addType){
+                        case 0:
+                            // 指定开启系统相机的Action
+                            intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
+                            intent.addCategory(Intent.CATEGORY_DEFAULT);
+                            String f = System.currentTimeMillis()+".jpg";
+                            FilePath=Environment.getExternalStorageDirectory().getAbsolutePath()+"/ymjy/"+f;
+                            File file=new File(FilePath);
+//                        File dir=new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/ymjy");
+//                        if (!dir.exists()){
+//                            dir.mkdir();
+//                        }
+                            if (!file.exists()){
+                                try {
+                                    file.createNewFile();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            Uri fileUri = Uri.fromFile(file);
+                            intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+                            startActivityForResult(intent, 0);
+                            break;
+                        case 1:
+                            intent=new Intent(mActivity,CameraActivity.class);
+                            startActivityForResult(intent, 222);
+                        /*intent.setAction("android.media.action.VIDEO_CAPTURE");
+                        intent.addCategory("android.intent.category.DEFAULT");
+                        intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+                        intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 20000);
+                        intent.putExtra(MediaStore.EXTRA_SIZE_LIMIT, 10485760);
+                        String str = System.currentTimeMillis()+".mp4";
+                        FilePath=Environment.getExternalStorageDirectory().getAbsolutePath()+"/Ymjy/"+str;
+                        File mfile=new File(FilePath);
+                        if (!mfile.exists()){
+                            try {
+                                mfile.createNewFile();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        Uri mUri = Uri.fromFile(mfile);
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, mUri);
+                        startActivityForResult(intent, 0);*/
+                            break;
+                    }
+                } else {//拒绝
+                    MyUtils.showToast(mActivity, "相机权限未开启");
+                }
+                break;
             default:
                 break;
 
         }
+    }
+    /**
+     * 弹出Popupwindow
+     */
+    public void showPopupWindow() {
+        popupWindow_view = LayoutInflater.from(mActivity).inflate(R.layout.camera_layout, null);
+        Button camera_btn=popupWindow_view.findViewById(R.id.camera_btn);
+        Button photo_btn=popupWindow_view.findViewById(R.id.photo_btn);
+        Button cancel_btn=popupWindow_view.findViewById(R.id.cancel_btn);
+        camera_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                requestPermissions();
+                Intent intent = new Intent();
+                switch (addType){
+                    case 0:
+                        // 指定开启系统相机的Action
+                        intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
+                        intent.addCategory(Intent.CATEGORY_DEFAULT);
+                        String f = System.currentTimeMillis()+".jpg";
+                        FilePath=Environment.getExternalStorageDirectory().getAbsolutePath()+"/ymjy/"+f;
+                        File file=new File(FilePath);
+//                        File dir=new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/ymjy");
+//                        if (!dir.exists()){
+//                            dir.mkdir();
+//                        }
+                        if (!file.exists()){
+                            try {
+                                file.createNewFile();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        Uri fileUri = Uri.fromFile(file);
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+                        startActivityForResult(intent, 0);
+                        break;
+                    case 1:
+                        intent=new Intent(mActivity,CameraActivity.class);
+                        startActivityForResult(intent, 222);
+                        /*intent.setAction("android.media.action.VIDEO_CAPTURE");
+                        intent.addCategory("android.intent.category.DEFAULT");
+                        intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+                        intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 20000);
+                        intent.putExtra(MediaStore.EXTRA_SIZE_LIMIT, 10485760);
+                        String str = System.currentTimeMillis()+".mp4";
+                        FilePath=Environment.getExternalStorageDirectory().getAbsolutePath()+"/Ymjy/"+str;
+                        File mfile=new File(FilePath);
+                        if (!mfile.exists()){
+                            try {
+                                mfile.createNewFile();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        Uri mUri = Uri.fromFile(mfile);
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, mUri);
+                        startActivityForResult(intent, 0);*/
+                        break;
+                }
+                mPopupWindow.dismiss();
+            }
+        });
+        photo_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                switch (addType){
+                    case 0:
+                        goImage();
+                        break;
+                    case 1:
+                        goVideo();
+                        break;
+                }
+                mPopupWindow.dismiss();
+            }
+        });
+        cancel_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mPopupWindow.dismiss();
+            }
+        });
+        mPopupWindow = new PopupWindow(popupWindow_view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        mPopupWindow.setAnimationStyle(R.style.popwindow_anim_style);
+        mPopupWindow.setBackgroundDrawable(new BitmapDrawable());
+        mPopupWindow.setFocusable(true);
+        mPopupWindow.setOutsideTouchable(true);
+        mPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                MyUtils.setWindowAlpa(mActivity,false);
+            }
+        });
+
     }
 }

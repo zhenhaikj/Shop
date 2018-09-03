@@ -67,6 +67,9 @@ public class Post implements Serializable{
     private String date_year;
     private String address;
     private String audio;
+    private String isadv;
+    private String linktype;
+    private String linkid;
     private int showtype;
     private boolean isoneimage;
     private int iszan;
@@ -77,6 +80,30 @@ public class Post implements Serializable{
     private List<ReplylistBean> replylist;
     private boolean expand=false;
     private boolean isPlaying=false;
+
+    public String getIsadv() {
+        return isadv;
+    }
+
+    public void setIsadv(String isadv) {
+        this.isadv = isadv;
+    }
+
+    public String getLinktype() {
+        return linktype;
+    }
+
+    public void setLinktype(String linktype) {
+        this.linktype = linktype;
+    }
+
+    public String getLinkid() {
+        return linkid;
+    }
+
+    public void setLinkid(String linkid) {
+        this.linkid = linkid;
+    }
 
     public boolean isPlaying() {
         return isPlaying;

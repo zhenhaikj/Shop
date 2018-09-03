@@ -228,9 +228,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     @Override
     public void onClick(View v) {
-        if (!MyUtils.isFastClick()) {
-            return;
-        }
+//        if (!MyUtils.isFastClick()) {
+//            return;
+//        }
         Intent intent = null;
         switch (v.getId()) {
             case R.id.ll_home:
@@ -321,6 +321,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         ll_car.setSelected(false);
         ll_mine.setSelected(false);
         linearLayout.setSelected(true);
+        JZVideoPlayer.releaseAllVideos();
     }
 
     private class MyAdapter extends FragmentPagerAdapter {

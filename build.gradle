@@ -11,6 +11,10 @@ buildscript {
         classpath 'com.android.tools.build:gradle:3.0.1'
 //        classpath 'com.jakewharton:butterknife-gradle-plugin:7.0.1'  //添加这一行
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+        //1.自动化maven打包插件
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
+        //2.自动上传至Bintray平台插件
+        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6"
 //添加下面这行代码就OK了
         classpath 'com.novoda:bintray-release:0.5.0'
         // NOTE: Do not place your application dependencies here; they belong

@@ -26,10 +26,13 @@ import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.GlideUtil;
 import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
+import com.emjiayuan.app.activity.GoodsDetailActivity;
+import com.emjiayuan.app.activity.MessageDetailActivity;
 import com.emjiayuan.app.activity.MyMessageActivity;
 import com.emjiayuan.app.activity.PostActivity;
 import com.emjiayuan.app.activity.PostAudioActivity;
 import com.emjiayuan.app.activity.PostDetailActivity;
+import com.emjiayuan.app.activity.SecondsKillActivity;
 import com.emjiayuan.app.activity.SqMineActivity;
 import com.emjiayuan.app.adapter.LabelAdapter;
 import com.emjiayuan.app.adapter.PostsAdapter;
@@ -64,6 +67,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import cn.jzvd.JZVideoPlayer;
 import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -144,9 +148,10 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
      */
     protected void initImmersionBar() {
         mImmersionBar = ImmersionBar.with(this);
+        mImmersionBar.titleBar(R.id.toolbar);
         mImmersionBar.statusBarDarkFont(true, 0.2f); //原理：如果当前设备支持状态栏字体变色，会设置状态栏字体为黑色，如果当前设备不支持状态栏字体变色，会使当前状态栏加上透明度，否则不执行透明度
         mImmersionBar.statusBarColor(R.color.white);
-        mImmersionBar.fitsSystemWindows(true);
+        mImmersionBar.fitsSystemWindows(false);
         mImmersionBar.keyboardEnable(true).navigationBarWithKitkatEnable(false).init();
     }
 
@@ -162,7 +167,9 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(RefreshLayout refreshlayout) {
-                mAdapter.notifyDataSetChanged();
+                if (mAdapter!=null){
+                    mAdapter.releasePlayer();
+                }
                 list.clear();
                 pageindex = 1;
                 refreshLayout.setLoadmoreFinished(false);
@@ -182,6 +189,10 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
         gvLabel.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if (mAdapter!=null){
+                    mAdapter.releasePlayer();
+                }
+                JZVideoPlayer.releaseAllVideos();
                 labelAdapter.setSelected(i);
                 type = labels.get(i).getId();
                 pageindex = 1;
@@ -580,9 +591,27 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
 
                 break;
             case R.id.lv_post:
-                Intent intent = new Intent(getActivity(), PostDetailActivity.class);
-                intent.putExtra("weiboid", list.get(i).getId());
-                startActivity(intent);
+                if ("1".equals(list.get(i).getIsadv())){
+                    if ("1".equals(list.get(i).getLinktype())){
+                        Intent intent = new Intent(getActivity(), GoodsDetailActivity.class);
+                        intent.putExtra("productid", list.get(i).getLinkid());
+                        startActivity(intent);
+                    }else if ("2".equals(list.get(i).getLinktype())){
+                        Intent intent = new Intent(getActivity(), MessageDetailActivity.class);
+//                        intent.putExtra("productid", list.get(i).getLinkid());
+                        startActivity(intent);
+                    }else if ("3".equals(list.get(i).getLinktype())){
+                        Intent intent = new Intent(getActivity(), SecondsKillActivity.class);
+//                        intent.putExtra("productid", list.get(i).getLinkid());
+                        startActivity(intent);
+                    }else{
+
+                    }
+                }else{
+                    Intent intent = new Intent(getActivity(), PostDetailActivity.class);
+                    intent.putExtra("weiboid", list.get(i).getId());
+                    startActivity(intent);
+                }
                 break;
         }
     }
@@ -673,7 +702,9 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
         video_ll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(mActivity,PostActivity.class));
+                Intent intent=new Intent(mActivity,PostActivity.class);
+                intent.putExtra("addType",1);
+                startActivity(intent);
                 mPopupWindow.dismiss();
             }
         });
@@ -705,6 +736,14 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
             mPopupWindow.showAtLocation(popupWindow_view, Gravity.BOTTOM, 0, 0);
         }
         MyUtils.setWindowAlpa(mActivity, true);
+    }
+
+    @Override
+    protected void onInvisible() {
+        super.onInvisible();
+        if (mAdapter!=null){
+            mAdapter.releasePlayer();
+        }
     }
 
     @Override

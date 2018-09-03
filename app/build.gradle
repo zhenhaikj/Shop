@@ -175,4 +175,7 @@ dependencies {
 
     //    compile 'cn.jzvd:jiaozivideoplayer:6.2.12'
     implementation project(':jiaozivideoplayer')
+    compile 'com.czt.mp3recorder:library:1.0.4'
+    compile 'com.mabeijianxi:small-video-record:1.2.0'
+    implementation project(':camera')
 }

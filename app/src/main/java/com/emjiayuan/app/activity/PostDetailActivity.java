@@ -7,6 +7,8 @@ import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -32,14 +34,12 @@ import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.GlideUtil;
 import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
-import com.emjiayuan.app.adapter.PostsAdapter;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.PhotoInfo;
 import com.emjiayuan.app.entity.Post;
 import com.emjiayuan.app.widget.CommentListView;
 import com.emjiayuan.app.widget.FlowLayout;
 import com.emjiayuan.app.widget.MultiImageView;
-import com.emjiayuan.app.widget.PraiseListView;
 import com.google.gson.Gson;
 import com.previewlibrary.GPreviewBuilder;
 import com.previewlibrary.loader.OnLongClickListener;
@@ -60,6 +60,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import cn.jzvd.JZVideoPlayer;
+import cn.jzvd.JZVideoPlayerStandard;
 import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -128,6 +130,14 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
     LinearLayout llPl;
     @BindView(R.id.ll_zan)
     LinearLayout llZan;
+    @BindView(R.id.videoplayer)
+    JZVideoPlayerStandard videoplayer;
+    @BindView(R.id.soud_img)
+    ImageView soudImg;
+    @BindView(R.id.second)
+    TextView second;
+    @BindView(R.id.audio_ll)
+    LinearLayout audioLl;
 
     private String weiboid;
     private Post post;
@@ -137,6 +147,35 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
     private CustomShareListener mShareListener;
     private ShareAction mShareAction;
     private PopupWindow mPopupWindow;
+    private MediaPlayer mPlayer;
+    public AudioManager.OnAudioFocusChangeListener onAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {//是否新建个class，代码更规矩，并且变量的位置也很尴尬
+        @Override
+        public void onAudioFocusChange(int focusChange) {
+            switch (focusChange) {
+                case AudioManager.AUDIOFOCUS_GAIN:
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS:
+                    if (mPlayer!=null){
+                        mPlayer.stop();
+                        mPlayer.release();
+                        mPlayer=null;
+                        Glide.with(mActivity).asBitmap().load(R.drawable.soud).into(soudImg);
+                    }
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                    if(mPlayer!=null){
+                        mPlayer.stop();
+                        mPlayer.release();
+                        mPlayer=null;
+                        Glide.with(mActivity).asBitmap().load(R.drawable.soud).into(soudImg);
+                    }
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                    break;
+            }
+        }
+    };
+    private AudioManager mAudioManager;
 
     @Override
     protected int setLayoutId() {
@@ -156,7 +195,7 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
             weiboid = intent.getStringExtra("weiboid");
             getWeiboDetail();
         }
-        
+
     }
 
     public void setdata() {
@@ -168,10 +207,10 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
         time.setText(post.getPasttime());
         views.setText(post.getVisit_pv());
         address.setText(post.getAddress());
-        address.setVisibility((post.getAddress() ==null ? View.INVISIBLE : View.VISIBLE));
+        address.setVisibility((post.getAddress() == null ? View.INVISIBLE : View.VISIBLE));
         llLetter.setVisibility((post.getUserid().equals(Global.loginResult.getId()) ? View.GONE : View.VISIBLE));
         label.setText(post.getWeibotype());
-        PraiseList=new ArrayList<>();
+        PraiseList = new ArrayList<>();
         for (int i = 0; i < post.getZanlist().size(); i++) {
             PraiseList.add(post.getZanlist().get(i).getHeadimg());
         }
@@ -181,74 +220,118 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
         flow.setUrls(PraiseList);
 //        praiseListView.setDatas(post.getZanlist());
         commentList.setDatas(post.getReplylist());
-        final List<PhotoInfo> photos = new ArrayList<PhotoInfo>();
-        if (post.getImages().size() == 1) {
-            Glide.with(mActivity).load(post.getImages().get(0)).into(new SimpleTarget<Drawable>() {
+        if (post.getShowtype()==3){
+            videoplayer.setVisibility(View.VISIBLE);
+            content.setVisibility(View.VISIBLE);
+            multiimageview.setVisibility(View.GONE);
+            audioLl.setVisibility(View.GONE);
+            videoplayer.setUp(post.getVideo(), JZVideoPlayer.SCREEN_WINDOW_NORMAL,"");
+            Glide.with(mActivity).load(post.getVideo()).into(videoplayer.thumbImageView);
+        }else if (post.getShowtype()==2){
+            videoplayer.setVisibility(View.GONE);
+            content.setVisibility(View.GONE);
+            multiimageview.setVisibility(View.GONE);
+            audioLl.setVisibility(View.VISIBLE);
+            second.setText(post.getAudio().substring(post.getAudio().lastIndexOf("_")+1,post.getAudio().lastIndexOf("."))+"''");
+            audioLl.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
-                    photos.add(new PhotoInfo(post.getImages().get(0),"", resource.getIntrinsicWidth(), resource.getIntrinsicHeight()));
-                    multiimageview.setList(photos);
-                }
-            });
-        } else {
-            for (int i = 0; i < post.getImages().size(); i++) {
-                photos.add(new PhotoInfo(post.getImages().get(i),"", 0, 0));
-            }
-            multiimageview.setList(photos);
-        }
-//        multiimageview.setList(createPhotos(post.getImages()));
-        multiimageview.setOnItemClickListener(new MultiImageView.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                if (!MyUtils.isFastClick()) {
-                    return;
-                }
-                //imagesize是作为loading时的图片size
-//                ImagePagerActivity.ImageSize imageSize = new ImagePagerActivity.ImageSize(view.getMeasuredWidth(), view.getMeasuredHeight());
-//                ImagePagerActivity.startImagePagerActivity(mActivity, post.getImages(), position, imageSize);
-                List<View> viewList = new ArrayList<>();
-                for (int i = 0; i < multiimageview.getChildCount(); i++) {
-                    View itemView = multiimageview.getChildAt(i);
-                    if (itemView != null) {
-                        if (itemView instanceof LinearLayout) {
-                            LinearLayout thumbView = (LinearLayout) itemView;
-                            for (int j = 0; j < thumbView.getChildCount(); j++) {
-                                View iconView = thumbView.getChildAt(j);
-                                viewList.add(iconView);
-                            }
-
-                        } else {
-                            viewList.add(itemView);
+                public void onClick(View view) {
+                    if (mPlayer==null){
+                        mPlayer=new MediaPlayer();
+                    }
+                    if (mPlayer.isPlaying()){
+                        mAudioManager.abandonAudioFocus(onAudioFocusChangeListener);
+                        mPlayer.stop();
+                        Glide.with(mActivity).asBitmap().load(R.drawable.soud).into(soudImg);
+                    }else{
+                        try {
+                            mPlayer.reset();
+                            mPlayer.setDataSource(post.getAudio());
+                            mPlayer.prepare();
+                            mPlayer.start();
+                            mAudioManager = (AudioManager) mActivity.getSystemService(Context.AUDIO_SERVICE);
+                            mAudioManager.requestAudioFocus(onAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+                            Glide.with(mActivity).asGif().load(R.drawable.soud).into(soudImg);
+                        }catch (Exception e){
+                            e.printStackTrace();
                         }
                     }
+                    mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mediaPlayer) {
+                            mAudioManager.abandonAudioFocus(onAudioFocusChangeListener);
+                            mPlayer.stop();
+                            mPlayer.release();
+                            mPlayer=null;
+                            Glide.with(mActivity).asBitmap().load(R.drawable.soud).into(soudImg);
+                        }
+                    });
                 }
-                for (int j = 0; j < viewList.size(); j++) {
-                    Rect bounds = new Rect();
-                    viewList.get(j).getGlobalVisibleRect(bounds);
-                    photos.get(j).setStatusBarH(MyUtils.getStatusHeight(mActivity));
-                    photos.get(j).setmBounds(bounds);
-                    photos.get(j).setUrl(photos.get(j).getUrl());
+            });
+
+        }else{
+            videoplayer.setVisibility(View.GONE);
+            content.setVisibility(View.VISIBLE);
+            multiimageview.setVisibility(View.VISIBLE);
+            audioLl.setVisibility(View.GONE);
+            final List<PhotoInfo> photos = new ArrayList<PhotoInfo>();
+            if (post.getImages().size() == 1) {
+                Glide.with(mActivity).load(post.getImages().get(0)).into(new SimpleTarget<Drawable>() {
+                    @Override
+                    public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
+                        photos.add(new PhotoInfo(post.getImages().get(0), "", resource.getIntrinsicWidth(), resource.getIntrinsicHeight()));
+                        multiimageview.setList(photos);
+                    }
+                });
+            } else {
+                for (int i = 0; i < post.getImages().size(); i++) {
+                    photos.add(new PhotoInfo(post.getImages().get(i), "", 0, 0));
                 }
-                GPreviewBuilder.from((Activity) mActivity)
-                        .to(CustomImagePreviewActivity.class)
-                        .setOnLongClickListener(new OnLongClickListener() {
-                            @Override
-                            public boolean onLongClick(View view) {
-                                MyUtils.showToast(mActivity, "长按！！！！！！");
-                                return false;
-                            }
-
-                            @Override
-                            public void getContext(Context context) {
-
-                            }
-                        })
-                        .setData(photos)
-                        .setCurrentIndex(position)
-                        .setType(GPreviewBuilder.IndicatorType.Number)
-                        .start();//启动
+                multiimageview.setList(photos);
             }
-        });
+            multiimageview.setOnItemClickListener(new MultiImageView.OnItemClickListener() {
+                @Override
+                public void onItemClick(View view, int position) {
+                    if (!MyUtils.isFastClick()) {
+                        return;
+                    }
+                    //imagesize是作为loading时的图片size
+//                ImagePagerActivity.ImageSize imageSize = new ImagePagerActivity.ImageSize(view.getMeasuredWidth(), view.getMeasuredHeight());
+//                ImagePagerActivity.startImagePagerActivity(mActivity, post.getImages(), position, imageSize);
+                    List<View> viewList = new ArrayList<>();
+                    for (int i = 0; i < multiimageview.getChildCount(); i++) {
+                        View itemView = multiimageview.getChildAt(i);
+                        if (itemView != null) {
+                            if (itemView instanceof LinearLayout) {
+                                LinearLayout thumbView = (LinearLayout) itemView;
+                                for (int j = 0; j < thumbView.getChildCount(); j++) {
+                                    View iconView = thumbView.getChildAt(j);
+                                    viewList.add(iconView);
+                                }
+
+                            } else {
+                                viewList.add(itemView);
+                            }
+                        }
+                    }
+                    for (int j = 0; j < viewList.size(); j++) {
+                        Rect bounds = new Rect();
+                        viewList.get(j).getGlobalVisibleRect(bounds);
+                        photos.get(j).setStatusBarH(MyUtils.getStatusHeight(mActivity));
+                        photos.get(j).setmBounds(bounds);
+                        photos.get(j).setUrl(photos.get(j).getUrl());
+                    }
+                    GPreviewBuilder.from((Activity) mActivity)
+                            .to(CustomImagePreviewActivity.class)
+                            .setData(photos)
+                            .setCurrentIndex(position)
+                            .setType(GPreviewBuilder.IndicatorType.Number)
+                            .start();//启动
+                }
+            });
+        }
+//        multiimageview.setList(createPhotos(post.getImages()));
+
         if (post.getIszan() == 1) {
             zanIcon.setSelected(true);
         } else {
@@ -348,7 +431,7 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
             Glide.with(mActivity).load(list.get(i)).into(new SimpleTarget<Drawable>() {
                 @Override
                 public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
-                    photos.add(new PhotoInfo(list.get(finalI),"", resource.getIntrinsicWidth(), resource.getIntrinsicHeight()));
+                    photos.add(new PhotoInfo(list.get(finalI), "", resource.getIntrinsicWidth(), resource.getIntrinsicHeight()));
                 }
             });
         }
@@ -368,9 +451,9 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
             @Override
             public void onItemClick(int commentPosition) {
                 bean = post.getReplylist().get(commentPosition);
-                if (bean.getUserid().equals(Global.loginResult.getId())){
-                    showPopupWindow(bean.getContent(),bean.getId());
-                }else{
+                if (bean.getUserid().equals(Global.loginResult.getId())) {
+                    showPopupWindow(bean.getContent(), bean.getId());
+                } else {
                     etPl.setHint("回复" + bean.getNickname());
                     reply = 1;
                 }
@@ -380,7 +463,7 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
             @Override
             public void onItemLongClick(int position) {
                 bean = post.getReplylist().get(position);
-                showPopupWindow(bean.getContent(),bean.getId());
+                showPopupWindow(bean.getContent(), bean.getId());
             }
         });
     }
@@ -408,9 +491,9 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
             case R.id.ll_share:
                 mShareListener = new CustomShareListener((PostDetailActivity) mActivity);
                 /*增加自定义按钮的分享面板*/
-                mShareAction = new ShareAction((Activity)mActivity).setDisplayList(
+                mShareAction = new ShareAction((Activity) mActivity).setDisplayList(
                         SHARE_MEDIA.WEIXIN, SHARE_MEDIA.WEIXIN_CIRCLE, SHARE_MEDIA.WEIXIN_FAVORITE,
-                        SHARE_MEDIA.SINA, SHARE_MEDIA.QQ, SHARE_MEDIA.QZONE,SHARE_MEDIA.MORE)
+                        SHARE_MEDIA.SINA, SHARE_MEDIA.QQ, SHARE_MEDIA.QZONE, SHARE_MEDIA.MORE)
                         .addButton("复制文本", "复制文本", "umeng_socialize_copy", "umeng_socialize_copy")
                         .addButton("复制链接", "复制链接", "umeng_socialize_copyurl", "umeng_socialize_copyurl")
                         .setShareboardclickCallback(new ShareBoardlistener() {
@@ -437,7 +520,7 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
                 break;
             case R.id.ll_letter:
                 reply = 2;
-                etPl.setHint("私信"+post.getNickname());
+                etPl.setHint("私信" + post.getNickname());
                 break;
             case R.id.ll_pl:
                 reply = 0;
@@ -451,9 +534,9 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
                 }
                 if (reply == 0) {
                     addWeiboReply(content, "");
-                } else if (reply==2){
-                    addWeiboLetter(post.getUserid(),content);
-                }else{
+                } else if (reply == 2) {
+                    addWeiboLetter(post.getUserid(), content);
+                } else {
                     addWeiboReply(content, bean.getUserid());
                 }
                 break;
@@ -525,6 +608,7 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
             }
         });
     }
+
     /**
      * 帖子删评论
      */
@@ -555,6 +639,7 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
             }
         });
     }
+
     /**
      * 私信
      */
@@ -657,7 +742,7 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
                             etPl.setText("");
                             MyUtils.hideSoftInput(mActivity, etPl);
 //                            if (reply!=1){
-                                getWeiboDetail();
+                            getWeiboDetail();
 //                            }
                         } else {
                             MyUtils.showToast(mActivity, message);
@@ -772,6 +857,29 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
         super.onDestroy();
         UMShareAPI.get(this).release();
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mPlayer!=null){
+            mPlayer.release();
+            mPlayer=null;
+            return;
+        }
+        JZVideoPlayer.releaseAllVideos();
+        if (mAudioManager!=null){
+            mAudioManager.abandonAudioFocus(onAudioFocusChangeListener);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (JZVideoPlayer.backPress()) {
+            return;
+        }
+        super.onBackPressed();
+    }
+
     /**
      * 弹出Popupwindow
      */
@@ -779,7 +887,7 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
         View popupWindow_view = LayoutInflater.from(mActivity).inflate(R.layout.pop_layout, null);
         Button save_btn = popupWindow_view.findViewById(R.id.save_btn);
         Button zxing_btn = popupWindow_view.findViewById(R.id.zxing_btn);
-        save_btn.setVisibility(post.getUserid().equals(Global.loginResult.getId())?View.VISIBLE:View.GONE);
+        save_btn.setVisibility(post.getUserid().equals(Global.loginResult.getId()) ? View.VISIBLE : View.GONE);
         save_btn.setText("删除");
         zxing_btn.setText("复制");
         save_btn.setOnClickListener(new View.OnClickListener() {
@@ -792,7 +900,7 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
         zxing_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MyUtils.copy(content,mActivity);
+                MyUtils.copy(content, mActivity);
                 mPopupWindow.dismiss();
             }
         });

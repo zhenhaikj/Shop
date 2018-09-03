@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import butterknife.BindView;
+import cn.jzvd.JZVideoPlayer;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -380,14 +381,27 @@ public class MyPostActivity extends BaseActivity implements AdapterView.OnItemCl
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        if (adapter!=null){
+            adapter.releasePlayer();
+        }
+        JZVideoPlayer.releaseAllVideos();
+    }
+    @Override
+    public void onBackPressed() {
+        if (JZVideoPlayer.backPress()) {
+            return;
+        }
+        super.onBackPressed();
+    }
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
         }
-        if (adapter!=null){
-            adapter.releasePlayer();
-        }
+
     }
 
     @Override

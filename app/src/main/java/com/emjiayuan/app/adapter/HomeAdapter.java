@@ -98,7 +98,9 @@ public class HomeAdapter extends BaseAdapter {
         }else if ("2".equals(products.getType())){
             holder.gvGoods.setNumColumns(3);
         }
-
+        holder.gvGoods.setVisibility(View.GONE);
+        holder.gvGoods.setVisibility(View.VISIBLE);
+        holder.gvGoods.setFocusable(false);
         holder.gvGoods.setAdapter(new TwzqAdapter(mContext, products.getProduct_list()));
         holder.gvGoods.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

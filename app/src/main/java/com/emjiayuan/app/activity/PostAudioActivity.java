@@ -2,8 +2,10 @@ package com.emjiayuan.app.activity;
 
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Build;
@@ -26,6 +28,8 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
+import com.bumptech.glide.Glide;
+import com.czt.mp3recorder.MP3Recorder;
 import com.dmcbig.mediapicker.entity.Media;
 import com.emjiayuan.app.BaseActivity;
 import com.emjiayuan.app.R;
@@ -51,6 +55,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -119,10 +124,38 @@ public class PostAudioActivity extends BaseActivity implements AdapterView.OnIte
     private Post post;
     private Intent intent;
     private static final int BAIDU_ACCESS_FINE_LOCATION = 100;//定位申请跳转
-    private MediaRecorder mRecorder;
+//    private MediaRecorder mRecorder;
     private String FileName;
     private MediaPlayer mPlayer;
     private TimeCount timeCount;
+    private MP3Recorder mp3Recorder;
+    public AudioManager.OnAudioFocusChangeListener onAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {//是否新建个class，代码更规矩，并且变量的位置也很尴尬
+        @Override
+        public void onAudioFocusChange(int focusChange) {
+            switch (focusChange) {
+                case AudioManager.AUDIOFOCUS_GAIN:
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS:
+                    if (mPlayer!=null){
+                        mPlayer.stop();
+                        mPlayer.release();
+                        mPlayer=null;
+                    }
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                    if(mPlayer!=null){
+                        mPlayer.stop();
+                        mPlayer.release();
+                        mPlayer=null;
+                    }
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                    break;
+            }
+        }
+    };
+    private AudioManager mAudioManager;
+    private String time="";
 
     @Override
     protected int setLayoutId() {
@@ -171,22 +204,28 @@ public class PostAudioActivity extends BaseActivity implements AdapterView.OnIte
                 } else {
                     audioBtn.setBackgroundResource(R.drawable.audio_selector);
                     second.setVisibility(View.VISIBLE);
-                    timeCount=new TimeCount(60000,1000);
-                    timeCount.start();
-                    mRecorder = new MediaRecorder();
-                    mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-                    mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+//                    mRecorder = new MediaRecorder();
+//                    mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+//                    mRecorder.setOutputFormat(MediaRecorder.OutputFormat.);
                     //设置sdcard的路径
                     FileName = Environment.getExternalStorageDirectory().getAbsolutePath();
                     FileName += "/audio.mp3";
-                    mRecorder.setOutputFile(FileName);
-                    mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+                    mp3Recorder = new MP3Recorder(new File(FileName));
                     try {
-                        mRecorder.prepare();
+                        mp3Recorder.start();
                     } catch (IOException e) {
-                        Log.e("mRecorder", "prepare() failed");
+                        e.printStackTrace();
                     }
-                    mRecorder.start();
+//                    mRecorder.setOutputFile(FileName);
+//                    mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+//                    try {
+//                        mRecorder.prepare();
+//                    } catch (IOException e) {
+//                        Log.e("mRecorder", "prepare() failed");
+//                    }
+//                    mRecorder.start();
+                    timeCount=new TimeCount(60000,1000);
+                    timeCount.start();
                 }
 
             }
@@ -445,17 +484,36 @@ public class PostAudioActivity extends BaseActivity implements AdapterView.OnIte
                         mPlayer.setDataSource(FileName);
                         mPlayer.prepare();
                         mPlayer.start();
+                        mAudioManager = (AudioManager) mActivity.getSystemService(Context.AUDIO_SERVICE);
+                        mAudioManager.requestAudioFocus(onAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
                     } catch (IOException e) {
                         Log.e("", "播放失败");
                     }
+                }else{
+                    mPlayer.stop();
+                    mPlayer.release();
+                    mPlayer=null;
+                    mAudioManager.abandonAudioFocus(onAudioFocusChangeListener);
                 }
                 break;
             case R.id.retry:
+                if (mPlayer!=null&&mPlayer.isPlaying()){
+                    mPlayer.stop();
+                    mPlayer.release();
+                    mPlayer=null;
+                    mAudioManager.abandonAudioFocus(onAudioFocusChangeListener);
+                }
                 audioBtn.setEnabled(true);
                 audioBtn.setChecked(true);
                 btnLl.setVisibility(View.INVISIBLE);
                 break;
             case R.id.save:
+                if (mPlayer!=null&&mPlayer.isPlaying()){
+                    mPlayer.stop();
+                    mPlayer.release();
+                    mPlayer=null;
+                    mAudioManager.abandonAudioFocus(onAudioFocusChangeListener);
+                }
                 if (btnLl.getVisibility()==View.INVISIBLE){
                     MyUtils.showToast(mActivity, "请录音!");
                     return;
@@ -487,7 +545,7 @@ public class PostAudioActivity extends BaseActivity implements AdapterView.OnIte
 //        String key = <指定七牛服务上的文件名，或 null>;
 //        String token = <从服务端SDK获取>;
         UploadManager uploadManager = new UploadManager(config);
-        uploadManager.put(FileName, "upload_file/app/" + getRandomFileName()+".mp3", token, new UpCompletionHandler() {
+        uploadManager.put(FileName, "upload_file/app/" + getRandomFileName()+"_"+time+".mp3", token, new UpCompletionHandler() {
                     @Override
                     public void complete(String key, ResponseInfo info, JSONObject res) {
                         //res包含hash、key等信息，具体字段取决于上传策略的设置
@@ -616,16 +674,18 @@ public class PostAudioActivity extends BaseActivity implements AdapterView.OnIte
 
         @Override
         public void onTick(long millisUntilFinished) {
+            time=(60000-millisUntilFinished )/ 1000 +1+"";
             second.setText((60000-millisUntilFinished )/ 1000 +1+ "''");
         }
 
         @Override
         public void onFinish() {
+            mp3Recorder.stop();
             btnLl.setVisibility(View.VISIBLE);
             audioBtn.setBackgroundResource(R.drawable.audio3);
-            mRecorder.stop();
-            mRecorder.release();
-            mRecorder = null;
+//            mRecorder.stop();
+//            mRecorder.release();
+//            mRecorder = null;
         }
     }
 
@@ -639,11 +699,15 @@ public class PostAudioActivity extends BaseActivity implements AdapterView.OnIte
             mPlayer.stop();
             mPlayer.release();
             mPlayer=null;
+            mAudioManager.abandonAudioFocus(onAudioFocusChangeListener);
         }
-        if (mRecorder!=null){
-            mRecorder.stop();
-            mRecorder.release();
-            mRecorder = null;
+        if (mp3Recorder!=null){
+            mp3Recorder.stop();
         }
+//        if (mRecorder!=null){
+//            mRecorder.stop();
+//            mRecorder.release();
+//            mRecorder = null;
+//        }
     }
 }

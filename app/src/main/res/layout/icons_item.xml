@@ -18,4 +18,10 @@
         android:layout_height="25dp"
         android:layout_gravity="top|right"
         android:src="@drawable/delete_img"/>
+    <com.emjiayuan.app.widget.MyImageView
+        android:id="@+id/video_img"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center"
+        android:src="@drawable/video"/>
 </FrameLayout>

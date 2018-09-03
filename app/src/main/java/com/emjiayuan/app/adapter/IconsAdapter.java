@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.GlideUtil;
+import com.emjiayuan.app.activity.PostActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,6 +73,7 @@ public class IconsAdapter extends BaseAdapter {
             convertView = mInflater.inflate(R.layout.icons_item, null);
             holder.icon = (ImageView) convertView.findViewById(R.id.icon);
             holder.delete = (ImageView) convertView.findViewById(R.id.delete);
+            holder.video_img = (ImageView) convertView.findViewById(R.id.video_img);
             convertView.setTag(holder);
         } else {// 如果之前已经显示过该页面，则用viewholder中的缓存直接刷屏
             holder = (ViewHolder) convertView.getTag();
@@ -82,18 +84,22 @@ public class IconsAdapter extends BaseAdapter {
             setNoMovePosition(position);
             holder.icon.setImageResource(R.drawable.add_img2);
             holder.delete.setVisibility(View.GONE);
+            holder.video_img.setVisibility(View.GONE);
         } else {
             holder.delete.setVisibility(View.VISIBLE);
             if (item.contains("mp4")){
                 Glide.with(mContext).load(item).into(holder.icon);
+                holder.video_img.setVisibility(View.VISIBLE);
             }else{
                 GlideUtil.loadImageViewLoding(mContext,item,holder.icon,R.drawable.empty_img,R.drawable.empty_img);
+                holder.video_img.setVisibility(View.GONE);
             }
         }
         holder.delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 grouplists.remove(position);
+                ((PostActivity)mContext).remove(position);
                 if (!grouplists.contains("add")){
                     grouplists.add("add");
                 }
@@ -108,5 +114,6 @@ public class IconsAdapter extends BaseAdapter {
     public class ViewHolder {
         public ImageView icon;
         public ImageView delete;
+        public ImageView video_img;
     }
 }
