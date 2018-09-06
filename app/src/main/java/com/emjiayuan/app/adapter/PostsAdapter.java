@@ -18,6 +18,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -81,7 +82,7 @@ import okhttp3.Response;
  * Created by cyl on 2018年5月10日 09:52:49.
  */
 
-public class PostsAdapter extends BaseAdapter {
+public class PostsAdapter extends BaseAdapter implements AbsListView.OnScrollListener{
 
     private Context mContext;
     private Context context;
@@ -154,6 +155,7 @@ public class PostsAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
+        MyUtils.e("getView===",position+"");
         ViewHolder holder = null;
         if (convertView == null || convertView.getTag() == null) {
             convertView = mInflater.inflate(R.layout.post_item, parent, false);
@@ -212,50 +214,33 @@ public class PostsAdapter extends BaseAdapter {
                 holder.commentList.setDatas(post.getReplylist());
             }
             final List<PhotoInfo> photos = new ArrayList<PhotoInfo>();
-            if (post.getImages().size() == 1) {
-                Glide.with(mContext).load(post.getImages().get(0)).into(new SimpleTarget<Drawable>() {
-                    @Override
-                    public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
-                        photos.add(new PhotoInfo(post.getImages().get(0), "", resource.getIntrinsicWidth(), resource.getIntrinsicHeight()));
-                        finalHolder.multiimageview.setList(photos);
-                    }
-                });
-            } else {
+//            if (post.getImages().size() == 1) {
+//                Glide.with(mContext).load(post.getImages().get(0)).into(new SimpleTarget<Drawable>() {
+//                    @Override
+//                    public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
+//                        photos.add(new PhotoInfo(post.getImages().get(0), "", resource.getIntrinsicWidth(), resource.getIntrinsicHeight()));
+//                        finalHolder.multiimageview.setList(photos);
+//                    }
+//                });
+//            } else {
                 for (int i = 0; i < post.getImages().size(); i++) {
                     photos.add(new PhotoInfo(post.getImages().get(i), "", 0, 0));
                 }
                 holder.multiimageview.setList(photos);
-            }
+//            }
             if (post.getShowtype() == 3) {
-//            Glide.with(mContext).load(post.getVideo()).into(new SimpleTarget<Drawable>() {
-//                @Override
-//                public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
-//                    photos.add(new PhotoInfo("",post.getVideo(), resource.getIntrinsicWidth(), resource.getIntrinsicHeight()));
-//                    finalHolder.multiimageview.setList(photos);
-//                }
-//            });
                 finalHolder.multiimageview.setVisibility(View.GONE);
                 finalHolder.videoplayer.setVisibility(View.VISIBLE);
                 finalHolder.content.setVisibility(View.VISIBLE);
                 finalHolder.audioLl.setVisibility(View.GONE);
                 finalHolder.videoplayer.setUp(post.getVideo(), JZVideoPlayer.SCREEN_WINDOW_LIST, "");
-                Glide.with(mContext).load(post.getVideo()).into(finalHolder.videoplayer.thumbImageView);
+                Glide.with(mContext).load(post.getVideo()+"?vframe/png/offset/0").into(finalHolder.videoplayer.thumbImageView);
                 finalHolder.videoplayer.positionInList = position;
             } else if (post.getShowtype() == 2) {
                 finalHolder.audioLl.setVisibility(View.VISIBLE);
                 finalHolder.videoplayer.setVisibility(View.GONE);
                 finalHolder.multiimageview.setVisibility(View.GONE);
                 finalHolder.content.setVisibility(View.GONE);
-//            finalHolder.second.setText(post.getAud);
-//            final MediaPlayer mediaPlayer=new MediaPlayer();
-//            try {
-//                mediaPlayer.reset();
-//                mediaPlayer.setDataSource(post.getAudio());
-//                mediaPlayer.prepare();
-//                finalHolder.second.setText(mediaPlayer.getDuration()/1000+"''");
-//            }catch (Exception e){
-//                e.printStackTrace();
-//            }
                 if (post.getAudio().contains("mp3")) {
                     finalHolder.second.setText(post.getAudio().substring(post.getAudio().lastIndexOf("_") + 1, post.getAudio().lastIndexOf(".")) + "''");
                 }
@@ -771,6 +756,26 @@ public class PostsAdapter extends BaseAdapter {
         MyUtils.setWindowAlpa(mContext, true);
     }
 
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+        switch (scrollState){
+            case SCROLL_STATE_IDLE:
+                Glide.with(mContext).resumeRequests();
+                break;
+            case SCROLL_STATE_FLING:
+                Glide.with(mContext).pauseRequests();
+                break;
+            case SCROLL_STATE_TOUCH_SCROLL:
+                Glide.with(mContext).pauseRequests();
+                break;
+        }
+    }
+
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+    }
+
     private static class CustomShareListener implements UMShareListener {
 
         private WeakReference<Activity> mContext;
@@ -914,8 +919,8 @@ public class PostsAdapter extends BaseAdapter {
         TextView timegg;
         @BindView(R.id.contentgg)
         TextView contentgg;
-        @BindView(R.id.loadmore)
-        TextView loadmore;
+        @BindView(R.id.LoadMore)
+        TextView LoadMore;
         @BindView(R.id.ll_contentgg)
         LinearLayout llContentgg;
         @BindView(R.id.ll_gg)

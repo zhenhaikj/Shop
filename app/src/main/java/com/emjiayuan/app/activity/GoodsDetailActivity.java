@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -28,12 +29,14 @@ import com.emjiayuan.app.Utils.GlideUtil;
 import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.adapter.CommentAdapter;
+import com.emjiayuan.app.adapter.GuigeAdapter;
 import com.emjiayuan.app.imageloader.GlideImageLoader;
 import com.emjiayuan.app.entity.Comment;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.OrderComfirm;
 import com.emjiayuan.app.entity.Product;
 import com.emjiayuan.app.entity.SeckillBean;
+import com.emjiayuan.app.widget.MyGridView;
 import com.emjiayuan.app.widget.MyListView;
 import com.google.gson.Gson;
 import com.lwkandroid.stateframelayout.StateFrameLayout;
@@ -41,7 +44,7 @@ import com.qiyukf.unicorn.api.ConsultSource;
 import com.qiyukf.unicorn.api.Unicorn;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
-import com.scwang.smartrefresh.layout.listener.OnLoadmoreListener;
+import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.umeng.socialize.ShareAction;
 import com.umeng.socialize.UMShareAPI;
@@ -143,6 +146,7 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
     StateFrameLayout stateLayoutPl;
     @BindView(R.id.webview)
     WebView webview;
+
     private Product product;
     private PopupWindow popupWindow;
     private int num = 1;
@@ -158,6 +162,7 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
     private long sjc;
     private UMShareListener mShareListener;
     private ShareAction mShareAction;
+    private boolean isCheck=false;
 
     @Override
     protected int setLayoutId() {
@@ -166,7 +171,7 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
 
     @Override
     protected void initData() {
-        refreshLayout.setEnableLoadmore(false);
+        refreshLayout.setEnableLoadMore(false);
         refreshLayout.setEnableHeaderTranslationContent(false);
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
@@ -174,9 +179,9 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
                 getProduct(productid);
             }
         });
-        refreshLayout.setOnLoadmoreListener(new OnLoadmoreListener() {
+        refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
-            public void onLoadmore(RefreshLayout refreshlayout) {
+            public void onLoadMore(RefreshLayout refreshlayout) {
                 pageindex++;
                 getComment();
             }
@@ -438,7 +443,7 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
                 tv_pl.setBackgroundResource(R.drawable.detail_line_uncheck);
                 stateLayoutPl.setVisibility(View.GONE);
                 webview.setVisibility(View.VISIBLE);
-                refreshLayout.setEnableLoadmore(false);
+                refreshLayout.setEnableLoadMore(false);
                 break;
             case R.id.pl_ll:
                 tv_detail.setTextColor(getResources().getColor(R.color.tv_detail_uncheck_color));
@@ -742,13 +747,13 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
 //                            MyUtils.showToast(mActivity, result);
                         } else {
                             stateLayoutPl.changeState(StateFrameLayout.EMPTY);
-                            refreshLayout.setLoadmoreFinished(true);
+                            refreshLayout.finishLoadMore(true);
                             MyUtils.showToast(mActivity, message);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    refreshLayout.finishLoadmore();
+                    refreshLayout.finishLoadMore();
                     refreshLayout.finishRefresh();
                     break;
             }
@@ -756,19 +761,52 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
     };
 
     public void showPopWindow(int type) {
+        isCheck=false;
         View view = LayoutInflater.from(mActivity).inflate(R.layout.choose_num, null);
-        ImageView imageView = view.findViewById(R.id.icon);
-        TextView name = view.findViewById(R.id.name);
-        TextView price = view.findViewById(R.id.price);
-        TextView preprice = view.findViewById(R.id.preprice);
+        final ImageView imageView = view.findViewById(R.id.icon);
+        final TextView name = view.findViewById(R.id.name);
+        final TextView price = view.findViewById(R.id.price);
+        final TextView preprice = view.findViewById(R.id.preprice);
 //        ImageView imageView=view.findViewById(R.id.icon);
         TextView up = view.findViewById(R.id.up);
         TextView down = view.findViewById(R.id.down);
-        TextView kc = view.findViewById(R.id.kc);
+        final TextView kc = view.findViewById(R.id.kc);
         TextView xg = view.findViewById(R.id.xg);
+        MyGridView gg_grid=view.findViewById(R.id.gg_grid);
+        LinearLayout gg_ll=view.findViewById(R.id.gg_ll);
+        View gg_line=view.findViewById(R.id.gg_line);
+        gg_line.setVisibility(product.getStyle_list()==null?View.GONE:View.VISIBLE);
+        gg_ll.setVisibility(product.getStyle_list()==null?View.GONE:View.VISIBLE);
         xg.setVisibility(View.GONE);
         TextView next = view.findViewById(R.id.next);
         final EditText et_count = view.findViewById(R.id.et_count);
+        if (product.getStyle_list()!=null){
+            final GuigeAdapter adapter=new GuigeAdapter(mActivity,product.getStyle_list());
+            gg_grid.setAdapter(adapter);
+            gg_grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    isCheck=true;
+                    adapter.setSelected(position);
+                    Product product_gg=product.getStyle_list().get(position);
+                    product_gg.setStyle_list(product.getStyle_list());
+                    product=product_gg;
+                    setdata();
+                    GlideUtil.loadImageViewLoding(mActivity, product.getImages(), imageView, R.drawable.empty_img, R.drawable.empty_img);
+                    name.setText(product.getName());
+                    if (flag) {
+                        price.setText("¥" + bean.getPriceX());
+                        preprice.setText("原价¥" + product.getPreprice());
+                        kc.setText("剩余" + bean.getStock() + "件");
+                    } else {
+                        price.setText("¥" + product.getPrice());
+                        preprice.setText("原价¥" + product.getPreprice());
+                        kc.setText("剩余" + product.getTotalnum() + "件");
+                    }
+                }
+            });
+        }
+
         GlideUtil.loadImageViewLoding(mActivity, product.getImages(), imageView, R.drawable.empty_img, R.drawable.empty_img);
         name.setText(product.getName());
         if (flag) {
@@ -825,7 +863,15 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
                         if (!MyUtils.isFastClick()) {
                             return;
                         }
-                        addCar(Integer.toString(num));
+                        if (product.getStyle_list()!=null){
+                            if (isCheck){
+                                addCar(Integer.toString(num));
+                            }else{
+                                MyUtils.showToast(mActivity,"请选择规格");
+                            }
+                        }else{
+                            addCar(Integer.toString(num));
+                        }
                     }
                 });
                 break;
@@ -842,7 +888,15 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
                         if (!MyUtils.isFastClick()) {
                             return;
                         }
-                        confirmOrder();
+                        if (product.getStyle_list()!=null){
+                            if (isCheck){
+                                confirmOrder();
+                            }else{
+                                MyUtils.showToast(mActivity,"请选择规格");
+                            }
+                        }else{
+                            confirmOrder();
+                        }
                     }
                 });
                 break;

@@ -53,7 +53,7 @@ public class VideoPlayerActivity extends BaseActivity {
         String url = intent.getStringExtra("url");
         JZVideoPlayerStandard videoplayer= (JZVideoPlayerStandard) findViewById(R.id.videoplayer);
         videoplayer.setUp(url, JZVideoPlayerStandard.SCREEN_WINDOW_NORMAL, "sssss");
-        Glide.with(mActivity).load(url).into(videoplayer.thumbImageView);
+        Glide.with(mActivity).load(url+"?vframe/png/offset/0").into(videoplayer.thumbImageView);
     }
 
     @Override

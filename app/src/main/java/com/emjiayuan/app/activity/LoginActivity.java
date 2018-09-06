@@ -12,7 +12,9 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.emjiayuan.app.MainActivity;
 import com.emjiayuan.app.Utils.SpUtils;
+import com.emjiayuan.app.event.LoginSuccessEvent;
 import com.google.gson.Gson;
 import com.emjiayuan.app.BaseActivity;
 import com.emjiayuan.app.R;
@@ -135,7 +137,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                             MobclickAgent.onProfileSignIn(Global.loginResult.getId());
                             SpUtils.putObject(mActivity,"loginResult",Global.loginResult);
                             MyUtils.showToast(LoginActivity.this, message);
-                            EventBus.getDefault().post(new UpdateEvent("update"));
+
                             getDevice();
                             setResult(RESULT_OK);
                             finish();
@@ -221,6 +223,16 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             case R.id.password_forget:
                 startActivity(new Intent(this, PwdForgetActivity.class));
                 break;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (Global.loginResult==null){
+            startActivity(new Intent(mActivity, MainActivity.class));
+        }else{
+            EventBus.getDefault().post(new LoginSuccessEvent("update"));
         }
     }
 }

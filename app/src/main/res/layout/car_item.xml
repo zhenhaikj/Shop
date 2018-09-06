@@ -26,8 +26,7 @@
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_marginRight="10dp"
-        android:layout_gravity="center"
-        android:src="@drawable/lt" />
+        android:layout_gravity="center" />
 
     <LinearLayout
         android:layout_width="match_parent"

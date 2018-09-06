@@ -120,7 +120,7 @@ public class ClassifyFragment2 extends BaseLazyFragment {
             }
         });
         reqCategory();
-        refreshLayout.setEnableLoadmore(false);
+        refreshLayout.setEnableLoadMore(false);
         refreshLayout.setEnableHeaderTranslationContent(false);
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override

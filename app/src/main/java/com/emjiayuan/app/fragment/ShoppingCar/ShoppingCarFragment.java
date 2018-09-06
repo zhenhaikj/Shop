@@ -29,6 +29,7 @@ import com.emjiayuan.app.entity.CarBean;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.OrderComfirm;
 import com.emjiayuan.app.event.CarUpdateEvent;
+import com.emjiayuan.app.event.LoginSuccessEvent;
 import com.emjiayuan.app.fragment.BaseLazyFragment;
 import com.google.gson.Gson;
 import com.gyf.barlibrary.ImmersionBar;
@@ -127,7 +128,7 @@ public class ShoppingCarFragment extends BaseLazyFragment implements View.OnClic
     protected void initData() {
         reqCarList();
         manage.setVisibility(View.GONE);
-        refreshLayout.setEnableLoadmore(false);
+        refreshLayout.setEnableLoadMore(false);
         refreshLayout.setEnableHeaderTranslationContent(false);
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
@@ -282,6 +283,10 @@ public class ShoppingCarFragment extends BaseLazyFragment implements View.OnClic
     public void Event(CarUpdateEvent event) {
         setPay(event.getCarBeanList());
     }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void Event(LoginSuccessEvent event) {
+        reqCarList();
+    }
 
     public void setPay(List<CarBean> carBeanList) {
         total = 0.00;
@@ -332,10 +337,10 @@ public class ShoppingCarFragment extends BaseLazyFragment implements View.OnClic
         selectList.clear();
         total = 0.0;
         FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
-        if (Global.loginResult == null) {
-            startActivityForResult(new Intent(mActivity, LoginActivity.class), 100);
-            return;
-        }
+//        if (Global.loginResult == null) {
+//            startActivityForResult(new Intent(mActivity, LoginActivity.class), 100);
+//            return;
+//        }
         formBody.add("userid", Global.loginResult.getId());
         formBody.add("provinceid",Global.provinceid);
         Log.d("------参数------", formBody.build().toString());
@@ -531,11 +536,11 @@ public class ShoppingCarFragment extends BaseLazyFragment implements View.OnClic
         }
     };
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode==RESULT_OK){
-            reqCarList();
-        }
-    }
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if (requestCode==RESULT_OK){
+//            reqCarList();
+//        }
+//    }
 }

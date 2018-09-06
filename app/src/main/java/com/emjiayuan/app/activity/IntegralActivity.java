@@ -22,7 +22,7 @@ import com.google.gson.Gson;
 import com.lwkandroid.stateframelayout.StateFrameLayout;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
-import com.scwang.smartrefresh.layout.listener.OnLoadmoreListener;
+import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import org.json.JSONArray;
@@ -94,21 +94,21 @@ public class IntegralActivity extends BaseActivity implements View.OnClickListen
         lv_history.setAdapter(adapter);
         request(pageindex, status);
         refreshLayout.setEnableHeaderTranslationContent(false);
-//        refreshLayout.setEnableAutoLoadmore(true);
+//        refreshLayout.setEnableAutoLoadMore(true);
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(RefreshLayout refreshlayout) {
                 flag=false;
                 list.clear();
                 pageindex = 1;
-                refreshLayout.setLoadmoreFinished(false);
-                refreshLayout.setEnableLoadmore(true);
+                refreshLayout.finishLoadMore(false);
+                refreshLayout.setEnableLoadMore(true);
                 request(pageindex, status);
             }
         });
-        refreshLayout.setOnLoadmoreListener(new OnLoadmoreListener() {
+        refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
-            public void onLoadmore(RefreshLayout refreshlayout) {
+            public void onLoadMore(RefreshLayout refreshlayout) {
                 flag=false;
                 pageindex++;
                 request(pageindex, status);
@@ -188,7 +188,7 @@ public class IntegralActivity extends BaseActivity implements View.OnClickListen
                             stateLayout.changeState(StateFrameLayout.SUCCESS);
                             adapter.notifyDataSetChanged();
                         } else {
-                            refreshLayout.setLoadmoreFinished(true);
+                            refreshLayout.finishLoadMore(true);
                             if (pageindex==1){
                                 stateLayout.changeState(StateFrameLayout.EMPTY);
                             }else{
@@ -204,7 +204,7 @@ public class IntegralActivity extends BaseActivity implements View.OnClickListen
                         e.printStackTrace();
                     }
                     refreshLayout.finishRefresh();
-                    refreshLayout.finishLoadmore();
+                    refreshLayout.finishLoadMore();
                     break;
                 case 1:
 //                    MyUtils.showToast(LoginActivity.this,result);
@@ -223,7 +223,7 @@ public class IntegralActivity extends BaseActivity implements View.OnClickListen
                 finish();
                 break;
             case R.id.cz_ll:
-                refreshLayout.setLoadmoreFinished(false);
+                refreshLayout.finishLoadMore(false);
                 status = "1";
                 pageindex = 1;
                 list.clear();
@@ -234,7 +234,7 @@ public class IntegralActivity extends BaseActivity implements View.OnClickListen
                 tab2.setTextColor(Color.parseColor("#48C351"));
                 break;
             case R.id.xf_ll:
-                refreshLayout.setLoadmoreFinished(false);
+                refreshLayout.finishLoadMore(false);
                 status = "2";
                 pageindex = 1;
                 list.clear();

@@ -117,7 +117,7 @@ public class AllGoodsActivity extends BaseActivity implements View.OnClickListen
             }
         });
         reqCategory();
-        refreshLayout.setEnableLoadmore(false);
+        refreshLayout.setEnableLoadMore(false);
         refreshLayout.setEnableHeaderTranslationContent(false);
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override

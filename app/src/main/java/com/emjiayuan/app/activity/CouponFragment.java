@@ -12,7 +12,7 @@ import com.gyf.barlibrary.ImmersionBar;
 import com.lwkandroid.stateframelayout.StateFrameLayout;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
-import com.scwang.smartrefresh.layout.listener.OnLoadmoreListener;
+import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.MyOkHttp;
@@ -137,7 +137,7 @@ public  class CouponFragment extends BaseLazyFragment {
                 getCoupon();
             }
         });
-        refreshLayout.setEnableLoadmore(false);
+        refreshLayout.setEnableLoadMore(false);
         refreshLayout.setEnableRefresh(false);
 //        refreshLayout.setEnableHeaderTranslationContent(false);
 //        refreshLayout.setOnRefreshListener(new OnRefreshListener() {
@@ -146,13 +146,13 @@ public  class CouponFragment extends BaseLazyFragment {
 //                flag=false;
 //                couponList.clear();
 //                pageindex=1;
-//                refreshLayout.setLoadmoreFinished(false);
+//                refreshLayout.finishLoadMore(false);
 //                getCoupon();
 //            }
 //        });
-//        refreshLayout.setOnLoadmoreListener(new OnLoadmoreListener() {
+//        refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
 //            @Override
-//            public void onLoadmore(RefreshLayout refreshlayout) {
+//            public void onLoadMore(RefreshLayout refreshlayout) {
 //                flag=false;
 //                pageindex++;
 //                getCoupon();
@@ -326,7 +326,7 @@ public  class CouponFragment extends BaseLazyFragment {
                                 stateLayout.changeState(StateFrameLayout.EMPTY);
                             }
                             stateLayout.changeState(StateFrameLayout.EMPTY);
-                            refreshLayout.setLoadmoreFinished(true);
+                            refreshLayout.finishLoadMore(true);
                             MyUtils.showToast(getActivity(), message);
                         }
                     } catch (JSONException e) {
@@ -338,7 +338,7 @@ public  class CouponFragment extends BaseLazyFragment {
                     break;
             }
             refreshLayout.finishRefresh();
-            refreshLayout.finishLoadmore();
+            refreshLayout.finishLoadMore();
         }
     };
 

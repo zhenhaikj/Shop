@@ -13,6 +13,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -137,6 +138,7 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
     private View popupWindow_view;
     private String FilePath;
     private ProgressDialog pd;
+    private ArrayList<String> permissions;
 
     @Override
     protected int setLayoutId() {
@@ -711,7 +713,11 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
             if (list.get(i).contains("mp4")){
                 RandomFileName+=".mp4";
             }else{
-                RandomFileName+=".jpg";
+                if (list.get(i).contains("gif")){
+                    RandomFileName+=".gif";
+                }else{
+                    RandomFileName+=".jpg";
+                }
             }
             final int finalI = i;
             if (!list.get(i).contains("http")){
@@ -843,25 +849,29 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
         }
     }
     //请求权限
-    private void requestPermissions(){
+    private boolean requestPermissions(){
         if (Build.VERSION.SDK_INT >= 23) {
-            ArrayList<String> permissions = new ArrayList<>();
-            if (mActivity.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-            }
-            if (mActivity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            }
+            permissions = new ArrayList<>();
+//            if (mActivity.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//                permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+//            }
+//            if (mActivity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//                permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+//            }
             if (mActivity.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 permissions.add(Manifest.permission.CAMERA);
             }
+            if (mActivity.checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                permissions.add(Manifest.permission.RECORD_AUDIO);
+            }
 
             if (permissions.size() == 0) {
-                return;
+                return true;
             } else {
-                requestPermissions(permissions.toArray(new String[permissions.size()]), 10001);
+                return false;
             }
         }
+        return true;
     }
 
 
@@ -879,7 +889,7 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
                 }
                 break;
             case 10001:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {//允许
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED&&grantResults[1]==PackageManager.PERMISSION_GRANTED) {//允许
                     Intent intent = new Intent();
                     switch (addType){
                         case 0:
@@ -928,7 +938,7 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
                             break;
                     }
                 } else {//拒绝
-                    MyUtils.showToast(mActivity, "相机权限未开启");
+                    MyUtils.showToast(mActivity, "相机或录音权限未开启");
                 }
                 break;
             default:
@@ -945,36 +955,37 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
         Button photo_btn=popupWindow_view.findViewById(R.id.photo_btn);
         Button cancel_btn=popupWindow_view.findViewById(R.id.cancel_btn);
         camera_btn.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View view) {
-                requestPermissions();
-                Intent intent = new Intent();
-                switch (addType){
-                    case 0:
-                        // 指定开启系统相机的Action
-                        intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
-                        intent.addCategory(Intent.CATEGORY_DEFAULT);
-                        String f = System.currentTimeMillis()+".jpg";
-                        FilePath=Environment.getExternalStorageDirectory().getAbsolutePath()+"/ymjy/"+f;
-                        File file=new File(FilePath);
+                if (requestPermissions()){
+                    Intent intent = new Intent();
+                    switch (addType){
+                        case 0:
+                            // 指定开启系统相机的Action
+                            intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
+                            intent.addCategory(Intent.CATEGORY_DEFAULT);
+                            String f = System.currentTimeMillis()+".jpg";
+                            FilePath=Environment.getExternalStorageDirectory().getAbsolutePath()+"/ymjy/"+f;
+                            File file=new File(FilePath);
 //                        File dir=new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/ymjy");
 //                        if (!dir.exists()){
 //                            dir.mkdir();
 //                        }
-                        if (!file.exists()){
-                            try {
-                                file.createNewFile();
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                            if (!file.exists()){
+                                try {
+                                    file.createNewFile();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                             }
-                        }
-                        Uri fileUri = Uri.fromFile(file);
-                        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                        startActivityForResult(intent, 0);
-                        break;
-                    case 1:
-                        intent=new Intent(mActivity,CameraActivity.class);
-                        startActivityForResult(intent, 222);
+                            Uri fileUri = Uri.fromFile(file);
+                            intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+                            startActivityForResult(intent, 0);
+                            break;
+                        case 1:
+                            intent=new Intent(mActivity,CameraActivity.class);
+                            startActivityForResult(intent, 222);
                         /*intent.setAction("android.media.action.VIDEO_CAPTURE");
                         intent.addCategory("android.intent.category.DEFAULT");
                         intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
@@ -993,7 +1004,10 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
                         Uri mUri = Uri.fromFile(mfile);
                         intent.putExtra(MediaStore.EXTRA_OUTPUT, mUri);
                         startActivityForResult(intent, 0);*/
-                        break;
+                            break;
+                    }
+                }else{
+                    requestPermissions(permissions.toArray(new String[permissions.size()]), 10001);
                 }
                 mPopupWindow.dismiss();
             }

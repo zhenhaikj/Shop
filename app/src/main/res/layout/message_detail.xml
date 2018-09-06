@@ -45,8 +45,7 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:scaleType="fitXY"
-            android:visibility="gone"
-            android:src="@drawable/bg"/>
+            android:visibility="gone"/>
         <WebView
             android:id="@+id/webview"
             android:layout_width="match_parent"

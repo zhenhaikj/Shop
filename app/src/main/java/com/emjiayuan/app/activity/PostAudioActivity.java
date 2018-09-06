@@ -14,6 +14,7 @@ import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -156,12 +157,34 @@ public class PostAudioActivity extends BaseActivity implements AdapterView.OnIte
     };
     private AudioManager mAudioManager;
     private String time="";
+    private ArrayList<String> permissions;
 
     @Override
     protected int setLayoutId() {
         return R.layout.activity_post_audio;
     }
+    //请求权限
+    private boolean requestPermissions(){
+        if (Build.VERSION.SDK_INT >= 23) {
+            permissions = new ArrayList<>();
+//            if (mActivity.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//                permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+//            }
+//            if (mActivity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//                permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+//            }
+            if (mActivity.checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                permissions.add(Manifest.permission.RECORD_AUDIO);
+            }
 
+            if (permissions.size() == 0) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
     @Override
     protected void initData() {
 
@@ -194,28 +217,37 @@ public class PostAudioActivity extends BaseActivity implements AdapterView.OnIte
             }
         });
         audioBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                audioBtn.setChecked(b);
-                if (!audioBtn.isChecked()) {
-                    timeCount.onFinish();
-                    timeCount.cancel();
-                    audioBtn.setEnabled(false);
-                } else {
-                    audioBtn.setBackgroundResource(R.drawable.audio_selector);
-                    second.setVisibility(View.VISIBLE);
+                if (!requestPermissions()){
+                    audioBtn.setChecked(false);
+                    requestPermissions(permissions.toArray(new String[permissions.size()]), 10001);
+                    return;
+                }
+                    audioBtn.setChecked(b);
+                    if (!audioBtn.isChecked()) {
+                        timeCount.onFinish();
+                        timeCount.cancel();
+                        audioBtn.setEnabled(false);
+                    } else {
+
+                            audioBtn.setBackgroundResource(R.drawable.audio_selector);
+                            second.setVisibility(View.VISIBLE);
 //                    mRecorder = new MediaRecorder();
 //                    mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 //                    mRecorder.setOutputFormat(MediaRecorder.OutputFormat.);
-                    //设置sdcard的路径
-                    FileName = Environment.getExternalStorageDirectory().getAbsolutePath();
-                    FileName += "/audio.mp3";
-                    mp3Recorder = new MP3Recorder(new File(FileName));
-                    try {
-                        mp3Recorder.start();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                            //设置sdcard的路径
+                            FileName = Environment.getExternalStorageDirectory().getAbsolutePath();
+                            FileName += "/audio.mp3";
+                            mp3Recorder = new MP3Recorder(new File(FileName));
+                            try {
+
+                                mp3Recorder.start();
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
 //                    mRecorder.setOutputFile(FileName);
 //                    mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 //                    try {
@@ -224,9 +256,10 @@ public class PostAudioActivity extends BaseActivity implements AdapterView.OnIte
 //                        Log.e("mRecorder", "prepare() failed");
 //                    }
 //                    mRecorder.start();
-                    timeCount=new TimeCount(60000,1000);
-                    timeCount.start();
-                }
+                            timeCount=new TimeCount(60000,1000);
+                            timeCount.start();
+
+                    }
 
             }
         });
@@ -658,6 +691,46 @@ public class PostAudioActivity extends BaseActivity implements AdapterView.OnIte
                     initMapLocation();
                 } else {//拒绝
                     MyUtils.showToast(mActivity, "定位权限未开启");
+                }
+                break;
+            case 10001:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {//允许
+                    audioBtn.setChecked(true);
+                    if (!audioBtn.isChecked()) {
+                        timeCount.onFinish();
+                        timeCount.cancel();
+                        audioBtn.setEnabled(false);
+                    } else {
+                        audioBtn.setBackgroundResource(R.drawable.audio_selector);
+                        second.setVisibility(View.VISIBLE);
+//                    mRecorder = new MediaRecorder();
+//                    mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+//                    mRecorder.setOutputFormat(MediaRecorder.OutputFormat.);
+                        //设置sdcard的路径
+                        FileName = Environment.getExternalStorageDirectory().getAbsolutePath();
+                        FileName += "/audio.mp3";
+                        mp3Recorder = new MP3Recorder(new File(FileName));
+                        try {
+
+                            mp3Recorder.start();
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+//                    mRecorder.setOutputFile(FileName);
+//                    mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+//                    try {
+//                        mRecorder.prepare();
+//                    } catch (IOException e) {
+//                        Log.e("mRecorder", "prepare() failed");
+//                    }
+//                    mRecorder.start();
+                        timeCount=new TimeCount(60000,1000);
+                        timeCount.start();
+
+                    }
+                } else {//拒绝
+                    MyUtils.showToast(mActivity, "录音权限未开启");
                 }
                 break;
             default:

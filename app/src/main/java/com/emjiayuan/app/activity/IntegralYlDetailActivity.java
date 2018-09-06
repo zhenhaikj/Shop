@@ -33,7 +33,7 @@ import com.qiyukf.unicorn.api.ConsultSource;
 import com.qiyukf.unicorn.api.Unicorn;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
-import com.scwang.smartrefresh.layout.listener.OnLoadmoreListener;
+import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.youth.banner.Banner;
 
@@ -140,9 +140,9 @@ public class IntegralYlDetailActivity extends BaseActivity implements View.OnCli
                 getProduct(productid);
             }
         });
-        refreshLayout.setOnLoadmoreListener(new OnLoadmoreListener() {
+        refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
-            public void onLoadmore(RefreshLayout refreshlayout) {
+            public void onLoadMore(RefreshLayout refreshlayout) {
                 pageindex++;
                 getComment();
             }
@@ -299,7 +299,7 @@ public class IntegralYlDetailActivity extends BaseActivity implements View.OnCli
                 tvPl.setBackgroundResource(R.drawable.detail_line_uncheck);
                 webview.setVisibility(View.VISIBLE);
                 stateLayoutPl.setVisibility(View.GONE);
-                refreshLayout.setEnableLoadmore(false);
+                refreshLayout.setEnableLoadMore(false);
                 break;
             case R.id.pl_ll:
                 tvDetail.setTextColor(getResources().getColor(R.color.tv_detail_uncheck_color));
@@ -308,7 +308,7 @@ public class IntegralYlDetailActivity extends BaseActivity implements View.OnCli
                 tvPl.setBackgroundResource(R.drawable.detail_line);
                 webview.setVisibility(View.GONE);
                 stateLayoutPl.setVisibility(View.VISIBLE);
-                refreshLayout.setEnableLoadmore(true);
+                refreshLayout.setEnableLoadMore(true);
                 pageindex = 1;
                 commentArrayList.clear();
                 getComment();
@@ -516,13 +516,13 @@ public class IntegralYlDetailActivity extends BaseActivity implements View.OnCli
 //                            MyUtils.showToast(mActivity, result);
                         } else {
                             stateLayoutPl.changeState(StateFrameLayout.EMPTY);
-                            refreshLayout.setLoadmoreFinished(true);
+                            refreshLayout.finishLoadMore(true);
                             MyUtils.showToast(mActivity, message);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    refreshLayout.finishLoadmore();
+                    refreshLayout.finishLoadMore();
                     refreshLayout.finishRefresh();
                     break;
 

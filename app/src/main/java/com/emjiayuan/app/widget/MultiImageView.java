@@ -199,12 +199,12 @@ public class MultiImageView extends LinearLayout {
 				imageView.setScaleType(ImageView.ScaleType.FIT_START);
 				//imageView.setMaxHeight(pxOneMaxWandH);
 
-				int expectW = photoInfo.w;
-				int expectH = photoInfo.h;
+//				int expectW = photoInfo.w;
+//				int expectH = photoInfo.h;
 //						int expectW = resource.getIntrinsicWidth();
 //						int expectH = resource.getIntrinsicHeight();
-//						int expectW = 300;
-//						int expectH = 500;
+						int expectW = 200;
+						int expectH = 200;
 
 				if (expectW == 0 || expectH == 0) {
 					imageView.setLayoutParams(onePicPara);
@@ -232,13 +232,13 @@ public class MultiImageView extends LinearLayout {
 //					imageView.setTag(R.id.tag_group,photoInfo);
 //				}
 //			});
-			if (!"".equals(photoInfo.getVideoUrl())){
-//				btnVideo.setVisibility(VISIBLE);
-				Glide.with(getContext()).load(photoInfo.getVideoUrl()).into(imageView);
-			}else{
+//			if (!"".equals(photoInfo.getVideoUrl())){
+////				btnVideo.setVisibility(VISIBLE);
+//				Glide.with(getContext()).load(photoInfo.getVideoUrl()+"?imageView2/1/w/160/h/160/q/85|imageslim").into(imageView);
+//			}else{
 //				btnVideo.setVisibility(GONE);
-				Glide.with(getContext()).load(photoInfo.url).into(imageView);
-			}
+				Glide.with(getContext()).load(photoInfo.url+"?imageView2/1/w/120/h/120/q/75|imageslim").into(imageView);
+//			}
 //		}
 		}
 		return imageView;

@@ -20,10 +20,14 @@ import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.adapter.MyLetterAdapter;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.MyLetter;
+import com.emjiayuan.app.event.IsReadEvent;
 import com.emjiayuan.app.widget.MyListView;
 import com.google.gson.Gson;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -71,10 +75,11 @@ public class MyLetterActivity extends BaseActivity implements View.OnClickListen
 
     @Override
     protected void initData() {
+        EventBus.getDefault().register(this);
         llPl.setVisibility(View.GONE);
         lvMyLetter.setDividerHeight(1);
         refreshLayout.setEnableRefresh(false);
-        refreshLayout.setEnableLoadmore(false);
+        refreshLayout.setEnableLoadMore(false);
     }
 
     @Override
@@ -162,7 +167,10 @@ public class MyLetterActivity extends BaseActivity implements View.OnClickListen
         }
     };
 
-
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void Event(IsReadEvent event) {
+        getWeiboLetterNew();
+    }
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -173,4 +181,11 @@ public class MyLetterActivity extends BaseActivity implements View.OnClickListen
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (EventBus.getDefault().isRegistered(this)){
+            EventBus.getDefault().unregister(this);
+        }
+    }
 }

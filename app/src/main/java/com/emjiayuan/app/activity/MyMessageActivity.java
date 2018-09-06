@@ -18,10 +18,12 @@ import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.adapter.MyMessageAdapter;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.MyMessage;
+import com.emjiayuan.app.event.IsReadEvent;
 import com.emjiayuan.app.widget.MyListView;
 import com.google.gson.Gson;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -63,7 +65,7 @@ public class MyMessageActivity extends BaseActivity implements View.OnClickListe
     @Override
     protected void initData() {
         refreshLayout.setEnableRefresh(false);
-        refreshLayout.setEnableLoadmore(false);
+        refreshLayout.setEnableLoadMore(false);
     }
 
     @Override
@@ -158,9 +160,15 @@ public class MyMessageActivity extends BaseActivity implements View.OnClickListe
         switch (view.getId()) {
             case R.id.back:
                 finish();
+
                 break;
 
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().post(new IsReadEvent(0));
+    }
 }

@@ -320,6 +320,11 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
             }
 
             @Override
+            public void onHeaderReleased(RefreshHeader header, int headerHeight, int extendHeight) {
+
+            }
+
+            @Override
             public void onHeaderReleasing(RefreshHeader header, float percent, int offset, int headerHeight, int extendHeight) {
 //                toolbar.setVisibility(View.VISIBLE);
             }
@@ -330,12 +335,18 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
             }
 
             @Override
-            public void onHeaderFinish(RefreshHeader header) {
-//                toolbar.setVisibility(View.VISIBLE);
+            public void onHeaderFinish(RefreshHeader header, boolean success) {
+
             }
+
 
             @Override
             public void onFooterPulling(RefreshFooter footer, float percent, int offset, int footerHeight, int extendHeight) {
+
+            }
+
+            @Override
+            public void onFooterReleased(RefreshFooter footer, int footerHeight, int extendHeight) {
 
             }
 
@@ -350,12 +361,13 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
             }
 
             @Override
-            public void onFooterFinish(RefreshFooter footer) {
+            public void onFooterFinish(RefreshFooter footer, boolean success) {
 
             }
 
+
             @Override
-            public void onLoadmore(RefreshLayout refreshlayout) {
+            public void onLoadMore(RefreshLayout refreshlayout) {
 
             }
 
@@ -387,12 +399,12 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                 }
             }
         });
-        refreshLayout.setEnableLoadmore(false);
+        refreshLayout.setEnableLoadMore(false);
         refreshLayout.setEnableHeaderTranslationContent(false);
-//        refreshLayout.setOnLoadmoreListener(new OnLoadmoreListener() {
+//        refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
 //            @Override
-//            public void onLoadmore(RefreshLayout refreshlayout) {
-//                refreshlayout.finishLoadmore(2000);
+//            public void onLoadMore(RefreshLayout refreshlayout) {
+//                refreshlayout.finishLoadMore(2000);
 //            }
 //        });
     }
@@ -567,8 +579,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                     break;
                 case R.id.tv_message:
                     intent = new Intent(mActivity, MessageDetailActivity.class);
-                    intent.putExtra("news", news);
-                    intent.putExtra("position", index % news.size());
+                    intent.putExtra("newsid", news.get(index % news.size()).getId());
                     startActivity(intent);
                     break;
                 case R.id.xsh_more_ll://秒杀专区

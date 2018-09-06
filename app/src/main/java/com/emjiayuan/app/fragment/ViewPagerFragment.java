@@ -23,7 +23,7 @@ import com.gyf.barlibrary.ImmersionBar;
 import com.lwkandroid.stateframelayout.StateFrameLayout;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
-import com.scwang.smartrefresh.layout.listener.OnLoadmoreListener;
+import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.MyOkHttp;
@@ -164,7 +164,7 @@ public class ViewPagerFragment extends BaseLazyFragment {
                 }
             }
         });
-//        refreshLayout.setEnableAutoLoadmore(true);
+//        refreshLayout.setEnableAutoLoadMore(true);
         refreshLayout.setEnableHeaderTranslationContent(false);
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
@@ -173,7 +173,7 @@ public class ViewPagerFragment extends BaseLazyFragment {
                 orderList.clear();
                 soupOrderList.clear();
                 pageindex=1;
-                refreshLayout.setLoadmoreFinished(false);
+                refreshLayout.finishLoadMore(false);
                 if (type==3){
                     getSoupOrder();
                 }else{
@@ -181,9 +181,9 @@ public class ViewPagerFragment extends BaseLazyFragment {
                 }
             }
         });
-        refreshLayout.setOnLoadmoreListener(new OnLoadmoreListener() {
+        refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
-            public void onLoadmore(RefreshLayout refreshlayout) {
+            public void onLoadMore(RefreshLayout refreshlayout) {
                 flag=false;
                 pageindex++;
                 if (type==3){
@@ -377,7 +377,7 @@ public class ViewPagerFragment extends BaseLazyFragment {
                             } else {
                                 stateLayout.changeState(StateFrameLayout.EMPTY);
                             }
-                            refreshLayout.setLoadmoreFinished(true);
+                            refreshLayout.finishLoadMore(true);
                             if (pageindex!=1){
                                 MyUtils.showToast(getActivity(), "已全部加载");
                             }else{
@@ -426,7 +426,7 @@ public class ViewPagerFragment extends BaseLazyFragment {
                             } else {
                                 stateLayout.changeState(StateFrameLayout.EMPTY);
                             }
-                            refreshLayout.setLoadmoreFinished(true);
+                            refreshLayout.finishLoadMore(true);
                             if (pageindex!=1){
                                 MyUtils.showToast(getActivity(), "已全部加载");
                             }else{
@@ -439,7 +439,7 @@ public class ViewPagerFragment extends BaseLazyFragment {
                     break;
             }
             refreshLayout.finishRefresh();
-            refreshLayout.finishLoadmore();
+            refreshLayout.finishLoadMore();
         }
     };
 

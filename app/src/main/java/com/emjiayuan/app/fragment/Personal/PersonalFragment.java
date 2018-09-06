@@ -40,6 +40,7 @@ import com.emjiayuan.app.activity.address.AddressActivity;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.LoginResult;
 import com.emjiayuan.app.entity.User;
+import com.emjiayuan.app.event.LoginSuccessEvent;
 import com.emjiayuan.app.event.UpdateEvent;
 import com.emjiayuan.app.fragment.BaseLazyFragment;
 import com.google.gson.Gson;
@@ -153,7 +154,7 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
 //            startActivity(new Intent(getActivity(), LoginActivity.class));
 //        }
         user();
-        refreshLayout.setEnableLoadmore(false);
+        refreshLayout.setEnableLoadMore(false);
         refreshLayout.setEnableHeaderTranslationContent(false);
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
@@ -448,7 +449,7 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
 
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void Event(UpdateEvent event) {
+    public void Event(LoginSuccessEvent event) {
         user();
     }
 

@@ -409,7 +409,7 @@
                     android:textColor="#55C65D"
                     android:text="广告" />
                 <TextView
-                    android:id="@+id/loadmore"
+                    android:id="@+id/LoadMore"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"

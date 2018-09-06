@@ -62,8 +62,7 @@ public class MessageActivity extends BaseActivity {
                     return;
                 }
                 Intent intent=new Intent(mActivity,MessageDetailActivity.class);
-                intent.putExtra("news",news);
-                intent.putExtra("position",i);
+                intent.putExtra("newsid",news.get(i).getId());
                 intent.putExtra("flag",true);
                 startActivity(intent);
             }

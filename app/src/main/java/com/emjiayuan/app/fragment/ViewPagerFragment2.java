@@ -14,7 +14,7 @@ import com.gyf.barlibrary.ImmersionBar;
 import com.lwkandroid.stateframelayout.StateFrameLayout;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
-import com.scwang.smartrefresh.layout.listener.OnLoadmoreListener;
+import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.MyOkHttp;
@@ -150,13 +150,13 @@ public class ViewPagerFragment2 extends BaseLazyFragment {
                 flag=false;
                 orderList.clear();
                 pageindex=1;
-                refreshLayout.setLoadmoreFinished(false);
+                refreshLayout.finishLoadMore(false);
                 getOrder();
             }
         });
-        refreshLayout.setOnLoadmoreListener(new OnLoadmoreListener() {
+        refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
-            public void onLoadmore(RefreshLayout refreshlayout) {
+            public void onLoadMore(RefreshLayout refreshlayout) {
                 flag=false;
                 pageindex++;
                 getOrder();
@@ -294,7 +294,7 @@ public class ViewPagerFragment2 extends BaseLazyFragment {
                             } else {
                                 stateLayout.changeState(StateFrameLayout.EMPTY);
                             }
-                            refreshLayout.setLoadmoreFinished(true);
+                            refreshLayout.finishLoadMore(true);
                             if (pageindex!=1){
                                 MyUtils.showToast(getActivity(), "已全部加载");
                             }else{
@@ -310,7 +310,7 @@ public class ViewPagerFragment2 extends BaseLazyFragment {
                     break;
             }
             refreshLayout.finishRefresh();
-            refreshLayout.finishLoadmore();
+            refreshLayout.finishLoadMore();
         }
     };
 

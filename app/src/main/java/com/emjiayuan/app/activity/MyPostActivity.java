@@ -30,7 +30,7 @@ import com.emjiayuan.app.widget.MyListView;
 import com.google.gson.Gson;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
-import com.scwang.smartrefresh.layout.listener.OnLoadmoreListener;
+import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import org.greenrobot.eventbus.EventBus;
@@ -95,13 +95,13 @@ public class MyPostActivity extends BaseActivity implements AdapterView.OnItemCl
             public void onRefresh(RefreshLayout refreshlayout) {
                 list.clear();
                 pageindex = 1;
-                refreshLayout.setLoadmoreFinished(false);
+                refreshLayout.finishLoadMore(false);
                 getWeiboList();
             }
         });
-        refreshLayout.setOnLoadmoreListener(new OnLoadmoreListener() {
+        refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
-            public void onLoadmore(RefreshLayout refreshlayout) {
+            public void onLoadMore(RefreshLayout refreshlayout) {
                 pageindex++;
                 getWeiboList();
             }
@@ -272,6 +272,7 @@ public class MyPostActivity extends BaseActivity implements AdapterView.OnItemCl
                                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                                     Intent intent = new Intent(mActivity, PostDetailActivity.class);
                                     intent.putExtra("weiboid", list.get(i).getId());
+                                    intent.putExtra("position", i);
                                     startActivity(intent);
                                 }
                             });
@@ -279,7 +280,7 @@ public class MyPostActivity extends BaseActivity implements AdapterView.OnItemCl
                             MyUtils.showToast(mActivity, message);
                         }
                         refreshLayout.finishRefresh();
-                        refreshLayout.finishLoadmore();
+                        refreshLayout.finishLoadMore();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

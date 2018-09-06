@@ -12,6 +12,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,10 +23,13 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.GlideUtil;
 import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
+import com.emjiayuan.app.Utils.PollingService;
+import com.emjiayuan.app.Utils.PollingUtils;
 import com.emjiayuan.app.activity.GoodsDetailActivity;
 import com.emjiayuan.app.activity.MessageDetailActivity;
 import com.emjiayuan.app.activity.MyMessageActivity;
@@ -42,6 +46,8 @@ import com.emjiayuan.app.entity.NineGridTestModel;
 import com.emjiayuan.app.entity.Post;
 import com.emjiayuan.app.event.CommentEvent;
 import com.emjiayuan.app.event.DeletePostEvent;
+import com.emjiayuan.app.event.IsReadEvent;
+import com.emjiayuan.app.event.LoginSuccessEvent;
 import com.emjiayuan.app.event.UpdateEvent;
 import com.emjiayuan.app.event.ZanEvent;
 import com.emjiayuan.app.fragment.BaseLazyFragment;
@@ -53,7 +59,7 @@ import com.previewlibrary.view.DownLoadImage;
 import com.previewlibrary.view.ImageDownLoadCallBack;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
-import com.scwang.smartrefresh.layout.listener.OnLoadmoreListener;
+import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -172,16 +178,16 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
                 }
                 list.clear();
                 pageindex = 1;
-                refreshLayout.setLoadmoreFinished(false);
+                refreshLayout.finishLoadMore(false);
                 getWeiboList();
                 getWeiboMessage();
                 GlideUtil.loadImageViewLoding(mActivity, Global.loginResult.getHeadimg(), profileImage, R.drawable.default_tx, R.drawable.default_tx);
                 username.setText(Global.loginResult.getNickname());
             }
         });
-        refreshLayout.setOnLoadmoreListener(new OnLoadmoreListener() {
+        refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
-            public void onLoadmore(RefreshLayout refreshlayout) {
+            public void onLoadMore(RefreshLayout refreshlayout) {
                 pageindex++;
                 getWeiboList();
             }
@@ -207,6 +213,10 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
                 MyUtils.hideSoftInput(mActivity, etPl);
             }
         });
+        lvPost.setOnScrollListener(mAdapter);
+        //Start polling service
+        System.out.println("Start polling service...");
+        PollingUtils.startPollingService(mActivity, 5, PollingService.class, PollingService.ACTION);
     }
 
     /**
@@ -422,6 +432,8 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
                         String data = jsonObject.getString("data");
                         Gson gson = new Gson();
                         if ("200".equals(code)) {
+                            refreshLayout.finishRefresh();
+                            refreshLayout.finishLoadMore();
                             JSONArray dataArray = new JSONArray(data);
                             for (int i = 0; i < dataArray.length(); i++) {
                                 list.add(gson.fromJson(dataArray.getJSONObject(i).toString(), Post.class));
@@ -433,10 +445,10 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
                                 mAdapter.notifyDataSetChanged();
                             }
                         } else {
+                            refreshLayout.finishRefresh();
+                            refreshLayout.finishLoadMore();
                             MyUtils.showToast(mActivity, message);
                         }
-                        refreshLayout.finishRefresh();
-                        refreshLayout.finishLoadmore();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -598,7 +610,7 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
                         startActivity(intent);
                     }else if ("2".equals(list.get(i).getLinktype())){
                         Intent intent = new Intent(getActivity(), MessageDetailActivity.class);
-//                        intent.putExtra("productid", list.get(i).getLinkid());
+                        intent.putExtra("newsid", list.get(i).getLinkid());
                         startActivity(intent);
                     }else if ("3".equals(list.get(i).getLinktype())){
                         Intent intent = new Intent(getActivity(), SecondsKillActivity.class);
@@ -610,6 +622,7 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
                 }else{
                     Intent intent = new Intent(getActivity(), PostDetailActivity.class);
                     intent.putExtra("weiboid", list.get(i).getId());
+                    intent.putExtra("position", i);
                     startActivity(intent);
                 }
                 break;
@@ -621,6 +634,19 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
         list.clear();
         pageindex=1;
         getWeiboList();
+    }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void Event(LoginSuccessEvent event) {
+        list.clear();
+        pageindex=1;
+        getWeiboList();
+        getWeiboMessage();
+        GlideUtil.loadImageViewLoding(mActivity, Global.loginResult.getHeadimg(), profileImage, R.drawable.default_tx, R.drawable.default_tx);
+        username.setText(Global.loginResult.getNickname());
+    }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void Event(IsReadEvent event) {
+        getWeiboMessage();
     }
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void Event(ZanEvent event) {
@@ -752,5 +778,8 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
         if (mAdapter!=null){
             mAdapter.releasePlayer();
         }
+        //Stop polling service
+        System.out.println("Stop polling service...");
+        PollingUtils.stopPollingService(mActivity, PollingService.class, PollingService.ACTION);
     }
 }

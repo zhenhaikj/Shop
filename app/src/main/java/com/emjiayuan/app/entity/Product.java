@@ -3,6 +3,7 @@ package com.emjiayuan.app.entity;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class Product implements Serializable{
     /*"id":"309",
@@ -109,6 +110,7 @@ public class Product implements Serializable{
     private Object outerid;
     private PromotioninfoBean promotioninfo;
     private int isbuy;
+    private List<Product> style_list;
 
     public String getIscollection() {
         return iscollection;
@@ -504,6 +506,14 @@ public class Product implements Serializable{
         this.isbuy = isbuy;
     }
 
+    public List<Product> getStyle_list() {
+        return style_list;
+    }
+
+    public void setStyle_list(List<Product> style_list) {
+        this.style_list = style_list;
+    }
+
     public static class PromotioninfoBean {
         /**
          * type : MS
@@ -621,4 +631,5 @@ public class Product implements Serializable{
             this.enddate = enddate;
         }
     }
+
 }

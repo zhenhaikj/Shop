@@ -37,6 +37,8 @@ import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.PhotoInfo;
 import com.emjiayuan.app.entity.Post;
+import com.emjiayuan.app.event.CommentEvent;
+import com.emjiayuan.app.event.ZanEvent;
 import com.emjiayuan.app.widget.CommentListView;
 import com.emjiayuan.app.widget.FlowLayout;
 import com.emjiayuan.app.widget.MultiImageView;
@@ -52,6 +54,7 @@ import com.umeng.socialize.media.UMWeb;
 import com.umeng.socialize.shareboard.SnsPlatform;
 import com.umeng.socialize.utils.ShareBoardlistener;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -176,6 +179,7 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
         }
     };
     private AudioManager mAudioManager;
+    private int position;
 
     @Override
     protected int setLayoutId() {
@@ -193,6 +197,7 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
         Intent intent = getIntent();
         if (intent != null) {
             weiboid = intent.getStringExtra("weiboid");
+            position = intent.getIntExtra("position",-1);
             getWeiboDetail();
         }
 
@@ -226,7 +231,7 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
             multiimageview.setVisibility(View.GONE);
             audioLl.setVisibility(View.GONE);
             videoplayer.setUp(post.getVideo(), JZVideoPlayer.SCREEN_WINDOW_NORMAL,"");
-            Glide.with(mActivity).load(post.getVideo()).into(videoplayer.thumbImageView);
+            Glide.with(mActivity).load(post.getVideo()+"?vframe/png/offset/0").into(videoplayer.thumbImageView);
         }else if (post.getShowtype()==2){
             videoplayer.setVisibility(View.GONE);
             content.setVisibility(View.GONE);
@@ -484,6 +489,7 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
         switch (view.getId()) {
             case R.id.back:
                 finish();
+
                 break;
             case R.id.ll_zan:
                 zanWeibo();
@@ -856,6 +862,9 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
     protected void onDestroy() {
         super.onDestroy();
         UMShareAPI.get(this).release();
+        if (position!=-1){
+            EventBus.getDefault().post(new ZanEvent(position));
+        }
     }
 
     @Override

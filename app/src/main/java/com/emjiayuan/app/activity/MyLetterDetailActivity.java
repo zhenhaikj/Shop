@@ -20,6 +20,7 @@ import com.emjiayuan.app.adapter.MyLetterDetailAdapter;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.MyLetter;
 import com.emjiayuan.app.entity.MyLetterDetail;
+import com.emjiayuan.app.event.IsReadEvent;
 import com.emjiayuan.app.widget.MyListView;
 import com.google.gson.Gson;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
@@ -28,6 +29,7 @@ import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.tencent.android.tpush.XGPushClickedResult;
 import com.tencent.android.tpush.XGPushManager;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -80,7 +82,7 @@ public class MyLetterDetailActivity extends BaseActivity implements View.OnClick
 
     @Override
     protected void initData() {
-        refreshLayout.setEnableLoadmore(false);
+        refreshLayout.setEnableLoadMore(false);
         refreshLayout.setEnableHeaderTranslationContent(false);
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
@@ -276,4 +278,9 @@ public class MyLetterDetailActivity extends BaseActivity implements View.OnClick
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().post(new IsReadEvent(0));
+    }
 }

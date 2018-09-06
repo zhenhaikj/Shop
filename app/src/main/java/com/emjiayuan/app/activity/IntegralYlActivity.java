@@ -14,7 +14,7 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
-import com.scwang.smartrefresh.layout.listener.OnLoadmoreListener;
+import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.emjiayuan.app.BaseActivity;
 import com.emjiayuan.app.R;
@@ -94,20 +94,20 @@ public class IntegralYlActivity extends BaseActivity {
             listX.add(item1);
         }*/
         request(pageindex);
-        refreshLayout.setEnableAutoLoadmore(true);
+        refreshLayout.setEnableAutoLoadMore(true);
         refreshLayout.setEnableHeaderTranslationContent(false);
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(RefreshLayout refreshlayout) {
                 list.clear();
                 pageindex = 1;
-                refreshLayout.setLoadmoreFinished(false);
+                refreshLayout.finishLoadMore(false);
                 request(pageindex);
             }
         });
-        refreshLayout.setOnLoadmoreListener(new OnLoadmoreListener() {
+        refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
-            public void onLoadmore(RefreshLayout refreshlayout) {
+            public void onLoadMore(RefreshLayout refreshlayout) {
                 pageindex++;
                 request(pageindex);
             }
@@ -192,7 +192,7 @@ public class IntegralYlActivity extends BaseActivity {
                             }else{
                                 MyUtils.showToast(mActivity,message);
                             }
-                            refreshLayout.setLoadmoreFinished(true);
+                            refreshLayout.finishLoadMore(true);
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -203,7 +203,7 @@ public class IntegralYlActivity extends BaseActivity {
                     break;
             }
             refreshLayout.finishRefresh();
-            refreshLayout.finishLoadmore();
+            refreshLayout.finishLoadMore();
         }
     };
 

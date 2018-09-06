@@ -24,7 +24,7 @@ import com.google.gson.Gson;
 import com.lwkandroid.stateframelayout.StateFrameLayout;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
-import com.scwang.smartrefresh.layout.listener.OnLoadmoreListener;
+import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import org.greenrobot.eventbus.EventBus;
@@ -115,20 +115,20 @@ public class BalanceActivity extends BaseActivity implements View.OnClickListene
         title.setText("余额记录");
         request(pageindex, status);
         refreshLayout.setEnableHeaderTranslationContent(false);
-//        refreshLayout.setEnableAutoLoadmore(true);
+//        refreshLayout.setEnableAutoLoadMore(true);
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(RefreshLayout refreshlayout) {
                 flag=false;
                 list.clear();
                 pageindex = 1;
-                refreshLayout.setLoadmoreFinished(false);
+                refreshLayout.finishLoadMore(false);
                 request(pageindex, status);
             }
         });
-        refreshLayout.setOnLoadmoreListener(new OnLoadmoreListener() {
+        refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
-            public void onLoadmore(RefreshLayout refreshlayout) {
+            public void onLoadMore(RefreshLayout refreshlayout) {
                 flag=false;
                 pageindex++;
                 request(pageindex, status);
@@ -205,7 +205,7 @@ public class BalanceActivity extends BaseActivity implements View.OnClickListene
                             stateLayout.changeState(StateFrameLayout.SUCCESS);
                             adapter.notifyDataSetChanged();
                         } else {
-                            refreshLayout.setLoadmoreFinished(true);
+                            refreshLayout.finishLoadMore(true);
                             if (pageindex==1){
                                 stateLayout.changeState(StateFrameLayout.EMPTY);
                             }else{
@@ -221,7 +221,7 @@ public class BalanceActivity extends BaseActivity implements View.OnClickListene
                         e.printStackTrace();
                     }
                     refreshLayout.finishRefresh();
-                    refreshLayout.finishLoadmore();
+                    refreshLayout.finishLoadMore();
                     break;
                 case 1:
 //                    MyUtils.showToast(LoginActivity.this,result);
@@ -241,7 +241,7 @@ public class BalanceActivity extends BaseActivity implements View.OnClickListene
                 break;
             case R.id.cz_ll:
 //                cz_ll.setBackgroundColor(Color.parseColor("#48C351"));
-                refreshLayout.setLoadmoreFinished(false);
+                refreshLayout.finishLoadMore(false);
                 status = "2";
                 pageindex = 1;
                 list.clear();
@@ -252,7 +252,7 @@ public class BalanceActivity extends BaseActivity implements View.OnClickListene
                 tab2.setTextColor(Color.parseColor("#48C351"));
                 break;
             case R.id.xf_ll:
-                refreshLayout.setLoadmoreFinished(false);
+                refreshLayout.finishLoadMore(false);
 //                xf_ll.setBackgroundColor(Color.parseColor("#48C351"));
                 status = "4";
                 pageindex = 1;

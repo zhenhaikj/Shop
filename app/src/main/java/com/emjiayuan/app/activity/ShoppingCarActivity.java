@@ -104,7 +104,7 @@ public class ShoppingCarActivity extends BaseActivity implements View.OnClickLis
             return;
         }
         reqCarList();
-        refreshLayout.setEnableLoadmore(false);
+        refreshLayout.setEnableLoadMore(false);
         refreshLayout.setEnableHeaderTranslationContent(false);
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
