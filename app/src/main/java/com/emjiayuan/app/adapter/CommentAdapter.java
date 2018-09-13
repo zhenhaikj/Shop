@@ -1,6 +1,7 @@
 package com.emjiayuan.app.adapter;
 
 import android.content.Context;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 
 import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.GlideUtil;
+import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.entity.Comment;
 import com.emjiayuan.app.widget.MyGridView;
 
@@ -60,6 +62,7 @@ public class CommentAdapter extends BaseAdapter {
             holder.name = (TextView) convertView.findViewById(R.id.name);
             holder.content = (TextView) convertView.findViewById(R.id.content);
             holder.time = (TextView) convertView.findViewById(R.id.time);
+            holder.hf = (TextView) convertView.findViewById(R.id.hf);
             convertView.setTag(holder);
         } else {// 如果之前已经显示过该页面，则用viewholder中的缓存直接刷屏
             holder = (ViewHolder) convertView.getTag();
@@ -70,7 +73,8 @@ public class CommentAdapter extends BaseAdapter {
         holder.name.setText(item.getNickname());
         holder.time.setText(item.getCreatetime());
         holder.content.setText(item.getComment());
-
+        holder.hf.setVisibility(null==item.getReply_comment()?View.GONE:View.VISIBLE);
+        holder.hf.setText(Html.fromHtml("<font color='#333333'>客服回复：<font/><font color='#757575'>"+item.getReply_comment()+"<font/>"));
         return convertView;
     }
 
@@ -79,5 +83,6 @@ public class CommentAdapter extends BaseAdapter {
         public TextView name;
         public TextView content;
         public TextView time;
+        public TextView hf;
     }
 }

@@ -39,6 +39,15 @@ public class Comment {
     private String productname;
     private String productid;
     private String createdate;
+    private String reply_comment;
+
+    public String getReply_comment() {
+        return reply_comment;
+    }
+
+    public void setReply_comment(String reply_comment) {
+        this.reply_comment = reply_comment;
+    }
 
     public String getId() {
         return id;

@@ -99,6 +99,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     @Override
     protected void initData() {
+        setSwipeBackEnable(false);
         mFragments = new ArrayList<>();
         homeFragment = new HomeFragment();
         classifyFragment2 = new ClassifyFragment2();

@@ -42,8 +42,17 @@ public class CityBean {
         private String code;
         private String name;
         private String provincecode;
+        private String provinceid;
         private String full_py;
         private String first_zm;
+
+        public String getProvinceid() {
+            return provinceid;
+        }
+
+        public void setProvinceid(String provinceid) {
+            this.provinceid = provinceid;
+        }
 
         public String getId() {
             return id;

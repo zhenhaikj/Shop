@@ -63,6 +63,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="超值肉汤底料"
+                android:maxLines="2"
+                android:ellipsize="end"
                 android:textSize="12sp"
                 android:textColor="@color/grey" />
 
@@ -117,6 +119,8 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:text="超值肉汤底料"
+                    android:maxLines="2"
+                    android:ellipsize="end"
                     android:textSize="12sp"
                     android:textColor="@color/grey" />
 
@@ -173,6 +177,8 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:text="超值肉汤底料"
+                        android:maxLines="2"
+                        android:ellipsize="end"
                         android:textSize="12sp"
                         android:textColor="@color/grey" />
 

@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.emjiayuan.app.R;
@@ -58,6 +59,7 @@ public class IntegralYlAdapter extends BaseAdapter {
             holder.icon = (ImageView) convertView.findViewById(R.id.icon);
             holder.name = (TextView) convertView.findViewById(R.id.name);
             holder.yh = (TextView) convertView.findViewById(R.id.yh);
+            holder.bg_ll =  convertView.findViewById(R.id.bg_ll);
             convertView.setTag(holder);
         } else {// 如果之前已经显示过该页面，则用viewholder中的缓存直接刷屏
             holder = (ViewHolder) convertView.getTag();
@@ -69,7 +71,12 @@ public class IntegralYlAdapter extends BaseAdapter {
 //        holder.icon.setImageResource(R.drawable.img1);
         holder.name.setText(item.getName());
         holder.yh.setText(item.getJifen()+"积分");
-
+        if ("0".equals(item.getTotalnum())){
+            holder.bg_ll.setVisibility(View.VISIBLE);
+            holder.bg_ll.getBackground().setAlpha(100);
+        }else{
+            holder.bg_ll.setVisibility(View.GONE);
+        }
         return convertView;
     }
 
@@ -77,6 +84,7 @@ public class IntegralYlAdapter extends BaseAdapter {
         public ImageView icon;
         public TextView name;
         public TextView yh;
+        public LinearLayout bg_ll;
 
     }
 }

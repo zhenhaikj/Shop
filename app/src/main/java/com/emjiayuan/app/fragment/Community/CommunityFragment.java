@@ -462,6 +462,8 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
                         String data = jsonObject.getString("data");
                         Gson gson = new Gson();
                         if ("200".equals(code)) {
+                            String bannerimage = jsonObject.getString("bannerimage");
+                            GlideUtil.loadImageViewLoding(mActivity,bannerimage,bg,R.drawable.empty_img,R.drawable.empty_img);
                             JSONArray jsonArray = new JSONArray(data);
                             labels.add(new Label("", "全部消息", "", ""));
                             for (int i = 0; i < jsonArray.length(); i++) {

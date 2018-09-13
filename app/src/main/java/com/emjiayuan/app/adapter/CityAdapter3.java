@@ -84,7 +84,7 @@ public class CityAdapter3 extends BaseAdapter {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent();
                 intent.putExtra("name", list.get(position).getList().get(i).getName());
-                intent.putExtra("provincecode", list.get(position).getList().get(i).getId());
+                intent.putExtra("provincecode", list.get(position).getList().get(i).getProvinceid());
                 ((CityActivity)context).setResult(1, intent);
                 ((CityActivity)context).finish();
             }

@@ -84,6 +84,7 @@ import com.scwang.smartrefresh.layout.constant.RefreshState;
 import com.scwang.smartrefresh.layout.listener.OnMultiPurposeListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.youth.banner.Banner;
+import com.youth.banner.listener.OnBannerListener;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -197,6 +198,9 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
     private ArrayList<String> images_top = new ArrayList<>();
     private ArrayList<String> images_mid = new ArrayList<>();
     private ArrayList<String> images_bot = new ArrayList<>();
+    private ArrayList<BannerItem> banner_top = new ArrayList<>();
+    private ArrayList<BannerItem> banner_mid = new ArrayList<>();
+    private ArrayList<BannerItem> banner_bot = new ArrayList<>();
     private ArrayList<Product> souplist;
     private SeckillBean seckillBean;
     private Long sjc;
@@ -232,6 +236,60 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
         bannerTop.setImageLoader(new GlideImageLoader());
         banner.setImageLoader(new GlideImageLoader());
         banner2.setImageLoader(new GlideImageLoader());
+        bannerTop.setOnBannerListener(new OnBannerListener() {
+            @Override
+            public void OnBannerClick(int position) {
+                BannerItem item=banner_top.get(position);
+                if ("1".equals(item.getType())){
+                    Intent intent=new Intent(mActivity,GoodsDetailActivity.class);
+                    intent.putExtra("productid",item.getLinkid());
+                    startActivity(intent);
+                }else if ("2".equals(item.getType())){
+                    Intent intent=new Intent(mActivity,MessageDetailActivity.class);
+                    intent.putExtra("newsid",item.getLinkid());
+                    startActivity(intent);
+                }else if ("3".equals(item.getType())){
+                    Intent intent=new Intent(mActivity,SecondsKillActivity.class);
+                    startActivity(intent);
+                }
+            }
+        });
+        banner.setOnBannerListener(new OnBannerListener() {
+            @Override
+            public void OnBannerClick(int position) {
+                BannerItem item=banner_mid.get(position);
+                if ("1".equals(item.getType())){
+                    Intent intent=new Intent(mActivity,GoodsDetailActivity.class);
+                    intent.putExtra("productid",item.getLinkid());
+                    startActivity(intent);
+                }else if ("2".equals(item.getType())){
+                    Intent intent=new Intent(mActivity,MessageDetailActivity.class);
+                    intent.putExtra("newsid",item.getLinkid());
+                    startActivity(intent);
+                }else if ("3".equals(item.getType())){
+                    Intent intent=new Intent(mActivity,SecondsKillActivity.class);
+                    startActivity(intent);
+                }
+            }
+        });
+        banner2.setOnBannerListener(new OnBannerListener() {
+            @Override
+            public void OnBannerClick(int position) {
+                BannerItem item=banner_bot.get(position);
+                if ("1".equals(item.getType())){
+                    Intent intent=new Intent(mActivity,GoodsDetailActivity.class);
+                    intent.putExtra("productid",item.getLinkid());
+                    startActivity(intent);
+                }else if ("2".equals(item.getType())){
+                    Intent intent=new Intent(mActivity,MessageDetailActivity.class);
+                    intent.putExtra("newsid",item.getLinkid());
+                    startActivity(intent);
+                }else if ("3".equals(item.getType())){
+                    Intent intent=new Intent(mActivity,SecondsKillActivity.class);
+                    startActivity(intent);
+                }
+            }
+        });
         requestPermission();
         initMapLocation();
         sv.setOnScrollChangeListener(new View.OnScrollChangeListener() {
@@ -694,6 +752,9 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                             images_top.clear();
                             images_mid.clear();
                             images_bot.clear();
+                            banner_top.clear();
+                            banner_mid.clear();
+                            banner_bot.clear();
                             for (int i = 0; i < iconArray.length(); i++) {
                                 MenuItem menuItem = gson.fromJson(iconArray.getJSONObject(i).toString(), MenuItem.class);
                                 list.add(menuItem);
@@ -708,10 +769,13 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                                 images.add(bannerItem.getImage());
                                 if ("1".equals(bannerItem.getLocaltion())) {
                                     images_top.add(bannerItem.getImage());
+                                    banner_top.add(bannerItem);
                                 } else if ("2".equals(bannerItem.getLocaltion())) {
                                     images_mid.add(bannerItem.getImage());
+                                    banner_mid.add(bannerItem);
                                 } else if ("3".equals(bannerItem.getLocaltion())) {
                                     images_bot.add(bannerItem.getImage());
+                                    banner_bot.add(bannerItem);
                                 }
                             }
                             Global.images = images;

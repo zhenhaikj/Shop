@@ -126,6 +126,23 @@
         android:layout_height="1dp"
         android:background="#ECECEC"
         android:layout_below="@+id/search_ll"/>-->
+    <com.emjiayuan.app.widget.RatioLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:ratios="3">
+        <com.youth.banner.Banner
+            android:id="@+id/banner"
+            android:layout_width="match_parent"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingBottom="10dp"
+            android:paddingTop="5dp"
+            android:background="@color/white"
+            android:layout_height="match_parent"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            app:image_scale_type="fit_xy"/>
+    </com.emjiayuan.app.widget.RatioLayout>
     <com.lwkandroid.stateframelayout.StateFrameLayout
         android:id="@+id/stateLayout"
         android:layout_width="match_parent"

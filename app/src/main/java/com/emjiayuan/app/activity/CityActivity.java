@@ -152,7 +152,7 @@ public class CityActivity extends BaseActivity implements View.OnClickListener {
                 }
                 Intent intent = new Intent();
                 intent.putExtra("name", mCityNamesSearch.get(i).getName());
-                intent.putExtra("provincecode", mCityNamesSearch.get(i).getId());
+                intent.putExtra("provincecode", mCityNamesSearch.get(i).getProvinceid());
                 setResult(1, intent);
                 finish();
             }

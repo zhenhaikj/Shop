@@ -15,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -23,6 +22,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.donkingliang.labels.LabelsView;
 import com.emjiayuan.app.BaseActivity;
 import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.GlideUtil;
@@ -36,7 +36,6 @@ import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.OrderComfirm;
 import com.emjiayuan.app.entity.Product;
 import com.emjiayuan.app.entity.SeckillBean;
-import com.emjiayuan.app.widget.MyGridView;
 import com.emjiayuan.app.widget.MyListView;
 import com.google.gson.Gson;
 import com.lwkandroid.stateframelayout.StateFrameLayout;
@@ -570,6 +569,7 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
         stateLayout.changeState(StateFrameLayout.LOADING);
         FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
         formBody.add("productid", productid);
+        formBody.add("provinceid", Global.provinceid);
         if (Global.loginResult != null) {
             formBody.add("userid", Global.loginResult.getId());
         }
@@ -772,7 +772,7 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
         TextView down = view.findViewById(R.id.down);
         final TextView kc = view.findViewById(R.id.kc);
         TextView xg = view.findViewById(R.id.xg);
-        MyGridView gg_grid=view.findViewById(R.id.gg_grid);
+        LabelsView labelsView=view.findViewById(R.id.labels);
         LinearLayout gg_ll=view.findViewById(R.id.gg_ll);
         View gg_line=view.findViewById(R.id.gg_line);
         gg_line.setVisibility(product.getStyle_list()==null?View.GONE:View.VISIBLE);
@@ -781,27 +781,35 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
         TextView next = view.findViewById(R.id.next);
         final EditText et_count = view.findViewById(R.id.et_count);
         if (product.getStyle_list()!=null){
-            final GuigeAdapter adapter=new GuigeAdapter(mActivity,product.getStyle_list());
-            gg_grid.setAdapter(adapter);
-            gg_grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            labelsView.setLabels(product.getStyle_list(), new LabelsView.LabelTextProvider<Product>() {
                 @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    isCheck=true;
-                    adapter.setSelected(position);
+                public CharSequence getLabelText(TextView label, int position, Product data) {
+                    return data.getGuige();
+                }
+            });
+            for (int i = 0; i < product.getStyle_list().size(); i++) {
+                if (product.getStyle_list().get(i).getGuige().equals(product.getGuige())){
+                    labelsView.setSelects(i);
+                }
+            }
+            //标签的选中监听
+            labelsView.setOnLabelSelectChangeListener(new LabelsView.OnLabelSelectChangeListener() {
+                @Override
+                public void onLabelSelectChange(TextView label, Object data, boolean isSelect, int position) {
+                    //label是被选中的标签，data是标签所对应的数据，isSelect是是否选中，position是标签的位置。
                     Product product_gg=product.getStyle_list().get(position);
                     product_gg.setStyle_list(product.getStyle_list());
                     product=product_gg;
-                    setdata();
                     GlideUtil.loadImageViewLoding(mActivity, product.getImages(), imageView, R.drawable.empty_img, R.drawable.empty_img);
                     name.setText(product.getName());
                     if (flag) {
                         price.setText("¥" + bean.getPriceX());
                         preprice.setText("原价¥" + product.getPreprice());
-                        kc.setText("剩余" + bean.getStock() + "件");
+                        kc.setText("库存" + bean.getStock() + "件");
                     } else {
                         price.setText("¥" + product.getPrice());
                         preprice.setText("原价¥" + product.getPreprice());
-                        kc.setText("剩余" + product.getTotalnum() + "件");
+                        kc.setText("库存" + product.getTotalnum() + "件");
                     }
                 }
             });
@@ -812,11 +820,11 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
         if (flag) {
             price.setText("¥" + bean.getPriceX());
             preprice.setText("原价¥" + product.getPreprice());
-            kc.setText("剩余" + bean.getStock() + "件");
+            kc.setText("库存" + bean.getStock() + "件");
         } else {
             price.setText("¥" + product.getPrice());
             preprice.setText("原价¥" + product.getPreprice());
-            kc.setText("剩余" + product.getTotalnum() + "件");
+            kc.setText("库存" + product.getTotalnum() + "件");
         }
 
         preprice.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG);
@@ -863,15 +871,15 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
                         if (!MyUtils.isFastClick()) {
                             return;
                         }
-                        if (product.getStyle_list()!=null){
-                            if (isCheck){
-                                addCar(Integer.toString(num));
-                            }else{
-                                MyUtils.showToast(mActivity,"请选择规格");
-                            }
-                        }else{
+//                        if (product.getStyle_list()!=null){
+//                            if (isCheck){
+//                                addCar(Integer.toString(num));
+//                            }else{
+//                                MyUtils.showToast(mActivity,"请选择规格");
+//                            }
+//                        }else{
                             addCar(Integer.toString(num));
-                        }
+//                        }
                     }
                 });
                 break;
@@ -888,15 +896,15 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
                         if (!MyUtils.isFastClick()) {
                             return;
                         }
-                        if (product.getStyle_list()!=null){
-                            if (isCheck){
-                                confirmOrder();
-                            }else{
-                                MyUtils.showToast(mActivity,"请选择规格");
-                            }
-                        }else{
+//                        if (product.getStyle_list()!=null){
+//                            if (isCheck){
+//                                confirmOrder();
+//                            }else{
+//                                MyUtils.showToast(mActivity,"请选择规格");
+//                            }
+//                        }else{
                             confirmOrder();
-                        }
+//                        }
                     }
                 });
                 break;

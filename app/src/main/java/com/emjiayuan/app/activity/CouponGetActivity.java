@@ -18,8 +18,11 @@ import com.emjiayuan.app.adapter.CouponGetAdapter;
 import com.emjiayuan.app.entity.Coupon;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.event.UpdateEvent;
+import com.emjiayuan.app.imageloader.GlideImageLoader;
 import com.google.gson.Gson;
 import com.lwkandroid.stateframelayout.StateFrameLayout;
+import com.youth.banner.Banner;
+import com.youth.banner.listener.OnBannerListener;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -30,6 +33,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import okhttp3.Call;
@@ -52,6 +56,8 @@ public class CouponGetActivity extends BaseActivity implements View.OnClickListe
     View lineTop;
     @BindView(R.id.stateLayout)
     StateFrameLayout stateLayout;
+    @BindView(R.id.banner)
+    Banner banner;
     private CouponGetAdapter adapter;
     private ArrayList<Coupon> list = new ArrayList<>();
 
@@ -99,7 +105,7 @@ public class CouponGetActivity extends BaseActivity implements View.OnClickListe
             public void onResponse(Call call, Response response) throws IOException {
 
                 String result = response.body().string();
-                MyUtils.e("==获取优惠券列表==",result);
+                MyUtils.e("==获取优惠券列表==", result);
                 Message message = new Message();
                 message.what = 0;
                 Bundle bundle = new Bundle();
@@ -125,13 +131,20 @@ public class CouponGetActivity extends BaseActivity implements View.OnClickListe
                         String data = jsonObject.getString("data");
                         Gson gson = new Gson();
                         if ("200".equals(code)) {
+                            String bannerimage = jsonObject.getString("bannerimage");
+                            List<String> images = new ArrayList<>();
+                            images.add(bannerimage);
+                            banner.setImageLoader(new GlideImageLoader());
+                            banner.setImages(images);
+                            //banner设置方法全部调用完毕时最后调用
+                            banner.start();
                             JSONArray jsonArray = new JSONArray(data);
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 list.add(gson.fromJson(jsonArray.getJSONObject(i).toString(), Coupon.class));
                             }
-                            if (list.size()>0){
+                            if (list.size() > 0) {
                                 stateLayout.changeState(StateFrameLayout.SUCCESS);
-                            }else{
+                            } else {
                                 stateLayout.changeState(StateFrameLayout.EMPTY);
                             }
                             adapter.notifyDataSetChanged();
@@ -176,7 +189,7 @@ public class CouponGetActivity extends BaseActivity implements View.OnClickListe
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (EventBus.getDefault().isRegistered(this)){
+        if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
         }
     }

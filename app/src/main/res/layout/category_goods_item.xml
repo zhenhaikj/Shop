@@ -1,16 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@color/white">
-
-    <com.emjiayuan.app.widget.MyImageView
-        android:id="@+id/icon"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:scaleType="fitXY"/>
+        android:background="@color/white">
+        <com.emjiayuan.app.widget.MyImageView
+            android:id="@+id/icon"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:scaleType="fitXY"/>
+        <LinearLayout
+            android:id="@+id/bg_ll"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="bottom|right"
+            android:background="@color/black"
+            android:orientation="vertical">
+            <com.emjiayuan.app.widget.RatioImageView
+                android:id="@+id/sold_out"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:src="@drawable/sold_out_2"
+                app:ratio="1.675"
+                android:scaleType="fitXY"/>
+        </LinearLayout>
+    </FrameLayout>
+
 
         <TextView
             android:id="@+id/name"

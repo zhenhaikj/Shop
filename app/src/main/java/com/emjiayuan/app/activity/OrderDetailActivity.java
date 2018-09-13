@@ -40,6 +40,8 @@ import com.emjiayuan.app.widget.MyListView;
 import com.google.gson.Gson;
 import com.qiyukf.unicorn.api.ConsultSource;
 import com.qiyukf.unicorn.api.Unicorn;
+import com.tencent.android.tpush.XGPushClickedResult;
+import com.tencent.android.tpush.XGPushManager;
 import com.tencent.mm.opensdk.constants.ConstantsAPI;
 import com.tencent.mm.opensdk.modelbase.BaseResp;
 import com.tencent.mm.opensdk.modelpay.PayReq;
@@ -153,6 +155,25 @@ public class OrderDetailActivity extends BaseActivity implements View.OnClickLis
         if (intent != null) {
             orderid = intent.getStringExtra("orderid");
             type = intent.getIntExtra("type", 0);
+        }
+        if (orderid==null){
+            //this必须为点击消息要跳转到页面的上下文。
+            XGPushClickedResult clickedResult = XGPushManager.onActivityStarted(this);
+            if (clickedResult!=null){
+                //获取消息附近参数
+                String ster = clickedResult.getCustomContent();
+                try {
+                    JSONObject jsonObject=new JSONObject(ster);
+                    orderid=jsonObject.getString("event_val");
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+//获取消息标题
+                String set = clickedResult.getTitle();
+//获取消息内容
+                String s = clickedResult.getContent();
+                MyUtils.e("推送",ster+"|"+set+"|"+s);
+            }
         }
         getOrderDetail();
         lv_goods.setOnItemClickListener(new AdapterView.OnItemClickListener() {

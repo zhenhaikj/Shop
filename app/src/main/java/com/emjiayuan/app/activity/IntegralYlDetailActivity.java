@@ -322,6 +322,7 @@ public class IntegralYlDetailActivity extends BaseActivity implements View.OnCli
         stateLayout.changeState(StateFrameLayout.LOADING);
         FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
         formBody.add("productid", productid);
+        formBody.add("provinceid", Global.provinceid);
         if (Global.loginResult != null) {
             formBody.add("userid", Global.loginResult.getId());
         }
