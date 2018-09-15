@@ -5,9 +5,11 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -169,18 +171,19 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                             Global.appTheme = gson.fromJson(data, APPTheme.class);
                             SpUtils.putObject(mActivity, "appTheme", Global.appTheme);
                             new Thread(new Runnable(){
+                                @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                                 @Override
                                 public void run() {
-                                    Drawable dw_home = MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_home().getImg());
-                                    Drawable dw_home_active = MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_home().getImg_active());
-                                    Drawable dw_cate = MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_cate().getImg());
-                                    Drawable dw_cate_active = MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_cate().getImg_active());
-                                    Drawable dw_sq = MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_sq().getImg());
-                                    Drawable dw_sq_active = MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_sq().getImg_active());
-                                    Drawable dw_cart = MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_cart().getImg());
-                                    Drawable dw_cart_active = MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_cart().getImg_active());
-                                    Drawable dw_my = MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_my().getImg());
-                                    Drawable dw_my_active = MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_my().getImg_active());
+                                    Drawable dw_home = Global.appTheme.getHome_bottom_menu_home()!=null?MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_home().getImg()):getDrawable(R.drawable.home);
+                                    Drawable dw_home_active = Global.appTheme.getHome_bottom_menu_home()!=null?MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_home().getImg_active()):getDrawable(R.drawable.homex);
+                                    Drawable dw_cate = Global.appTheme.getHome_bottom_menu_cate()!=null?MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_cate().getImg()):getDrawable(R.drawable.fenlei);
+                                    Drawable dw_cate_active = Global.appTheme.getHome_bottom_menu_cate()!=null?MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_cate().getImg_active()):getDrawable(R.drawable.feileix);
+                                    Drawable dw_sq = Global.appTheme.getHome_bottom_menu_sq()!=null?MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_sq().getImg()):getDrawable(R.drawable.shequ);
+                                    Drawable dw_sq_active = Global.appTheme.getHome_bottom_menu_sq()!=null?MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_sq().getImg_active()):getDrawable(R.drawable.shequx);
+                                    Drawable dw_cart = Global.appTheme.getHome_bottom_menu_cart()!=null?MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_cart().getImg()):getDrawable(R.drawable.car);
+                                    Drawable dw_cart_active = Global.appTheme.getHome_bottom_menu_cart()!=null?MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_cart().getImg_active()):getDrawable(R.drawable.carx);
+                                    Drawable dw_my = Global.appTheme.getHome_bottom_menu_my()!=null?MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_my().getImg()):getDrawable(R.drawable.wd);
+                                    Drawable dw_my_active = Global.appTheme.getHome_bottom_menu_my()!=null?MyUtils.loadImageFromNetwork(Global.appTheme.getHome_bottom_menu_my().getImg_active()):getDrawable(R.drawable.wdx);
                                     setSelector(imgHome,MyUtils.newSelector(mActivity,dw_home,dw_home_active));
                                     setSelector(imgCate,MyUtils.newSelector(mActivity,dw_cate,dw_cate_active));
                                     setSelector(imgSq,MyUtils.newSelector(mActivity,dw_sq,dw_sq_active));
@@ -189,7 +192,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                                 }
 
                             }).start();
-                            ColorStateList csl=new ColorStateList(new int[][]{new int[] { android.R.attr.state_selected },new int[]{}},new int[]{Color.parseColor(Global.appTheme.getHome_bottom_menu_sq().getColor_active()),Color.parseColor(Global.appTheme.getHome_bottom_menu_sq().getColor())});
+                            ColorStateList csl=Global.appTheme.getHome_bottom_menu_sq()!=null?new ColorStateList(new int[][]{new int[] { android.R.attr.state_selected },new int[]{}},new int[]{Color.parseColor(Global.appTheme.getHome_bottom_menu_sq().getColor_active()),Color.parseColor(Global.appTheme.getHome_bottom_menu_sq().getColor())}):new ColorStateList(new int[][]{new int[] { android.R.attr.state_selected },new int[]{}},new int[]{Color.parseColor("#4CD556"),Color.parseColor("#808080")});
                             tvHome.setTextColor(csl);
                             tvCate.setTextColor(csl);
                             tvSq.setTextColor(csl);

@@ -80,6 +80,8 @@ import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.Response;
 
+import static java.lang.Thread.sleep;
+
 
 public class CommunityFragment extends BaseLazyFragment implements View.OnClickListener, AdapterView.OnItemClickListener {
 
@@ -215,8 +217,21 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
         });
         lvPost.setOnScrollListener(mAdapter);
         //Start polling service
-        System.out.println("Start polling service...");
-        PollingUtils.startPollingService(mActivity, 5, PollingService.class, PollingService.ACTION);
+//        System.out.println("Start polling service...");
+//        PollingUtils.startPollingService(mActivity, 5, PollingService.class, PollingService.ACTION);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true){
+                    getWeiboMessage();
+                    try {
+                        sleep(10000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
     }
 
     /**
@@ -462,8 +477,8 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
                         String data = jsonObject.getString("data");
                         Gson gson = new Gson();
                         if ("200".equals(code)) {
-                            String bannerimage = jsonObject.getString("bannerimage");
-                            GlideUtil.loadImageViewLoding(mActivity,bannerimage,bg,R.drawable.empty_img,R.drawable.empty_img);
+                            String bannerimage = jsonObject.has("bannerimage")?jsonObject.getString("bannerimage"):"";
+                            GlideUtil.loadImageViewLoding(mActivity,bannerimage,bg,R.drawable.bg_community,R.drawable.bg_community);
                             JSONArray jsonArray = new JSONArray(data);
                             labels.add(new Label("", "全部消息", "", ""));
                             for (int i = 0; i < jsonArray.length(); i++) {

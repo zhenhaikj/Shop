@@ -18,4 +18,5 @@ public class Global {
     public static List<AreaModel> city_list=new ArrayList<>();
     public static List<CityBean> city_list2=new ArrayList<>();
     public static List<String> images;
+    public static  ArrayList<News> news;
 }

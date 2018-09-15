@@ -313,7 +313,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
 //        drawable = getResources().get;
 //        drawable.setAlpha(START_ALPHA);
         if (Global.appTheme!=null){
-            toolbar.setBackgroundColor(Color.parseColor(Global.appTheme.getHome_top_color()));
+            toolbar.setBackgroundColor(Color.parseColor(Global.appTheme.getHome_top_color()!=null?Global.appTheme.getHome_top_color():"#1f7f4b"));
         }else{
             toolbar.setBackgroundColor(Color.parseColor("#1f7f4b"));
         }
@@ -632,19 +632,20 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                     break;
                 case R.id.ymtt:
                     intent = new Intent(getActivity(), MessageActivity.class);
-                    intent.putExtra("news", news);
+//                    intent.putExtra("news", news);
                     startActivity(intent);
                     break;
                 case R.id.tv_message:
                     intent = new Intent(mActivity, MessageDetailActivity.class);
                     intent.putExtra("newsid", news.get(index % news.size()).getId());
+//                    intent.putExtra("news", news);
                     startActivity(intent);
                     break;
                 case R.id.xsh_more_ll://秒杀专区
-                    if ("null".equals(seckilldata)) {
-                        MyUtils.showToast(mActivity, "活动已结束！");
-                        return;
-                    }
+//                    if ("null".equals(seckilldata)) {
+//                        MyUtils.showToast(mActivity, "活动已结束！");
+//                        return;
+//                    }
                     intent = new Intent(getActivity(), SecondsKillActivity.class);
 //                intent.putExtra("product",Global.list.get(i));
                     startActivity(intent);
@@ -805,6 +806,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                             }
                             newsMessage();
                             Global.list = list;
+                            Global.news = news;
                             Global.Productslist = Productslist;
                             ArrayList<Product> recommendlist = getProductList(recommend);
                             if (recommendlist.size() == 0) {

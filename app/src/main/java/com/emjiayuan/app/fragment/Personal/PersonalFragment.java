@@ -6,10 +6,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.RequiresApi;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -150,6 +152,8 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
+        vip_ll.getBackground().setAlpha(100);
+        vip.getBackground().setAlpha(100);
 //        if (Global.loginResult == null) {
 //            startActivity(new Intent(getActivity(), LoginActivity.class));
 //        }
@@ -163,9 +167,10 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
             }
         });
         new Thread(new Runnable() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void run() {
-                final Drawable dw=MyUtils.loadImageFromNetwork(Global.appTheme.getUser_top_img());
+                final Drawable dw=Global.appTheme.getUser_top_img()!=null?MyUtils.loadImageFromNetwork(Global.appTheme.getUser_top_img()):mActivity.getDrawable(R.drawable.color_shape);
                 // post() 特别关键，就是到UI主线程去更新图片
                 myTop.post(new Runnable(){
                     @SuppressLint("NewApi")

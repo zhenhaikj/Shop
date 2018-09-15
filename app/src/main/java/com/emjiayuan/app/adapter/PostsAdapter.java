@@ -307,7 +307,7 @@ public class PostsAdapter extends BaseAdapter implements AbsListView.OnScrollLis
                     //imagesize是作为loading时的图片size
 //                ImagePagerActivity.ImageSize imageSize = new ImagePagerActivity.ImageSize(view.getMeasuredWidth(), view.getMeasuredHeight());
 //                ImagePagerActivity.startImagePagerActivity(mContext, post.getImages(), position, imageSize);
-                    if ("".equals(post.getVideo())) {
+                    if (post.getShowtype() == 1) {
                         List<View> viewList = new ArrayList<>();
                         for (int i = 0; i < finalHolder.multiimageview.getChildCount(); i++) {
                             View itemView = finalHolder.multiimageview.getChildAt(i);

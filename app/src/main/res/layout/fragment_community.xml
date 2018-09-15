@@ -45,7 +45,7 @@
             android:layout_centerInParent="true"
             android:textSize="20dp"
             android:textColor="#333333"
-            android:text="圈子" />
+            android:text="拉面家园" />
 
         <ImageView
             android:layout_width="20dp"

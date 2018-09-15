@@ -12,6 +12,7 @@ import com.emjiayuan.app.BaseActivity;
 import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.adapter.MessageAdapter;
+import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.News;
 import com.youth.banner.Banner;
 
@@ -53,8 +54,8 @@ public class MessageActivity extends BaseActivity {
                 finish();
             }
         });
-        news= (ArrayList<News>) getIntent().getSerializableExtra("news");
-        lvMessage.setAdapter(new MessageAdapter(mActivity,news));
+//        news= (ArrayList<News>) getIntent().getSerializableExtra("news");
+        lvMessage.setAdapter(new MessageAdapter(mActivity, Global.news));
         lvMessage.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -62,7 +63,8 @@ public class MessageActivity extends BaseActivity {
                     return;
                 }
                 Intent intent=new Intent(mActivity,MessageDetailActivity.class);
-                intent.putExtra("newsid",news.get(i).getId());
+//                intent.putExtra("news",news);
+                intent.putExtra("newsid",Global.news.get(i).getId());
                 intent.putExtra("flag",true);
                 startActivity(intent);
             }

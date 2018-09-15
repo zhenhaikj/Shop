@@ -9,7 +9,9 @@ import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -65,7 +67,7 @@ public class SearchActivity extends BaseActivity implements AdapterView.OnItemCl
     @BindView(R.id.history_ll)
     LinearLayout historyLl;
     @BindView(R.id.delete_btn)
-    Button deleteBtn;
+    TextView deleteBtn;
     @BindView(R.id.pre_ll)
     LinearLayout preLl;
     private SearchAdapter adapter;
@@ -101,6 +103,9 @@ public class SearchActivity extends BaseActivity implements AdapterView.OnItemCl
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 keyword=searchRecordsList.get(position);
                 etSearch.setText(keyword);
+                request();
+                recordsDao.addRecords(etSearch.getText().toString());
+                preLl.setVisibility(View.GONE);
             }
         });
         SwipeMenuCreator creator = new SwipeMenuCreator() {
@@ -195,20 +200,43 @@ public class SearchActivity extends BaseActivity implements AdapterView.OnItemCl
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 keyword = charSequence.toString();
-                preLl.setVisibility("".equals(keyword)?View.VISIBLE:View.GONE);
                 if ("".equals(keyword)){
+                    preLl.setVisibility(View.VISIBLE);
                     tempList.clear();
                     tempList.addAll(recordsDao.getRecordsList());
                     reversedList();
                     checkRecordsSize();
                     recordsAdapter.notifyDataSetChanged();
                 }
-                request();
+//                request();
             }
 
             @Override
             public void afterTextChanged(Editable editable) {
 
+            }
+        });
+        etSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    // do something
+                    preLl.setVisibility(View.GONE);
+                    keyword = etSearch.getText().toString();
+                    preLl.setVisibility("".equals(keyword)?View.VISIBLE:View.GONE);
+                    if ("".equals(keyword)){
+                        tempList.clear();
+                        tempList.addAll(recordsDao.getRecordsList());
+                        reversedList();
+                        checkRecordsSize();
+                        recordsAdapter.notifyDataSetChanged();
+                    }
+                    request();
+                    recordsDao.addRecords(etSearch.getText().toString());
+                    return true;
+                }
+                return false;
             }
         });
     }
@@ -325,8 +353,11 @@ public class SearchActivity extends BaseActivity implements AdapterView.OnItemCl
                             gvPop.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                 @Override
                                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                    preLl.setVisibility(View.GONE);
                                     keyword=listKeyword.get(position);
                                     etSearch.setText(keyword);
+                                    recordsDao.addRecords(etSearch.getText().toString());
+                                    request();
                                 }
                             });
                         } else {
@@ -370,7 +401,7 @@ public class SearchActivity extends BaseActivity implements AdapterView.OnItemCl
         if (!MyUtils.isFastClick()) {
             return;
         }
-        recordsDao.addRecords(etSearch.getText().toString());
+
         Intent intent = new Intent(mActivity, GoodsDetailActivity.class);
         intent.putExtra("productid", list.get(i).getId());
         startActivity(intent);

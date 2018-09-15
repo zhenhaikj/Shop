@@ -18,6 +18,7 @@ import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.adapter.LogisticsAdapter;
+import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.LogisticsBean;
 import com.emjiayuan.app.entity.News;
 import com.google.gson.Gson;
@@ -52,6 +53,7 @@ public class MessageDetailActivity extends BaseActivity {
     WebView webview;
     private String newsid;
     private News news;
+    private ArrayList<News> newslist;
 
     @Override
     protected int setLayoutId() {
@@ -60,7 +62,6 @@ public class MessageDetailActivity extends BaseActivity {
 
     @Override
     protected void initData() {
-
     }
 
     public void getDetail() {
@@ -147,10 +148,12 @@ public class MessageDetailActivity extends BaseActivity {
     protected void initView() {
         final boolean flag= getIntent().getBooleanExtra("flag",false);
         newsid=getIntent().getStringExtra("newsid");
+        newslist=(ArrayList<News>) getIntent().getSerializableExtra("news");
+        newslist= Global.news;
         getDetail();
         title.setText("伊穆头条");
         save.setText("查看更多");
-        save.setVisibility(View.GONE);
+        save.setVisibility(View.VISIBLE);
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

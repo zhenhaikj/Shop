@@ -93,6 +93,7 @@ public class JZVideoPlayerStandard extends JZVideoPlayer {
     @Override
     public void init(Context context) {
         super.init(context);
+        this.setBackgroundColor(Color.BLACK);
         batteryTimeLayout = findViewById(R.id.battery_time_layout);
         bottomProgressBar = findViewById(R.id.bottom_progress);
         titleTextView = findViewById(R.id.title);

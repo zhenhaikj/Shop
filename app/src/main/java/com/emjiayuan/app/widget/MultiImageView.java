@@ -237,7 +237,7 @@ public class MultiImageView extends LinearLayout {
 //				Glide.with(getContext()).load(photoInfo.getVideoUrl()+"?imageView2/1/w/160/h/160/q/85|imageslim").into(imageView);
 //			}else{
 //				btnVideo.setVisibility(GONE);
-				Glide.with(getContext()).load(photoInfo.url+"?imageView2/1/w/120/h/120/q/75|imageslim").into(imageView);
+				Glide.with(getContext()).load(photoInfo.url+"?imageView2/1/w/240/h/240/q/75|imageslim").into(imageView);
 //			}
 //		}
 		}
