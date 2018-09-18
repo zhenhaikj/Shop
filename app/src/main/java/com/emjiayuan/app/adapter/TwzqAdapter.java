@@ -39,7 +39,8 @@ public class TwzqAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return grouplists.size()>4?4:grouplists.size();
+//        return grouplists.size()>4?4:grouplists.size();
+        return grouplists.size();
     }
 
     @Override
