@@ -7,10 +7,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -24,13 +26,18 @@ import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.activity.GoodsDetailActivity;
 import com.emjiayuan.app.activity.LoginActivity;
 import com.emjiayuan.app.activity.OrderConfirmActivity;
+import com.emjiayuan.app.adapter.CarGoodsAdapter;
+import com.emjiayuan.app.adapter.GoodsAdapter;
 import com.emjiayuan.app.adapter.ShoppingCarAdapter;
 import com.emjiayuan.app.entity.CarBean;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.OrderComfirm;
+import com.emjiayuan.app.entity.Product;
 import com.emjiayuan.app.event.CarUpdateEvent;
 import com.emjiayuan.app.event.LoginSuccessEvent;
 import com.emjiayuan.app.fragment.BaseLazyFragment;
+import com.emjiayuan.app.widget.MyGridView;
+import com.emjiayuan.app.widget.MyStateFrameLayout;
 import com.google.gson.Gson;
 import com.gyf.barlibrary.ImmersionBar;
 import com.lwkandroid.stateframelayout.StateFrameLayout;
@@ -77,7 +84,7 @@ public class ShoppingCarFragment extends BaseLazyFragment implements View.OnClic
     @BindView(R.id.order)
     TextView order;
     @BindView(R.id.stateLayout)
-    StateFrameLayout stateLayout;
+    MyStateFrameLayout stateLayout;
     @BindView(R.id.back)
     LinearLayout back;
     @BindView(R.id.refreshLayout)
@@ -86,6 +93,7 @@ public class ShoppingCarFragment extends BaseLazyFragment implements View.OnClic
     LinearLayout checkLl;
     private ShoppingCarAdapter adapter;
     private ArrayList<CarBean> carBeanList;
+    private ArrayList<Product> productCarlist;
     public List<CarBean> selectList = new ArrayList<>();
     //监听来源
     public boolean mIsFromItem = false;
@@ -115,7 +123,7 @@ public class ShoppingCarFragment extends BaseLazyFragment implements View.OnClic
     @Override
     protected void initView() {
         super.initView();
-        stateLayout.setOnNetErrorRetryListener(new StateFrameLayout.OnNetErrorRetryListener() {
+        stateLayout.setOnNetErrorRetryListener(new MyStateFrameLayout.OnNetErrorRetryListener() {
             @Override
             public void onNetErrorRetry() {
                 reqCarList();
@@ -214,6 +222,9 @@ public class ShoppingCarFragment extends BaseLazyFragment implements View.OnClic
             }
         });
         lvGoods.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
+
+//        View view=LayoutInflater.from(mActivity).inflate(R.layout.layout_empty_car,null);
+
     }
 
     //对item导致maincheckbox改变做监听
@@ -325,13 +336,42 @@ public class ShoppingCarFragment extends BaseLazyFragment implements View.OnClic
         }
     }
 
+    public void getProductCarList() {
+        FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
+        formBody.add("userid", Global.loginResult.getId());
+        formBody.add("provinceid",Global.provinceid);
+        Log.d("------参数------", formBody.build().toString());
+//new call
+        Call call = MyOkHttp.GetCall("cart.getProductCartList", formBody);
+//请求加入调度
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("------------", e.toString());
+//                        myHandler.sendEmptyMessage(1);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String result = response.body().string();
+                MyUtils.e("------获取推荐产品结果------", result);
+                Message message = new Message();
+                message.what = 3;
+                Bundle bundle = new Bundle();
+                bundle.putString("result", result);
+                message.setData(bundle);
+                myHandler.sendMessage(message);
+            }
+        });
+    }
+
     public void reqCarList() {
         if (!checkNetwork()) {
-            stateLayout.changeState(StateFrameLayout.NET_ERROR);
+            stateLayout.changeState(MyStateFrameLayout.NET_ERROR);
             return;
         }
         if (flag) {
-            stateLayout.changeState(StateFrameLayout.LOADING);
+            stateLayout.changeState(MyStateFrameLayout.LOADING);
         }
         checkAll.setChecked(false);
         selectList.clear();
@@ -403,7 +443,7 @@ public class ShoppingCarFragment extends BaseLazyFragment implements View.OnClic
 
     public void deleteCar(String cartid, final int position) {
         if (!checkNetwork()) {
-            stateLayout.changeState(StateFrameLayout.NET_ERROR);
+            stateLayout.changeState(MyStateFrameLayout.NET_ERROR);
             return;
         }
 //        stateLayout.changeState(StateFrameLayout.LOADING);
@@ -464,10 +504,14 @@ public class ShoppingCarFragment extends BaseLazyFragment implements View.OnClic
                                 carBeanList.add(gson.fromJson(dataArray.getJSONObject(i).toString(), CarBean.class));
                             }
                             if (carBeanList.size() == 0) {
-                                stateLayout.changeState(StateFrameLayout.EMPTY);
+                                stateLayout.changeState(MyStateFrameLayout.EMPTY);
+                                if (stateLayout.mEmptyView!=null){
+                                    getProductCarList();
+
+                                }
                                 return;
                             } else {
-                                stateLayout.changeState(StateFrameLayout.SUCCESS);
+                                stateLayout.changeState(MyStateFrameLayout.SUCCESS);
                             }
                             adapter = new ShoppingCarAdapter(mActivity, carBeanList, lvGoods, new AllCheckListener() {
                                 @Override
@@ -488,6 +532,7 @@ public class ShoppingCarFragment extends BaseLazyFragment implements View.OnClic
                         } else {
                             MyUtils.showToast(mActivity, message);
                         }
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -501,7 +546,7 @@ public class ShoppingCarFragment extends BaseLazyFragment implements View.OnClic
                         String data = jsonObject.getString("data");
                         Gson gson = new Gson();
                         if ("200".equals(code)) {
-                            stateLayout.changeState(StateFrameLayout.SUCCESS);
+                            stateLayout.changeState(MyStateFrameLayout.SUCCESS);
                             MyUtils.showToast(mActivity, message);
                             reqCarList();
                         } else {
@@ -527,6 +572,40 @@ public class ShoppingCarFragment extends BaseLazyFragment implements View.OnClic
                             startActivity(intent);
                         } else {
                             MyUtils.showToast(mActivity, result);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case 3:
+                    try {
+                        JSONObject jsonObject = new JSONObject(result);
+                        String code = jsonObject.getString("code");
+                        String message = jsonObject.getString("message");
+                        String data = jsonObject.getString("data");
+                        Gson gson = new Gson();
+                        if ("200".equals(code)) {
+                            JSONArray dataArray = new JSONArray(data);
+                            productCarlist= new ArrayList<>();
+                            for (int i = 0; i < dataArray.length(); i++) {
+                                productCarlist.add(gson.fromJson(dataArray.getJSONObject(i).toString(), Product.class));
+                            }
+                            MyGridView gridView=stateLayout.mEmptyView.findViewById(R.id.gv_guest);
+                            CarGoodsAdapter adapter=new CarGoodsAdapter(mActivity,productCarlist);
+                            gridView.setAdapter(adapter);
+                            gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                    if (!MyUtils.isFastClick()){
+                                        return;
+                                    }
+                                    Intent intent=new Intent(mActivity,GoodsDetailActivity.class);
+                                    intent.putExtra("productid",productCarlist.get(position).getId());
+                                    startActivity(intent);
+                                }
+                            });
+                        } else {
+                            MyUtils.showToast(mActivity, message);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

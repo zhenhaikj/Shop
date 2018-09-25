@@ -30,6 +30,8 @@ import com.emjiayuan.app.activity.CollectionActivity;
 import com.emjiayuan.app.activity.CouponActivity2;
 import com.emjiayuan.app.activity.EnterpriseActivity;
 import com.emjiayuan.app.activity.HelpActivity;
+import com.emjiayuan.app.activity.HezuoActivity;
+import com.emjiayuan.app.activity.HistoryActivity;
 import com.emjiayuan.app.activity.IntegralActivity;
 import com.emjiayuan.app.activity.LoginActivity;
 import com.emjiayuan.app.activity.LogisticsActivity;
@@ -43,7 +45,6 @@ import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.LoginResult;
 import com.emjiayuan.app.entity.User;
 import com.emjiayuan.app.event.LoginSuccessEvent;
-import com.emjiayuan.app.event.UpdateEvent;
 import com.emjiayuan.app.fragment.BaseLazyFragment;
 import com.google.gson.Gson;
 import com.qiyukf.unicorn.api.ConsultSource;
@@ -126,6 +127,10 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
     SmartRefreshLayout refreshLayout;
     @BindView(R.id.my_top)
     LinearLayout myTop;
+    @BindView(R.id.hezuo_ll)
+    LinearLayout hezuoLl;
+    @BindView(R.id.record_ll)
+    LinearLayout recordLl;
 
 
     @Override
@@ -170,15 +175,16 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void run() {
-                final Drawable dw=Global.appTheme.getUser_top_img()!=null?MyUtils.loadImageFromNetwork(Global.appTheme.getUser_top_img()):mActivity.getDrawable(R.drawable.color_shape);
+                final Drawable dw = Global.appTheme.getUser_top_img() != null ? MyUtils.loadImageFromNetwork(Global.appTheme.getUser_top_img()) : mActivity.getDrawable(R.drawable.color_shape);
                 // post() 特别关键，就是到UI主线程去更新图片
-                myTop.post(new Runnable(){
+                myTop.post(new Runnable() {
                     @SuppressLint("NewApi")
                     @Override
                     public void run() {
                         // TODO Auto-generated method stub
                         myTop.setBackground(dw);
-                    }}) ;
+                    }
+                });
             }
         }).start();
     }
@@ -211,6 +217,8 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
         service_ll.setOnClickListener(this);
         help_ll.setOnClickListener(this);
         setting_ll.setOnClickListener(this);
+        recordLl.setOnClickListener(this);
+        hezuoLl.setOnClickListener(this);
     }
 
     @Override
@@ -300,6 +308,12 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
                 break;
             case R.id.setting_ll:
                 startActivity(new Intent(getActivity(), SettingActivity.class));
+                break;
+            case R.id.hezuo_ll:
+                startActivity(new Intent(getActivity(), HezuoActivity.class));
+                break;
+            case R.id.record_ll:
+                startActivity(new Intent(getActivity(), HistoryActivity.class));
                 break;
             case R.id.profile_image:
 //                startActivity(new Intent(getActivity(), SettingActivity.class));
@@ -400,7 +414,7 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
                         Gson gson = new Gson();
                         if ("200".equals(code)) {
                             user = gson.fromJson(data, User.class);
-                            Global.loginResult=gson.fromJson(data, LoginResult.class);
+                            Global.loginResult = gson.fromJson(data, LoginResult.class);
                             setData();
                         } else {
                             MyUtils.showToast(mActivity, message);

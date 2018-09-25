@@ -95,6 +95,7 @@ public class Product implements Serializable{
     private String catetype;
     private String linkid;
     private String createdate;
+    private String minprice;
     private boolean checked;
     /**
      * recommend : null
@@ -111,6 +112,14 @@ public class Product implements Serializable{
     private PromotioninfoBean promotioninfo;
     private int isbuy;
     private List<Product> style_list;
+
+    public String getMinprice() {
+        return minprice;
+    }
+
+    public void setMinprice(String minprice) {
+        this.minprice = minprice;
+    }
 
     public String getIscollection() {
         return iscollection;

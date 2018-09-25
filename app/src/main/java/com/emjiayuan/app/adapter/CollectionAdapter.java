@@ -24,6 +24,7 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -55,10 +56,10 @@ public class CollectionAdapter extends BaseAdapter {
     }
 
 
-    private ArrayList<Product> grouplists = new ArrayList<>();
+    private List<Product> grouplists = new ArrayList<>();
     private LayoutInflater mInflater;
 
-    public CollectionAdapter(Context mContext, ArrayList<Product> grouplists, ShoppingCarFragment2.AllCheckListener listener) {
+    public CollectionAdapter(Context mContext, List<Product> grouplists, ShoppingCarFragment2.AllCheckListener listener) {
         super();
         this.mContext = mContext;
         this.grouplists = grouplists;

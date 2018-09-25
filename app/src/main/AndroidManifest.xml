@@ -94,6 +94,12 @@
         <activity android:name=".activity.GuideActivity"
             android:windowSoftInputMode="stateHidden"
             android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.CgpwdActivity"
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.HistoryActivity"
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait"></activity>
         <activity android:name=".activity.CameraActivity"
             android:windowSoftInputMode="stateHidden"
             android:screenOrientation="portrait"></activity>
@@ -169,7 +175,7 @@
             android:screenOrientation="portrait"></activity>
         <activity android:name=".activity.CouponUseActivity"
             android:screenOrientation="portrait"></activity>
-        <activity android:name=".activity.SecondsKillActivity"
+        <activity android:name=".activity.SecondsKillActivity2"
             android:screenOrientation="portrait"></activity>
         <activity android:name=".activity.OrderConfirmActivity"
             android:screenOrientation="portrait"></activity>
@@ -194,6 +200,10 @@
         <activity android:name=".activity.SpitActivity"
             android:screenOrientation="portrait"></activity>
         <activity android:name=".activity.EnterpriseActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.HezuoActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.SoupwikiActivity"
             android:screenOrientation="portrait"></activity>
         <activity android:name=".activity.KfActivity"
             android:screenOrientation="portrait"></activity>

@@ -13,6 +13,7 @@ public class Global {
     public static String device_no="";
     public static String token="";
     public static ArrayList<Product> list;
+    public static List<Product> historylist=new ArrayList<>();
     public static ArrayList<Province> datas;
     public static ArrayList<Products> Productslist;
     public static List<AreaModel> city_list=new ArrayList<>();

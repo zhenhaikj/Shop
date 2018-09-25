@@ -6,6 +6,7 @@ import android.content.SharedPreferences.Editor;
 import android.text.TextUtils;
 import android.util.Base64;
 
+import com.emjiayuan.app.entity.Product;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -194,14 +195,15 @@ public class SpUtils {
      * @param tag
      * @param datalist
      */
-    public <T> void setDataList(String tag, List<T> datalist) {
+//    public static <T> void setDataList(String tag, List<T> datalist) {
+    public static void setDataList(String tag, List<Product> datalist) {
         if (null == datalist || datalist.size() <= 0)
             return;
 
         Gson gson = new Gson();
         //转换成json数据，再保存
         String strJson = gson.toJson(datalist);
-        editor.clear();
+//        editor.clear();
         editor.putString(tag, strJson);
         editor.commit();
 
@@ -212,14 +214,15 @@ public class SpUtils {
      * @param tag
      * @return
      */
-    public <T> List<T> getDataList(String tag) {
-        List<T> datalist=new ArrayList<>();
+//    public static <T> List<T> getDataList(String tag) {
+    public static List<Product> getDataList(String tag) {
+        List<Product> datalist=new ArrayList<>();
         String strJson = sp.getString(tag, null);
         if (null == strJson) {
             return datalist;
         }
         Gson gson = new Gson();
-        datalist = gson.fromJson(strJson, new TypeToken<List<T>>() {
+        datalist = gson.fromJson(strJson, new TypeToken<List<Product>>() {
         }.getType());
         return datalist;
 
@@ -233,7 +236,7 @@ public class SpUtils {
      * @param <T> 指定Map的值
      */
 
-    public <K,T> void setMap(String key , Map<K,T> map){
+    public static <K,T> void setMap(String key , Map<K,T> map){
         if (map == null || map.isEmpty() || map.size() < 1){
             return;
         }
@@ -248,7 +251,7 @@ public class SpUtils {
     /**
      * 获取Map集合
      * */
-    public <K,T> Map<K,T> getMap(String key){
+    public static <K,T> Map<K,T> getMap(String key){
         Map<K,T> map = new HashMap<>();
         String strJson = sp.getString(key,null);
         if (strJson == null){

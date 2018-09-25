@@ -22,7 +22,7 @@ import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.GlideUtil;
 import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.activity.GoodsDetailActivity;
-import com.emjiayuan.app.activity.SecondsKillActivity;
+import com.emjiayuan.app.activity.SecondsKillActivity2;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.SeckillBean.ProductListBean;
 import com.emjiayuan.app.entity.SeckillBean;

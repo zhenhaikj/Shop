@@ -9,14 +9,14 @@
 
     <FrameLayout
         android:id="@+id/fl_item"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ImageView
+        <com.emjiayuan.app.widget.MyImageView
             android:id="@+id/icon"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_marginRight="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="fitXY"
             android:src="@drawable/all" />
 
         <CheckBox

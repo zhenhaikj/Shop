@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -20,8 +21,10 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -53,7 +56,7 @@ import com.emjiayuan.app.activity.MessageDetailActivity;
 import com.emjiayuan.app.activity.NewArrivalsActivity;
 import com.emjiayuan.app.activity.PopularActivity;
 import com.emjiayuan.app.activity.SearchActivity;
-import com.emjiayuan.app.activity.SecondsKillActivity;
+import com.emjiayuan.app.activity.SecondsKillActivity2;
 import com.emjiayuan.app.activity.SpecialActivity;
 import com.emjiayuan.app.activity.TldzActivity;
 import com.emjiayuan.app.activity.TlzqActivity;
@@ -62,7 +65,6 @@ import com.emjiayuan.app.adapter.HomeAdapter;
 import com.emjiayuan.app.adapter.MenuAdapter;
 import com.emjiayuan.app.adapter.TlzqAdapter;
 import com.emjiayuan.app.adapter.XsgAdapter;
-import com.emjiayuan.app.imageloader.GlideImageLoader;
 import com.emjiayuan.app.entity.BannerItem;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.MenuItem;
@@ -71,6 +73,7 @@ import com.emjiayuan.app.entity.Product;
 import com.emjiayuan.app.entity.Products;
 import com.emjiayuan.app.entity.SeckillBean;
 import com.emjiayuan.app.event.UpdateEvent;
+import com.emjiayuan.app.imageloader.GlideImageLoader;
 import com.emjiayuan.app.widget.MyGridView;
 import com.emjiayuan.app.widget.MyListView;
 import com.emjiayuan.app.widget.ObservableScrollView;
@@ -105,7 +108,7 @@ import okhttp3.FormBody;
 import okhttp3.Response;
 
 
-public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItemClickListener, View.OnClickListener{
+public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItemClickListener, View.OnClickListener {
     @BindView(R.id.et_search)
     EditText et_search;
     @BindView(R.id.ll_search)
@@ -189,6 +192,12 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
     ObservableScrollView sv;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+    @BindView(R.id.hyj1)
+    TextView hyj1;
+    @BindView(R.id.hyj2)
+    TextView hyj2;
+    @BindView(R.id.hyj3)
+    TextView hyj3;
     private MenuAdapter adapter;
     private Product product1;
     private Product product2;
@@ -217,6 +226,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
     private LocationClient mLocClient;
     private String soupname = "";//汤料专区名称
     private boolean flag = true;
+    private AlertDialog dialog;
     private Drawable drawable; // 顶部渐变布局需设置的Drawable
     private int fadingHeight = 600; // 当ScrollView滑动到什么位置时渐变消失（根据需要进行调整）
     private static final int START_ALPHA = 0;//scrollview滑动开始位置
@@ -239,17 +249,17 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
         bannerTop.setOnBannerListener(new OnBannerListener() {
             @Override
             public void OnBannerClick(int position) {
-                BannerItem item=banner_top.get(position);
-                if ("1".equals(item.getType())){
-                    Intent intent=new Intent(mActivity,GoodsDetailActivity.class);
-                    intent.putExtra("productid",item.getLinkid());
+                BannerItem item = banner_top.get(position);
+                if ("1".equals(item.getType())) {
+                    Intent intent = new Intent(mActivity, GoodsDetailActivity.class);
+                    intent.putExtra("productid", item.getLinkid());
                     startActivity(intent);
-                }else if ("2".equals(item.getType())){
-                    Intent intent=new Intent(mActivity,MessageDetailActivity.class);
-                    intent.putExtra("newsid",item.getLinkid());
+                } else if ("2".equals(item.getType())) {
+                    Intent intent = new Intent(mActivity, MessageDetailActivity.class);
+                    intent.putExtra("newsid", item.getLinkid());
                     startActivity(intent);
-                }else if ("3".equals(item.getType())){
-                    Intent intent=new Intent(mActivity,SecondsKillActivity.class);
+                } else if ("3".equals(item.getType())) {
+                    Intent intent = new Intent(mActivity, SecondsKillActivity2.class);
                     startActivity(intent);
                 }
             }
@@ -257,17 +267,17 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
         banner.setOnBannerListener(new OnBannerListener() {
             @Override
             public void OnBannerClick(int position) {
-                BannerItem item=banner_mid.get(position);
-                if ("1".equals(item.getType())){
-                    Intent intent=new Intent(mActivity,GoodsDetailActivity.class);
-                    intent.putExtra("productid",item.getLinkid());
+                BannerItem item = banner_mid.get(position);
+                if ("1".equals(item.getType())) {
+                    Intent intent = new Intent(mActivity, GoodsDetailActivity.class);
+                    intent.putExtra("productid", item.getLinkid());
                     startActivity(intent);
-                }else if ("2".equals(item.getType())){
-                    Intent intent=new Intent(mActivity,MessageDetailActivity.class);
-                    intent.putExtra("newsid",item.getLinkid());
+                } else if ("2".equals(item.getType())) {
+                    Intent intent = new Intent(mActivity, MessageDetailActivity.class);
+                    intent.putExtra("newsid", item.getLinkid());
                     startActivity(intent);
-                }else if ("3".equals(item.getType())){
-                    Intent intent=new Intent(mActivity,SecondsKillActivity.class);
+                } else if ("3".equals(item.getType())) {
+                    Intent intent = new Intent(mActivity, SecondsKillActivity2.class);
                     startActivity(intent);
                 }
             }
@@ -275,17 +285,17 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
         banner2.setOnBannerListener(new OnBannerListener() {
             @Override
             public void OnBannerClick(int position) {
-                BannerItem item=banner_bot.get(position);
-                if ("1".equals(item.getType())){
-                    Intent intent=new Intent(mActivity,GoodsDetailActivity.class);
-                    intent.putExtra("productid",item.getLinkid());
+                BannerItem item = banner_bot.get(position);
+                if ("1".equals(item.getType())) {
+                    Intent intent = new Intent(mActivity, GoodsDetailActivity.class);
+                    intent.putExtra("productid", item.getLinkid());
                     startActivity(intent);
-                }else if ("2".equals(item.getType())){
-                    Intent intent=new Intent(mActivity,MessageDetailActivity.class);
-                    intent.putExtra("newsid",item.getLinkid());
+                } else if ("2".equals(item.getType())) {
+                    Intent intent = new Intent(mActivity, MessageDetailActivity.class);
+                    intent.putExtra("newsid", item.getLinkid());
                     startActivity(intent);
-                }else if ("3".equals(item.getType())){
-                    Intent intent=new Intent(mActivity,SecondsKillActivity.class);
+                } else if ("3".equals(item.getType())) {
+                    Intent intent = new Intent(mActivity, SecondsKillActivity2.class);
                     startActivity(intent);
                 }
             }
@@ -312,9 +322,9 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
         });
 //        drawable = getResources().get;
 //        drawable.setAlpha(START_ALPHA);
-        if (Global.appTheme!=null){
-            toolbar.setBackgroundColor(Color.parseColor(Global.appTheme.getHome_top_color()!=null?Global.appTheme.getHome_top_color():"#1f7f4b"));
-        }else{
+        if (Global.appTheme != null) {
+            toolbar.setBackgroundColor(Color.parseColor(Global.appTheme.getHome_top_color() != null ? Global.appTheme.getHome_top_color() : "#1f7f4b"));
+        } else {
             toolbar.setBackgroundColor(Color.parseColor("#1f7f4b"));
         }
         toolbar.getBackground().setAlpha(START_ALPHA);
@@ -328,6 +338,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                 .init();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void initData() {
 
@@ -342,6 +353,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
             }
         });
         getAppVersion();
+        getFloatBanner();
     }
 
     @Override
@@ -436,23 +448,23 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
 
             @Override
             public void onStateChanged(RefreshLayout refreshLayout, RefreshState oldState, RefreshState newState) {
-                Log.d("RefreshState",newState.name());
-                if (refreshLayout.getState()== RefreshState.PullDownToRefresh){
+                Log.d("RefreshState", newState.name());
+                if (refreshLayout.getState() == RefreshState.PullDownToRefresh) {
                     toolbar.setVisibility(View.GONE);
                 }
-                if (refreshLayout.getState()== RefreshState.PullDownCanceled){
+                if (refreshLayout.getState() == RefreshState.PullDownCanceled) {
                     toolbar.setVisibility(View.VISIBLE);
                 }
-                if (refreshLayout.getState()== RefreshState.Refreshing){
+                if (refreshLayout.getState() == RefreshState.Refreshing) {
                     toolbar.setVisibility(View.GONE);
                 }
-                if (refreshLayout.getState()== RefreshState.None){
+                if (refreshLayout.getState() == RefreshState.None) {
                     toolbar.setVisibility(View.VISIBLE);
                 }
-                if (refreshLayout.getState()== RefreshState.ReleaseToRefresh){
+                if (refreshLayout.getState() == RefreshState.ReleaseToRefresh) {
                     toolbar.setVisibility(View.GONE);
                 }
-                if (refreshLayout.getState()== RefreshState.RefreshFinish){
+                if (refreshLayout.getState() == RefreshState.RefreshFinish) {
                     toolbar.setVisibility(View.VISIBLE);
                 }
             }
@@ -526,6 +538,32 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                 MyUtils.e("------检查更新------", result);
                 Message message = new Message();
                 message.what = 2;
+                Bundle bundle = new Bundle();
+                bundle.putString("result", result);
+                message.setData(bundle);
+                myHandler.sendMessage(message);
+            }
+        });
+    }
+
+    public void getFloatBanner() {
+        FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
+//new call
+        Call call = MyOkHttp.GetCall("public.getFloatBanner", formBody);
+//请求加入调度
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("------------", e.toString());
+//                        myHandler.sendEmptyMessage(1);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String result = response.body().string();
+                MyUtils.e("------浮窗广告------", result);
+                Message message = new Message();
+                message.what = 3;
                 Bundle bundle = new Bundle();
                 bundle.putString("result", result);
                 message.setData(bundle);
@@ -646,7 +684,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
 //                        MyUtils.showToast(mActivity, "活动已结束！");
 //                        return;
 //                    }
-                    intent = new Intent(getActivity(), SecondsKillActivity.class);
+                    intent = new Intent(getActivity(), SecondsKillActivity2.class);
 //                intent.putExtra("product",Global.list.get(i));
                     startActivity(intent);
                     break;
@@ -697,6 +735,46 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                             JSONArray recommend = dataJson.getJSONArray("recommend");
                             JSONArray product = dataJson.getJSONArray("product");
                             JSONObject soup = dataJson.getJSONObject("soup");
+                            if (dataJson.has("floatbanner")) {
+                                /*final BannerItem bannerItem=gson.fromJson(dataJson.getString("floatbanner"),BannerItem.class);
+                                View view= LayoutInflater.from(mActivity).inflate(R.layout.layout_gg_dialog,null);
+                                LinearLayout gg_ll=view.findViewById(R.id.gg_ll);
+                                ImageView close=view.findViewById(R.id.close);
+                                ImageView icon=view.findViewById(R.id.icon);
+                                GlideUtil.loadImageView(mActivity,bannerItem.getImage(),icon);
+                                DisplayMetrics dm = getResources().getDisplayMetrics();
+//        heigth = dm.heightPixels;
+//        width = dm.widthPixels;
+                                icon.setLayoutParams(new LinearLayout.LayoutParams(dm.widthPixels/3*2,dm.widthPixels));
+                                dialog=new AlertDialog.Builder(mActivity).setView(view).create();
+                                dialog.setCancelable(false);
+                                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                                gg_ll.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        if ("1".equals(bannerItem.getType())){
+                                            Intent intent=new Intent(mActivity,GoodsDetailActivity.class);
+                                            intent.putExtra("productid",bannerItem.getLinkid());
+                                            startActivity(intent);
+                                        }else if ("2".equals(bannerItem.getType())){
+                                            Intent intent=new Intent(mActivity,MessageDetailActivity.class);
+                                            intent.putExtra("newsid",bannerItem.getLinkid());
+                                            startActivity(intent);
+                                        }else if ("3".equals(bannerItem.getType())){
+                                            Intent intent=new Intent(mActivity,SecondsKillActivity2.class);
+                                            startActivity(intent);
+                                        }
+                                        dialog.dismiss();
+                                    }
+                                });
+                                close.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                                dialog.show();*/
+                            }
                             seckilldata = dataJson.getString("seckill");
                             if (!"null".equals(seckilldata)) {
                                 gv_xsg.setVisibility(View.VISIBLE);
@@ -819,7 +897,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                                 good2Ll.setVisibility(View.INVISIBLE);
                                 goods3Ll.setVisibility(View.INVISIBLE);
                                 product1 = recommendlist.get(0);
-                                name1.setText(product1.getName());
+                                hyj1.setText("会员价¥"+product1.getMinprice()+"起");
                                 price1.setText(Html.fromHtml("<small>¥ </small><big><b>" + product1.getPrice().substring(0, product1.getPrice().indexOf(".")) + "</b></big><small><b>" + product1.getPrice().substring(product1.getPrice().indexOf("."), product1.getPrice().length()) + "</b></small>"));
                                 GlideUtil.loadImageViewLoding(mActivity, product1.getImages(), img1, R.drawable.empty_img, R.drawable.empty_img);
                             }
@@ -829,10 +907,12 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                                 goods3Ll.setVisibility(View.INVISIBLE);
                                 product1 = recommendlist.get(0);
                                 name1.setText(product1.getName());
+                                hyj1.setText("会员价¥"+product1.getMinprice()+"起");
                                 price1.setText(Html.fromHtml("<small>¥ </small><big><b>" + product1.getPrice().substring(0, product1.getPrice().indexOf(".")) + "</b></big><small><b>" + product1.getPrice().substring(product1.getPrice().indexOf("."), product1.getPrice().length()) + "</b></small>"));
                                 GlideUtil.loadImageViewLoding(mActivity, product1.getImages(), img1, R.drawable.empty_img, R.drawable.empty_img);
                                 product2 = recommendlist.get(1);
                                 name2.setText(product2.getName());
+                                hyj2.setText("会员价¥"+product2.getMinprice()+"起");
                                 price2.setText(Html.fromHtml("<small>¥ </small><big><b>" + product2.getPrice().substring(0, product2.getPrice().indexOf(".")) + "</b></big><small><b>" + product2.getPrice().substring(product2.getPrice().indexOf("."), product2.getPrice().length()) + "</b></small>"));
                                 GlideUtil.loadImageViewLoding(mActivity, product2.getImages(), img2, R.drawable.empty_img, R.drawable.empty_img);
                             }
@@ -842,14 +922,17 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                                 goods3Ll.setVisibility(View.VISIBLE);
                                 product1 = recommendlist.get(0);
                                 name1.setText(product1.getName());
+                                hyj1.setText("会员价¥"+product1.getMinprice()+"起");
                                 price1.setText(Html.fromHtml("<small>¥ </small><big><b>" + product1.getPrice().substring(0, product1.getPrice().indexOf(".")) + "</b></big><small><b>" + product1.getPrice().substring(product1.getPrice().indexOf("."), product1.getPrice().length()) + "</b></small>"));
                                 GlideUtil.loadImageViewLoding(mActivity, product1.getImages(), img1, R.drawable.empty_img, R.drawable.empty_img);
                                 product2 = recommendlist.get(1);
                                 name2.setText(product2.getName());
+                                hyj2.setText("会员价¥"+product2.getMinprice()+"起");
                                 price2.setText(Html.fromHtml("<small>¥ </small><big><b>" + product2.getPrice().substring(0, product2.getPrice().indexOf(".")) + "</b></big><small><b>" + product2.getPrice().substring(product2.getPrice().indexOf("."), product2.getPrice().length()) + "</b></small>"));
                                 GlideUtil.loadImageViewLoding(mActivity, product2.getImages(), img2, R.drawable.empty_img, R.drawable.empty_img);
                                 product3 = recommendlist.get(2);
                                 name3.setText(product3.getName());
+                                hyj3.setText("会员价¥"+product3.getMinprice()+"起");
                                 price3.setText(Html.fromHtml("<small>¥ </small><big><b>" + product3.getPrice().substring(0, product3.getPrice().indexOf(".")) + "</b></big><small><b>" + product3.getPrice().substring(product3.getPrice().indexOf("."), product3.getPrice().length()) + "</b></small>"));
                                 GlideUtil.loadImageViewLoding(mActivity, product3.getImages(), img3, R.drawable.empty_img, R.drawable.empty_img);
                             }
@@ -959,6 +1042,59 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                             }
 
 
+                        } else {
+                            MyUtils.showToast(mActivity, message);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case 3:
+                    try {
+                        JSONObject jsonObject = new JSONObject(result);
+                        String code = jsonObject.getString("code");
+                        String message = jsonObject.getString("message");
+                        String data = jsonObject.getString("data");
+                        Gson gson = new Gson();
+                        if ("200".equals(code)) {
+                            final BannerItem bannerItem = gson.fromJson(data, BannerItem.class);
+                            View view = LayoutInflater.from(mActivity).inflate(R.layout.layout_gg_dialog, null);
+                            LinearLayout gg_ll = view.findViewById(R.id.gg_ll);
+                            ImageView close = view.findViewById(R.id.close);
+                            ImageView icon = view.findViewById(R.id.icon);
+                            GlideUtil.loadImageView(mActivity, bannerItem.getImage(), icon);
+                            DisplayMetrics dm = getResources().getDisplayMetrics();
+//        heigth = dm.heightPixels;
+//        width = dm.widthPixels;
+                            icon.setLayoutParams(new LinearLayout.LayoutParams(dm.widthPixels / 3 * 2, dm.widthPixels));
+                            dialog = new AlertDialog.Builder(mActivity).setView(view).create();
+                            dialog.setCancelable(false);
+                            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                            gg_ll.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    if ("1".equals(bannerItem.getType())) {
+                                        Intent intent = new Intent(mActivity, GoodsDetailActivity.class);
+                                        intent.putExtra("productid", bannerItem.getLinkid());
+                                        startActivity(intent);
+                                    } else if ("2".equals(bannerItem.getType())) {
+                                        Intent intent = new Intent(mActivity, MessageDetailActivity.class);
+                                        intent.putExtra("newsid", bannerItem.getLinkid());
+                                        startActivity(intent);
+                                    } else if ("3".equals(bannerItem.getType())) {
+                                        Intent intent = new Intent(mActivity, SecondsKillActivity2.class);
+                                        startActivity(intent);
+                                    }
+                                    dialog.dismiss();
+                                }
+                            });
+                            close.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    dialog.dismiss();
+                                }
+                            });
+                            dialog.show();
                         } else {
                             MyUtils.showToast(mActivity, message);
                         }

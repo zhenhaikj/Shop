@@ -28,14 +28,14 @@ import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.GlideUtil;
 import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
+import com.emjiayuan.app.Utils.SpUtils;
 import com.emjiayuan.app.adapter.CommentAdapter;
-import com.emjiayuan.app.adapter.GuigeAdapter;
-import com.emjiayuan.app.imageloader.GlideImageLoader;
 import com.emjiayuan.app.entity.Comment;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.OrderComfirm;
 import com.emjiayuan.app.entity.Product;
 import com.emjiayuan.app.entity.SeckillBean;
+import com.emjiayuan.app.imageloader.GlideImageLoader;
 import com.emjiayuan.app.widget.MyListView;
 import com.google.gson.Gson;
 import com.lwkandroid.stateframelayout.StateFrameLayout;
@@ -145,6 +145,10 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
     StateFrameLayout stateLayoutPl;
     @BindView(R.id.webview)
     WebView webview;
+    @BindView(R.id.hyj)
+    TextView hyj;
+    @BindView(R.id.hyj_ll)
+    LinearLayout hyjLl;
 
     private Product product;
     private PopupWindow popupWindow;
@@ -161,7 +165,7 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
     private long sjc;
     private UMShareListener mShareListener;
     private ShareAction mShareAction;
-    private boolean isCheck=false;
+    private boolean isCheck = false;
 
     @Override
     protected int setLayoutId() {
@@ -190,7 +194,7 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
         /*增加自定义按钮的分享面板*/
         mShareAction = new ShareAction(this).setDisplayList(
                 SHARE_MEDIA.WEIXIN, SHARE_MEDIA.WEIXIN_CIRCLE, SHARE_MEDIA.WEIXIN_FAVORITE,
-                SHARE_MEDIA.SINA, SHARE_MEDIA.QQ, SHARE_MEDIA.QZONE,SHARE_MEDIA.MORE)
+                SHARE_MEDIA.SINA, SHARE_MEDIA.QQ, SHARE_MEDIA.QZONE, SHARE_MEDIA.MORE)
                 .addButton("复制文本", "复制文本", "umeng_socialize_copy", "umeng_socialize_copy")
                 .addButton("复制链接", "复制链接", "umeng_socialize_copyurl", "umeng_socialize_copyurl")
                 .setShareboardclickCallback(new ShareBoardlistener() {
@@ -259,10 +263,10 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
             youhui.setText("优惠" + yh + "元");
             xl.setText("限量" + bean.getLimitnumX() + "件");
             remain.setText("剩" + bean.getStock() + "件");
-            if ("0".equals(bean.getStock())){
+            if ("0".equals(bean.getStock())) {
                 buy.setBackgroundColor(Color.parseColor("#9FA0A0"));
                 buy.setEnabled(false);
-            }else{
+            } else {
                 buy.setBackgroundColor(Color.parseColor("#B02520"));
                 buy.setEnabled(true);
             }
@@ -297,12 +301,21 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
                     }
                 }
             });
+            hyjLl.setVisibility(View.GONE);
         } else {
+            hyjLl.setVisibility(View.VISIBLE);
             price.setText("¥" + product.getPrice());
 //            price.setText(Html.fromHtml("<small>¥ </small><big><big>"+product.getPrice().substring(0,product.getPrice().indexOf("."))+"</big></big><small>"+product.getPrice().substring(product.getPrice().indexOf("."),product.getPrice().length())+"</small>"));
             old_price.setText("¥" + product.getPreprice());
         }
         name.setText(product.getName());
+        hyj.setText("会员价¥"+product.getMinprice());
+        hyjLl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(mActivity,VipActivity.class));
+            }
+        });
         kc.setText("库存：" + product.getTotalnum());
         ys.setText("已售：" + product.getSellnum());
         cd.setText("产地：" + product.getSource());
@@ -461,8 +474,6 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
         }
     }
 
-    
-
 
     public void getComment() {
         stateLayoutPl.changeState(StateFrameLayout.LOADING);
@@ -505,7 +516,7 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
         formBody.add("productid", product.getId());
         formBody.add("option", "0");
         formBody.add("num", num);
-        formBody.add("provinceid",Global.provinceid);
+        formBody.add("provinceid", Global.provinceid);
         Log.d("------参数------", formBody.build().toString());
 //new call
         Call call = MyOkHttp.GetCall("cart.addOrUpdateCart", formBody);
@@ -611,7 +622,7 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
         formBody.add("userid", Global.loginResult.getId());
 //        formBody.add("addressprovince", "浙江省");
         formBody.add("couponid", "");
-        formBody.add("provinceid",Global.provinceid);
+        formBody.add("provinceid", Global.provinceid);
         if (flag) {
             formBody.add("promotiontype", promotiontype);
             formBody.add("promotionvalue", promotionvalue);
@@ -679,6 +690,20 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
                             stateLayout.changeState(StateFrameLayout.SUCCESS);
                             JSONObject jsonObject1 = new JSONObject(data);
                             product = gson.fromJson(jsonObject1.toString(), Product.class);
+                            Global.historylist = SpUtils.getDataList("history");
+                            if (Global.historylist == null) {
+                                Global.historylist = new ArrayList<>();
+                            }
+                            if (Global.historylist.size() == 20) {
+                                Global.historylist.remove(19);
+                            }
+                            for (int i = 0; i < Global.historylist.size(); i++) {
+                                if (product.getName().equals(Global.historylist.get(i).getName())) {
+                                    Global.historylist.remove(i);
+                                }
+                            }
+                            Global.historylist.add(0, product);
+                            SpUtils.setDataList("history", Global.historylist);
                             setdata();
                         } else {
                             MyUtils.showToast(mActivity, message);
@@ -761,7 +786,7 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
     };
 
     public void showPopWindow(int type) {
-        isCheck=false;
+        isCheck = false;
         View view = LayoutInflater.from(mActivity).inflate(R.layout.choose_num, null);
         final ImageView imageView = view.findViewById(R.id.icon);
         final TextView name = view.findViewById(R.id.name);
@@ -772,15 +797,15 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
         TextView down = view.findViewById(R.id.down);
         final TextView kc = view.findViewById(R.id.kc);
         TextView xg = view.findViewById(R.id.xg);
-        LabelsView labelsView=view.findViewById(R.id.labels);
-        LinearLayout gg_ll=view.findViewById(R.id.gg_ll);
-        View gg_line=view.findViewById(R.id.gg_line);
-        gg_line.setVisibility(product.getStyle_list()==null?View.GONE:View.VISIBLE);
-        gg_ll.setVisibility(product.getStyle_list()==null?View.GONE:View.VISIBLE);
+        LabelsView labelsView = view.findViewById(R.id.labels);
+        LinearLayout gg_ll = view.findViewById(R.id.gg_ll);
+        View gg_line = view.findViewById(R.id.gg_line);
+        gg_line.setVisibility(product.getStyle_list() == null ? View.GONE : View.VISIBLE);
+        gg_ll.setVisibility(product.getStyle_list() == null ? View.GONE : View.VISIBLE);
         xg.setVisibility(View.GONE);
         TextView next = view.findViewById(R.id.next);
         final EditText et_count = view.findViewById(R.id.et_count);
-        if (product.getStyle_list()!=null){
+        if (product.getStyle_list() != null) {
             labelsView.setLabels(product.getStyle_list(), new LabelsView.LabelTextProvider<Product>() {
                 @Override
                 public CharSequence getLabelText(TextView label, int position, Product data) {
@@ -788,7 +813,7 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
                 }
             });
             for (int i = 0; i < product.getStyle_list().size(); i++) {
-                if (product.getStyle_list().get(i).getGuige().equals(product.getGuige())){
+                if (product.getStyle_list().get(i).getGuige().equals(product.getGuige())) {
                     labelsView.setSelects(i);
                 }
             }
@@ -797,9 +822,9 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
                 @Override
                 public void onLabelSelectChange(TextView label, Object data, boolean isSelect, int position) {
                     //label是被选中的标签，data是标签所对应的数据，isSelect是是否选中，position是标签的位置。
-                    Product product_gg=product.getStyle_list().get(position);
+                    Product product_gg = product.getStyle_list().get(position);
                     product_gg.setStyle_list(product.getStyle_list());
-                    product=product_gg;
+                    product = product_gg;
                     GlideUtil.loadImageViewLoding(mActivity, product.getImages(), imageView, R.drawable.empty_img, R.drawable.empty_img);
                     name.setText(product.getName());
                     if (flag) {
@@ -878,7 +903,7 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
 //                                MyUtils.showToast(mActivity,"请选择规格");
 //                            }
 //                        }else{
-                            addCar(Integer.toString(num));
+                        addCar(Integer.toString(num));
 //                        }
                     }
                 });
@@ -903,7 +928,7 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
 //                                MyUtils.showToast(mActivity,"请选择规格");
 //                            }
 //                        }else{
-                            confirmOrder();
+                        confirmOrder();
 //                        }
                     }
                 });

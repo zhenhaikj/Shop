@@ -36,7 +36,7 @@ import com.emjiayuan.app.activity.MyMessageActivity;
 import com.emjiayuan.app.activity.PostActivity;
 import com.emjiayuan.app.activity.PostAudioActivity;
 import com.emjiayuan.app.activity.PostDetailActivity;
-import com.emjiayuan.app.activity.SecondsKillActivity;
+import com.emjiayuan.app.activity.SecondsKillActivity2;
 import com.emjiayuan.app.activity.SqMineActivity;
 import com.emjiayuan.app.adapter.LabelAdapter;
 import com.emjiayuan.app.adapter.PostsAdapter;
@@ -630,7 +630,7 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
                         intent.putExtra("newsid", list.get(i).getLinkid());
                         startActivity(intent);
                     }else if ("3".equals(list.get(i).getLinktype())){
-                        Intent intent = new Intent(getActivity(), SecondsKillActivity.class);
+                        Intent intent = new Intent(getActivity(), SecondsKillActivity2.class);
 //                        intent.putExtra("productid", list.get(i).getLinkid());
                         startActivity(intent);
                     }else{

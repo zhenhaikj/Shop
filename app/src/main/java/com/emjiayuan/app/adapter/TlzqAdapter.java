@@ -58,6 +58,7 @@ public class TlzqAdapter extends BaseAdapter {
             holder.icon = (ImageView) convertView.findViewById(R.id.icon);
             holder.name = (TextView) convertView.findViewById(R.id.name);
             holder.yh = (TextView) convertView.findViewById(R.id.yh);
+            holder.hyj = (TextView) convertView.findViewById(R.id.hyj);
             convertView.setTag(holder);
         } else {// 如果之前已经显示过该页面，则用viewholder中的缓存直接刷屏
             holder = (ViewHolder) convertView.getTag();
@@ -67,6 +68,7 @@ public class TlzqAdapter extends BaseAdapter {
         GlideUtil.loadImageViewLoding(mContext,item.getImages(),holder.icon,R.drawable.empty_img,R.drawable.empty_img);
         holder.icon.setImageResource(R.drawable.img2);
         holder.name.setText(item.getName());
+        holder.hyj.setText("会员价¥"+item.getMinprice()+"起");
         holder.yh.setText(Html.fromHtml("<small>¥ </small><big><b>"+item.getPrice().substring(0,item.getPrice().indexOf("."))+"</b></big><small><b>"+item.getPrice().substring(item.getPrice().indexOf("."),item.getPrice().length())+"</b></small>"));
 
         return convertView;
@@ -76,5 +78,6 @@ public class TlzqAdapter extends BaseAdapter {
         public ImageView icon;
         public TextView name;
         public TextView yh;
+        public TextView hyj;
     }
 }

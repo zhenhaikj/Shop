@@ -3,7 +3,6 @@ package com.emjiayuan.app.activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -18,22 +17,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
-import com.baoyz.swipemenulistview.SwipeMenu;
-import com.baoyz.swipemenulistview.SwipeMenuCreator;
-import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.emjiayuan.app.BaseActivity;
 import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
-import com.emjiayuan.app.adapter.SoupAdapter;
 import com.emjiayuan.app.adapter.SoupCategoryAdapter;
 import com.emjiayuan.app.adapter.SoupCheckAdapter;
 import com.emjiayuan.app.adapter.SoupRightAdapter;
@@ -62,9 +56,7 @@ import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.Response;
 
-import static com.emjiayuan.app.Utils.DensityUtil.dp2px;
-
-public class TldzActivity extends BaseActivity{
+public class TldzActivity extends BaseActivity {
 
     @BindView(R.id.back)
     LinearLayout back;
@@ -78,7 +70,7 @@ public class TldzActivity extends BaseActivity{
     View lineTop;
     @BindView(R.id.listview)
     ListView listview;
-//    @BindView(R.id.gv_content)
+    //    @BindView(R.id.gv_content)
 //    GridView gvContent;
     @BindView(R.id.lv_content)
     ListView lvContent;
@@ -88,9 +80,13 @@ public class TldzActivity extends BaseActivity{
     TextView count;
     @BindView(R.id.ok)
     TextView ok;
+    @BindView(R.id.tv_soupwiki)
+    TextView tv_soupwiki;
     @BindView(R.id.up_soup)
     ImageView upSoup;
-//    private SoupAdapter adapter;
+    @BindView(R.id.soupwiki_ll)
+    LinearLayout soupwikiLl;
+    //    private SoupAdapter adapter;
     private SoupRightAdapter adapter;
     private SoupCheckAdapter checkAdapter;
     private SoupCategoryAdapter categoryAdapter;
@@ -100,13 +96,13 @@ public class TldzActivity extends BaseActivity{
     private List<Soup> selectedList = new ArrayList<>();
     private PopupWindow mPopupWindow;
     private TextView countin;
-    private String mass="斤";
-    private String val="500";
-    private double total=0;
-    private double num=0;
+    private String mass = "斤";
+    private String val = "500";
+    private double total = 0;
+    private double num = 0;
     //记录滑动的ListView 滑动的位置   
     private int scrollPosition = -1;
-    DecimalFormat df   = new DecimalFormat("######0.00");
+    DecimalFormat df = new DecimalFormat("######0.00");
 
 
     @Override
@@ -124,7 +120,7 @@ public class TldzActivity extends BaseActivity{
         //部分文字改变颜色
 //ForegroundColorSpan 为文字前景色，BackgroundColorSpan为文字背景色
         ForegroundColorSpan greenSpan = new ForegroundColorSpan(Color.parseColor("#2BB835"));
-        count.setText("已选"+selectedList.size()+"类");
+        count.setText("已选" + selectedList.size() + "类");
 //这里注意一定要先给textview赋值
 
         SpannableStringBuilder builder = new SpannableStringBuilder(count.getText().toString());
@@ -133,12 +129,13 @@ public class TldzActivity extends BaseActivity{
 //   Spanned.SPAN_INCLUSIVE_INCLUSIVE 从起始下标到终了下标，同时包括起始下标和终了下标
 //   Spanned.SPAN_EXCLUSIVE_EXCLUSIVE 从起始下标到终了下标，但都不包括起始下标和终了下标
 //   Spanned.SPAN_EXCLUSIVE_INCLUSIVE 从起始下标到终了下标，包括终了下标
-        builder.setSpan(greenSpan, 2, count.getText().toString().length()-1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        builder.setSpan(greenSpan, 2, count.getText().toString().length() - 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 //最后为textview赋值
         count.setText(builder);
         title.setText("汤料定制");
         save.setVisibility(View.VISIBLE);
         save.setText("我的料单");
+        tv_soupwiki.setText("香料\n百科");
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -146,6 +143,15 @@ public class TldzActivity extends BaseActivity{
                     return;
                 }
                 finish();
+            }
+        });
+        soupwikiLl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!MyUtils.isFastClick()) {
+                    return;
+                }
+                startActivity(new Intent(mActivity,SoupwikiActivity.class));
             }
         });
         getSoupCategoryList();
@@ -298,26 +304,26 @@ public class TldzActivity extends BaseActivity{
         upSoup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!MyUtils.isFastClick()){
+                if (!MyUtils.isFastClick()) {
                     return;
                 }
-                if (selectedList.size()>0){
+                if (selectedList.size() > 0) {
                     showPopupWindow();
-                }else{
-                    MyUtils.showToast(mActivity,"请先选择配料！");
+                } else {
+                    MyUtils.showToast(mActivity, "请先选择配料！");
                 }
             }
         });
         ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!MyUtils.isFastClick()){
+                if (!MyUtils.isFastClick()) {
                     return;
                 }
-                if (selectedList.size()>0){
+                if (selectedList.size() > 0) {
                     showPopupWindow();
-                }else{
-                    MyUtils.showToast(mActivity,"请先选择配料！");
+                } else {
+                    MyUtils.showToast(mActivity, "请先选择配料！");
                 }
             }
         });
@@ -342,7 +348,7 @@ public class TldzActivity extends BaseActivity{
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(mActivity,MySoupOrderActivity.class));
+                startActivity(new Intent(mActivity, MySoupOrderActivity.class));
             }
         });
     }
@@ -365,7 +371,7 @@ public class TldzActivity extends BaseActivity{
         }
     };
 
-    public void setChecked(TextView t1,TextView t2,TextView t3,TextView t4){
+    public void setChecked(TextView t1, TextView t2, TextView t3, TextView t4) {
         t1.setBackgroundResource(R.drawable.button_edit_shape);
         t1.setTextColor(Color.WHITE);
         t2.setBackgroundResource(R.drawable.edit_shape);
@@ -375,6 +381,7 @@ public class TldzActivity extends BaseActivity{
         t4.setBackgroundResource(R.drawable.edit_shape);
         t4.setTextColor(Color.parseColor("#CCCCCC"));
     }
+
     /**
      * 弹出Popupwindow
      */
@@ -391,8 +398,8 @@ public class TldzActivity extends BaseActivity{
         final TextView ke = popupWindow_view.findViewById(R.id.ke);
         final TextView kg = popupWindow_view.findViewById(R.id.kg);
 //        if (checkAdapter==null){
-            checkAdapter=new SoupCheckAdapter(mActivity,selectedList);
-            swipe_lv.setAdapter(checkAdapter);
+        checkAdapter = new SoupCheckAdapter(mActivity, selectedList);
+        swipe_lv.setAdapter(checkAdapter);
 //        }else{
 //            checkAdapter.setGrouplists(selectedList);
 //            checkAdapter.notifyDataSetChanged();
@@ -400,143 +407,143 @@ public class TldzActivity extends BaseActivity{
         ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!MyUtils.isFastClick()){
+                if (!MyUtils.isFastClick()) {
                     return;
                 }
-                double totalweight=0;
-                if ("斤".equals(mass)){
-                    totalweight=total/2;
-                }else if ("两".equals(mass)){
-                    totalweight=total/20;
-                }else if ("克".equals(mass)){
-                    totalweight=total/1000;
-                }else if ("千克".equals(mass)){
-                    totalweight=total;
+                double totalweight = 0;
+                if ("斤".equals(mass)) {
+                    totalweight = total / 2;
+                } else if ("两".equals(mass)) {
+                    totalweight = total / 20;
+                } else if ("克".equals(mass)) {
+                    totalweight = total / 1000;
+                } else if ("千克".equals(mass)) {
+                    totalweight = total;
                 }
-                if (okList.size()!=selectedList.size()){
-                    MyUtils.showToast(mActivity,"请配置完再提交！");
+                if (okList.size() != selectedList.size()) {
+                    MyUtils.showToast(mActivity, "请配置完再提交！");
                     for (int i = 0; i < selectedList.size(); i++) {
-                        if ("0".equals(selectedList.get(i).getNum())){
+                        if ("0".equals(selectedList.get(i).getNum())) {
                             swipe_lv.setSelection(i);
                             return;
                         }
                     }
                     return;
                 }
-                if (totalweight<2.5){
-                    MyUtils.showToast(mActivity,"汤料总重量不能小于‘2.5’千克！");
+                if (totalweight < 2.5) {
+                    MyUtils.showToast(mActivity, "汤料总重量不能小于‘2.5’千克！");
                     return;
                 }
 
-                if (Global.loginResult==null){
-                    startActivity(new Intent(mActivity,LoginActivity.class));
+                if (Global.loginResult == null) {
+                    startActivity(new Intent(mActivity, LoginActivity.class));
                     return;
                 }
-                Intent intent=new Intent(mActivity,SoupOrderConfirmActivity.class);
+                Intent intent = new Intent(mActivity, SoupOrderConfirmActivity.class);
                 intent.putExtra("oklist", (Serializable) okList);
                 intent.putExtra("val", val);
                 startActivity(intent);
             }
         });
 //        mass="斤";
-        if ("斤".equals(mass)){
-            setChecked(jin,liang,ke,kg);
-        }else if ("两".equals(mass)){
-            setChecked(liang,jin,ke,kg);
-        }else if ("克".equals(mass)){
-            setChecked(ke,liang,jin,kg);
-        }else if ("千克".equals(mass)){
-            setChecked(kg,liang,ke,jin);
+        if ("斤".equals(mass)) {
+            setChecked(jin, liang, ke, kg);
+        } else if ("两".equals(mass)) {
+            setChecked(liang, jin, ke, kg);
+        } else if ("克".equals(mass)) {
+            setChecked(ke, liang, jin, kg);
+        } else if ("千克".equals(mass)) {
+            setChecked(kg, liang, ke, jin);
         }
 
-        countin.setText(Html.fromHtml("已配<font color='#2BB835'>"+okList.size()+"<font/>/<font color='#2BB835'>"+selectedList.size()+"<font/>类 共<font color='#2BB835'>"+MyUtils.subZeroAndDot(df.format((total)))+"<font/>"+mass));
+        countin.setText(Html.fromHtml("已配<font color='#2BB835'>" + okList.size() + "<font/>/<font color='#2BB835'>" + selectedList.size() + "<font/>类 共<font color='#2BB835'>" + MyUtils.subZeroAndDot(df.format((total))) + "<font/>" + mass));
         //千克1000斤500两50克1
         jin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 for (int i = 0; i < selectedList.size(); i++) {
-                    num=Double.parseDouble(selectedList.get(i).getNum());
-                    if (!"0".equals(selectedList.get(i).getNum())){
-                        if ("两".equals(mass)){
-                            selectedList.get(i).setNum(num/10+"");
-                        }else if ("克".equals(mass)){
-                            selectedList.get(i).setNum(num/500+"");
-                        }else if ("千克".equals(mass)){
-                            selectedList.get(i).setNum(num*2+"");
+                    num = Double.parseDouble(selectedList.get(i).getNum());
+                    if (!"0".equals(selectedList.get(i).getNum())) {
+                        if ("两".equals(mass)) {
+                            selectedList.get(i).setNum(num / 10 + "");
+                        } else if ("克".equals(mass)) {
+                            selectedList.get(i).setNum(num / 500 + "");
+                        } else if ("千克".equals(mass)) {
+                            selectedList.get(i).setNum(num * 2 + "");
                         }
                     }
                 }
                 checkAdapter.notifyDataSetChanged();
-                mass="斤";
-                val="500";
-                setChecked(jin,liang,ke,kg);
-                countin.setText(Html.fromHtml("已配<font color='#2BB835'>"+okList.size()+"<font/>/<font color='#2BB835'>"+selectedList.size()+"<font/>类 共<font color='#2BB835'>"+MyUtils.subZeroAndDot(df.format(total))+"<font/>"+mass));
+                mass = "斤";
+                val = "500";
+                setChecked(jin, liang, ke, kg);
+                countin.setText(Html.fromHtml("已配<font color='#2BB835'>" + okList.size() + "<font/>/<font color='#2BB835'>" + selectedList.size() + "<font/>类 共<font color='#2BB835'>" + MyUtils.subZeroAndDot(df.format(total)) + "<font/>" + mass));
             }
         });
         liang.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 for (int i = 0; i < selectedList.size(); i++) {
-                    num=Double.parseDouble(selectedList.get(i).getNum());
-                    if (!"0".equals(selectedList.get(i).getNum())){
-                        if ("斤".equals(mass)){
-                            selectedList.get(i).setNum(num*10+"");
-                        }else if ("克".equals(mass)){
-                            selectedList.get(i).setNum(num/50+"");
-                        }else if ("千克".equals(mass)){
-                            selectedList.get(i).setNum(num*20+"");
+                    num = Double.parseDouble(selectedList.get(i).getNum());
+                    if (!"0".equals(selectedList.get(i).getNum())) {
+                        if ("斤".equals(mass)) {
+                            selectedList.get(i).setNum(num * 10 + "");
+                        } else if ("克".equals(mass)) {
+                            selectedList.get(i).setNum(num / 50 + "");
+                        } else if ("千克".equals(mass)) {
+                            selectedList.get(i).setNum(num * 20 + "");
                         }
                     }
                 }
                 checkAdapter.notifyDataSetChanged();
-                mass="两";
-                val="50";
-                setChecked(liang,jin,ke,kg);
-                countin.setText(Html.fromHtml("已配<font color='#2BB835'>"+okList.size()+"<font/>/<font color='#2BB835'>"+selectedList.size()+"<font/>类 共<font color='#2BB835'>"+MyUtils.subZeroAndDot(df.format(total))+"<font/>"+mass));
+                mass = "两";
+                val = "50";
+                setChecked(liang, jin, ke, kg);
+                countin.setText(Html.fromHtml("已配<font color='#2BB835'>" + okList.size() + "<font/>/<font color='#2BB835'>" + selectedList.size() + "<font/>类 共<font color='#2BB835'>" + MyUtils.subZeroAndDot(df.format(total)) + "<font/>" + mass));
             }
         });
         ke.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 for (int i = 0; i < selectedList.size(); i++) {
-                    num=Double.parseDouble(selectedList.get(i).getNum());
-                    if (!"0".equals(selectedList.get(i).getNum())){
-                        if ("斤".equals(mass)){
-                            selectedList.get(i).setNum(num*500+"");
-                        }else if ("两".equals(mass)){
-                            selectedList.get(i).setNum(num*50+"");
-                        }else if ("千克".equals(mass)){
-                            selectedList.get(i).setNum(num*1000+"");
+                    num = Double.parseDouble(selectedList.get(i).getNum());
+                    if (!"0".equals(selectedList.get(i).getNum())) {
+                        if ("斤".equals(mass)) {
+                            selectedList.get(i).setNum(num * 500 + "");
+                        } else if ("两".equals(mass)) {
+                            selectedList.get(i).setNum(num * 50 + "");
+                        } else if ("千克".equals(mass)) {
+                            selectedList.get(i).setNum(num * 1000 + "");
                         }
                     }
                 }
                 checkAdapter.notifyDataSetChanged();
-                mass="克";
-                val="1";
-                setChecked(ke,liang,jin,kg);
-                countin.setText(Html.fromHtml("已配<font color='#2BB835'>"+okList.size()+"<font/>/<font color='#2BB835'>"+selectedList.size()+"<font/>类 共<font color='#2BB835'>"+MyUtils.subZeroAndDot(df.format(total))+"<font/>"+mass));
+                mass = "克";
+                val = "1";
+                setChecked(ke, liang, jin, kg);
+                countin.setText(Html.fromHtml("已配<font color='#2BB835'>" + okList.size() + "<font/>/<font color='#2BB835'>" + selectedList.size() + "<font/>类 共<font color='#2BB835'>" + MyUtils.subZeroAndDot(df.format(total)) + "<font/>" + mass));
             }
         });
         kg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 for (int i = 0; i < selectedList.size(); i++) {
-                    num=Double.parseDouble(selectedList.get(i).getNum());
-                    if (!"0".equals(selectedList.get(i).getNum())){
-                        if ("斤".equals(mass)){
-                            selectedList.get(i).setNum(num/2+"");
-                        }else if ("两".equals(mass)){
-                            selectedList.get(i).setNum(num/20+"");
-                        }else if ("克".equals(mass)){
-                            selectedList.get(i).setNum(num/1000+"");
+                    num = Double.parseDouble(selectedList.get(i).getNum());
+                    if (!"0".equals(selectedList.get(i).getNum())) {
+                        if ("斤".equals(mass)) {
+                            selectedList.get(i).setNum(num / 2 + "");
+                        } else if ("两".equals(mass)) {
+                            selectedList.get(i).setNum(num / 20 + "");
+                        } else if ("克".equals(mass)) {
+                            selectedList.get(i).setNum(num / 1000 + "");
                         }
                     }
                 }
                 checkAdapter.notifyDataSetChanged();
-                mass="千克";
-                val="1000";
-                setChecked(kg,liang,ke,jin);
-                countin.setText(Html.fromHtml("已配<font color='#2BB835'>"+okList.size()+"<font/>/<font color='#2BB835'>"+selectedList.size()+"<font/>类 共<font color='#2BB835'>"+MyUtils.subZeroAndDot(df.format(total))+"<font/>"+mass));
+                mass = "千克";
+                val = "1000";
+                setChecked(kg, liang, ke, jin);
+                countin.setText(Html.fromHtml("已配<font color='#2BB835'>" + okList.size() + "<font/>/<font color='#2BB835'>" + selectedList.size() + "<font/>类 共<font color='#2BB835'>" + MyUtils.subZeroAndDot(df.format(total)) + "<font/>" + mass));
             }
         });
         /*SwipeMenuCreator creator = new SwipeMenuCreator() {
@@ -614,7 +621,7 @@ public class TldzActivity extends BaseActivity{
             }
         });
         swipe_lv.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);*/
-        countin.setText(Html.fromHtml("已配<font color='#2BB835'>"+okList.size()+"<font/>/<font color='#2BB835'>"+selectedList.size()+"<font/>类 共<font color='#2BB835'>"+MyUtils.subZeroAndDot(df.format(total))+"<font/>"+mass));
+        countin.setText(Html.fromHtml("已配<font color='#2BB835'>" + okList.size() + "<font/>/<font color='#2BB835'>" + selectedList.size() + "<font/>类 共<font color='#2BB835'>" + MyUtils.subZeroAndDot(df.format(total)) + "<font/>" + mass));
         down_soup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -641,10 +648,10 @@ public class TldzActivity extends BaseActivity{
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (EventBus.getDefault().isRegistered(this)){
+        if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
         }
-        if (mPopupWindow!=null&&mPopupWindow.isShowing()){
+        if (mPopupWindow != null && mPopupWindow.isShowing()) {
             mPopupWindow.dismiss();
         }
     }
@@ -652,7 +659,7 @@ public class TldzActivity extends BaseActivity{
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void Event(Soup soup) {
         okList.clear();
-        total=0;
+        total = 0;
         if (!soup.isCheck()) {
             selectedList.remove(soup);
         } else {
@@ -661,7 +668,7 @@ public class TldzActivity extends BaseActivity{
         //部分文字改变颜色
 //ForegroundColorSpan 为文字前景色，BackgroundColorSpan为文字背景色
         ForegroundColorSpan greenSpan = new ForegroundColorSpan(Color.parseColor("#2BB835"));
-        count.setText("已选"+selectedList.size()+"类");
+        count.setText("已选" + selectedList.size() + "类");
 //这里注意一定要先给textview赋值
 
         SpannableStringBuilder builder = new SpannableStringBuilder(count.getText().toString());
@@ -670,7 +677,7 @@ public class TldzActivity extends BaseActivity{
 //   Spanned.SPAN_INCLUSIVE_INCLUSIVE 从起始下标到终了下标，同时包括起始下标和终了下标
 //   Spanned.SPAN_EXCLUSIVE_EXCLUSIVE 从起始下标到终了下标，但都不包括起始下标和终了下标
 //   Spanned.SPAN_EXCLUSIVE_INCLUSIVE 从起始下标到终了下标，包括终了下标
-        builder.setSpan(greenSpan, 2, count.getText().toString().length()-1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        builder.setSpan(greenSpan, 2, count.getText().toString().length() - 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 //最后为textview赋值
         count.setText(builder);
     }
@@ -679,16 +686,16 @@ public class TldzActivity extends BaseActivity{
     public void Event(SoupUpdateEvent event) {
         selectedList = event.getSoupList();
         okList.clear();
-        total=0;
+        total = 0;
         for (int i = 0; i < selectedList.size(); i++) {
-                if (!"0".equals(selectedList.get(i).getNum())){
-                    okList.add(selectedList.get(i));
-                   total+=Double.parseDouble(selectedList.get(i).getNum());
-                }
+            if (!"0".equals(selectedList.get(i).getNum())) {
+                okList.add(selectedList.get(i));
+                total += Double.parseDouble(selectedList.get(i).getNum());
+            }
         }
         //部分文字改变颜色
 //        ForegroundColorSpan greenSpan = new ForegroundColorSpan(Color.parseColor("#2BB835"));
-        countin.setText(Html.fromHtml("已配<font color='#2BB835'>"+okList.size()+"<font/>/<font color='#2BB835'>"+selectedList.size()+"<font/>类 共<font color='#2BB835'>"+MyUtils.subZeroAndDot(df.format(total))+"<font/>"+mass));
+        countin.setText(Html.fromHtml("已配<font color='#2BB835'>" + okList.size() + "<font/>/<font color='#2BB835'>" + selectedList.size() + "<font/>类 共<font color='#2BB835'>" + MyUtils.subZeroAndDot(df.format(total)) + "<font/>" + mass));
 
     }
 

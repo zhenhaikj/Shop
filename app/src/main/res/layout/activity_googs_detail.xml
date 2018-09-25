@@ -274,12 +274,44 @@
                             android:layout_below="@+id/old_price"
                             android:layout_marginLeft="5dp"
                             android:src="@drawable/share" />
+                        <LinearLayout
+                            android:id="@+id/hyj_ll"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/name"
+                            android:background="#F8C180"
+                            android:layout_marginTop="10dp"
+                            android:padding="8dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
 
+                            <TextView
+                                android:id="@+id/hyj"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="会员价￥10"
+                                android:textColor="#3F3B38"
+                                android:textSize="@dimen/kc_size" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="开通会员"
+                                android:textColor="#3F3B38"
+                                android:textSize="@dimen/kc_size" />
+
+                            <ImageView
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:src="@drawable/go"/>
+                        </LinearLayout>
                         <LinearLayout
                             android:id="@+id/bottom_ll"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_below="@+id/name"
+                            android:layout_below="@+id/hyj_ll"
                             android:layout_marginTop="10dp"
                             android:orientation="horizontal">
 

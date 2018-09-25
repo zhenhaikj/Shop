@@ -80,6 +80,8 @@ public class SettingActivity extends BaseActivity {
     LinearLayout serviceLl;
     @BindView(R.id.update_ll)
     LinearLayout updateLl;
+    @BindView(R.id.pwd_ll)
+    LinearLayout pwdLl;
     private String imagepath;
     private String nicknames;
 
@@ -103,6 +105,15 @@ public class SettingActivity extends BaseActivity {
                     return;
                 }
                 finish();
+            }
+        });
+        pwdLl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!MyUtils.isFastClick()) {
+                    return;
+                }
+                startActivity(new Intent(mActivity,CgpwdActivity.class));
             }
         });
         updateLl.setOnClickListener(new View.OnClickListener() {
@@ -189,7 +200,7 @@ public class SettingActivity extends BaseActivity {
 
     public void getAppVersion() {
         FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
-        formBody.add("versionno",Integer.toString(MyUtils.getAppVersionCode(mActivity)));
+        formBody.add("versionno", Integer.toString(MyUtils.getAppVersionCode(mActivity)));
 //new call
         Call call = MyOkHttp.GetCall("system.getAppVersion", formBody);
 //请求加入调度
@@ -239,7 +250,7 @@ public class SettingActivity extends BaseActivity {
                         Gson gson = new Gson();
                         if ("200".equals(code)) {
                             user = gson.fromJson(data, User.class);
-                            Global.loginResult=gson.fromJson(data, LoginResult.class);
+                            Global.loginResult = gson.fromJson(data, LoginResult.class);
                             setData();
                         } else {
                             MyUtils.showToast(mActivity, message);
@@ -298,7 +309,7 @@ public class SettingActivity extends BaseActivity {
                             final String app_download_url = jsonObject1.getString("download_url");
 //                            String appcode = "234";
 //                            final String app_download_url = "http://pz0.3dn.mse.sogou.com/semob5.13.5_154189_R14189_121106002_build47127_2.1.0.2133.apk";
-                            if("1".equals(is_update)) {
+                            if ("1".equals(is_update)) {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
                                 builder.setTitle("更新");
                                 builder.setMessage("检测到有更新,是否立刻更新？");
@@ -312,7 +323,7 @@ public class SettingActivity extends BaseActivity {
 
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        if(MyUtils.isWifi(mActivity)) {
+                                        if (MyUtils.isWifi(mActivity)) {
                                             AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
                                             builder.setTitle("提示");
                                             builder.setMessage("您当前正在使用移动网络，继续下载将消耗流量");
@@ -331,14 +342,14 @@ public class SettingActivity extends BaseActivity {
                                                 }
                                             });
                                             builder.create().show();
-                                        } else{
+                                        } else {
                                             downLoadApk(app_download_url);
                                         }
                                     }
                                 });
                                 builder.create().show();
-                            } else{
-                                    MyUtils.showToast(mActivity, "当前已是最新版本");
+                            } else {
+                                MyUtils.showToast(mActivity, "当前已是最新版本");
                             }
 
 
@@ -367,12 +378,12 @@ public class SettingActivity extends BaseActivity {
         new Thread() {
             @Override
             public void run() {
-                try{
+                try {
                     File file = DownLoadManager.getFileFromServer(url, pd);
                     sleep(3000);
                     installApk(file);
                     pd.dismiss(); //结束掉进度条对话框
-                } catch(Exception e) {
+                } catch (Exception e) {
 //                    Toast.makeText(mActivity, "下载失败!",
 //                            Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
@@ -389,21 +400,21 @@ public class SettingActivity extends BaseActivity {
         //执行的数据类型
         //判断是否是AndroidN以及更高的版本
 
-        if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.N) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 
-            Uri contentUri = FileProvider.getUriForFile(mActivity,"com.emjiayuan.app.fileProvider",file);
+            Uri contentUri = FileProvider.getUriForFile(mActivity, "com.emjiayuan.app.fileProvider", file);
 
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-            intent.setDataAndType(contentUri,"application/vnd.android.package-archive");
+            intent.setDataAndType(contentUri, "application/vnd.android.package-archive");
 
-        }else{
+        } else {
 
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-            intent.setDataAndType(Uri.fromFile(file),"application/vnd.android.package-archive");
+            intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
 
         }
         startActivity(intent);

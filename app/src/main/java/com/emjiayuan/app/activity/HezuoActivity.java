@@ -22,7 +22,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
 
-public class EnterpriseActivity extends BaseActivity {
+public class HezuoActivity extends BaseActivity {
     @BindView(R.id.webview)
     WebView webview;
     @BindView(R.id.back)
@@ -45,10 +45,10 @@ public class EnterpriseActivity extends BaseActivity {
     @Override
     protected void initData() {
         back.setVisibility(View.VISIBLE);
-        title.setText("企业介绍");
+        title.setText("商务合作");
 //        http://sq.emjiayuan.com/#/Home?userid=1&token=abc&app=1
 //        url = "https://www.emjiayuan.com/about/company.html";
-        url = "https://h5.emjiayuan.com/Public/app/about/company.html";
+        url = "https://h5.emjiayuan.com/Public/app/business/index.html";
         MyUtils.e("===url===", url);
         webview.loadUrl(url);
 //        webview.loadUrl("https://www.baidu.com");
