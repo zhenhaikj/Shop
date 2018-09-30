@@ -85,14 +85,14 @@
                                 <TextView
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:text="超级会员"
+                                    android:text="会员权益"
                                     android:textColor="@color/white"
                                     android:textSize="15sp" />
 
                                 <TextView
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:text="更多会员权益"
+                                    android:text="点击了解更多"
                                     android:textColor="@color/white"
                                     android:textSize="12sp" />
                             </LinearLayout>

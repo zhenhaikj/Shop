@@ -40,7 +40,7 @@
             android:id="@+id/name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:singleLine="true"
+            android:lines="2"
             android:text="伊穆家园 甄选 纯大料 整箱15斤"
             android:textColor="@color/black"
             android:layout_margin="5dp"

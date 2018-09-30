@@ -22,14 +22,17 @@ import com.emjiayuan.app.BaseActivity;
 import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
+import com.emjiayuan.app.adapter.CarGoodsAdapter;
 import com.emjiayuan.app.adapter.ShoppingCarAdapter2;
 import com.emjiayuan.app.entity.CarBean;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.OrderComfirm;
+import com.emjiayuan.app.entity.Product;
 import com.emjiayuan.app.event.CarUpdateEvent;
 import com.emjiayuan.app.fragment.ShoppingCar.ShoppingCarFragment2;
+import com.emjiayuan.app.widget.MyGridView;
+import com.emjiayuan.app.widget.MyStateFrameLayout;
 import com.google.gson.Gson;
-import com.lwkandroid.stateframelayout.StateFrameLayout;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
@@ -72,7 +75,7 @@ public class ShoppingCarActivity extends BaseActivity implements View.OnClickLis
     @BindView(R.id.order)
     TextView order;
     @BindView(R.id.stateLayout)
-    StateFrameLayout stateLayout;
+    MyStateFrameLayout stateLayout;
     @BindView(R.id.back)
     LinearLayout back;
     @BindView(R.id.refreshLayout)
@@ -81,6 +84,7 @@ public class ShoppingCarActivity extends BaseActivity implements View.OnClickLis
     LinearLayout checkLl;
     private ShoppingCarAdapter2 adapter;
     private ArrayList<CarBean> carBeanList;
+    private ArrayList<Product> productCarlist;
     public List<CarBean> selectList = new ArrayList<>();
     //监听来源
     public boolean mIsFromItem = false;
@@ -302,14 +306,42 @@ public class ShoppingCarActivity extends BaseActivity implements View.OnClickLis
                 break;
         }
     }
+    public void getProductCarList() {
+        FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
+        formBody.add("userid", Global.loginResult.getId());
+        formBody.add("provinceid",Global.provinceid);
+        Log.d("------参数------", formBody.build().toString());
+//new call
+        Call call = MyOkHttp.GetCall("cart.getProductCartList", formBody);
+//请求加入调度
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("------------", e.toString());
+//                        myHandler.sendEmptyMessage(1);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String result = response.body().string();
+                MyUtils.e("------获取推荐产品结果------", result);
+                Message message = new Message();
+                message.what = 3;
+                Bundle bundle = new Bundle();
+                bundle.putString("result", result);
+                message.setData(bundle);
+                myHandler.sendMessage(message);
+            }
+        });
+    }
 
     public void reqCarList() {
         if (!checkNetwork()) {
-            stateLayout.changeState(StateFrameLayout.NET_ERROR);
+            stateLayout.changeState(MyStateFrameLayout.NET_ERROR);
             return;
         }
         if (flag) {
-            stateLayout.changeState(StateFrameLayout.LOADING);
+            stateLayout.changeState(MyStateFrameLayout.LOADING);
         }
         checkAll.setChecked(false);
         selectList.clear();
@@ -378,10 +410,10 @@ public class ShoppingCarActivity extends BaseActivity implements View.OnClickLis
 
     public void deleteCar(String cartid, final int position) {
         if (!checkNetwork()) {
-            stateLayout.changeState(StateFrameLayout.NET_ERROR);
+            stateLayout.changeState(MyStateFrameLayout.NET_ERROR);
             return;
         }
-//        stateLayout.changeState(StateFrameLayout.LOADING);
+//        stateLayout.changeState(MyStateFrameLayout.LOADING);
         FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
         if (Global.loginResult == null) {
             startActivity(new Intent(mActivity, LoginActivity.class));
@@ -439,10 +471,14 @@ public class ShoppingCarActivity extends BaseActivity implements View.OnClickLis
                                 carBeanList.add(gson.fromJson(dataArray.getJSONObject(i).toString(), CarBean.class));
                             }
                             if (carBeanList.size() == 0) {
-                                stateLayout.changeState(StateFrameLayout.EMPTY);
+                                stateLayout.changeState(MyStateFrameLayout.EMPTY);
+                                if (stateLayout.mEmptyView!=null){
+                                    getProductCarList();
+
+                                }
                                 return;
                             } else {
-                                stateLayout.changeState(StateFrameLayout.SUCCESS);
+                                stateLayout.changeState(MyStateFrameLayout.SUCCESS);
                             }
                             adapter = new ShoppingCarAdapter2(mActivity, carBeanList, lvGoods, new ShoppingCarFragment2.AllCheckListener() {
                                 @Override
@@ -476,7 +512,7 @@ public class ShoppingCarActivity extends BaseActivity implements View.OnClickLis
                         String data = jsonObject.getString("data");
                         Gson gson = new Gson();
                         if ("200".equals(code)) {
-                            stateLayout.changeState(StateFrameLayout.SUCCESS);
+                            stateLayout.changeState(MyStateFrameLayout.SUCCESS);
                             MyUtils.showToast(mActivity, message);
                             reqCarList();
                         } else {
@@ -502,6 +538,40 @@ public class ShoppingCarActivity extends BaseActivity implements View.OnClickLis
                             startActivity(intent);
                         } else {
                             MyUtils.showToast(mActivity, result);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case 3:
+                    try {
+                        JSONObject jsonObject = new JSONObject(result);
+                        String code = jsonObject.getString("code");
+                        String message = jsonObject.getString("message");
+                        String data = jsonObject.getString("data");
+                        Gson gson = new Gson();
+                        if ("200".equals(code)) {
+                            JSONArray dataArray = new JSONArray(data);
+                            productCarlist= new ArrayList<>();
+                            for (int i = 0; i < dataArray.length(); i++) {
+                                productCarlist.add(gson.fromJson(dataArray.getJSONObject(i).toString(), Product.class));
+                            }
+                            MyGridView gridView=stateLayout.mEmptyView.findViewById(R.id.gv_guest);
+                            CarGoodsAdapter adapter=new CarGoodsAdapter(mActivity,productCarlist);
+                            gridView.setAdapter(adapter);
+                            gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                    if (!MyUtils.isFastClick()){
+                                        return;
+                                    }
+                                    Intent intent=new Intent(mActivity,GoodsDetailActivity.class);
+                                    intent.putExtra("productid",productCarlist.get(position).getId());
+                                    startActivity(intent);
+                                }
+                            });
+                        } else {
+                            MyUtils.showToast(mActivity, message);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

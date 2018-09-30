@@ -45,23 +45,19 @@
                 android:textColor="#333333"
                 android:text="圈子" />
 
-            <TextView
-                android:id="@+id/center_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_alignParentRight="true"
                 android:layout_marginRight="10dp"
                 android:layout_centerVertical="true"
-                android:gravity="center"
-                android:text="个人中心"
-                android:visibility="gone"
-                android:textColor="#808080"/>
+                android:src="@drawable/message" />
         </RelativeLayout>
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/line_color"/>
-        <com.tencent.smtt.sdk.WebView
+        <WebView
             android:id="@+id/webview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>

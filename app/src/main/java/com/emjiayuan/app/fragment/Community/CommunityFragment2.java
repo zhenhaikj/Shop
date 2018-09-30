@@ -8,13 +8,13 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.event.UpdateEvent;
 import com.emjiayuan.app.fragment.BaseLazyFragment;
-import com.emjiayuan.app.widget.MyChromeClient;
 import com.gyf.barlibrary.ImmersionBar;
 import com.tencent.smtt.export.external.interfaces.JsResult;
 import com.tencent.smtt.sdk.ValueCallback;
@@ -26,15 +26,11 @@ import com.tencent.smtt.sdk.WebViewClient;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import butterknife.BindView;
 import me.iwf.photopicker.PhotoPicker;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
-import static com.emjiayuan.app.widget.MyChromeClient.FILECHOOSER_RESULTCODE;
 
 
 public class CommunityFragment2 extends BaseLazyFragment implements View.OnClickListener, AdapterView.OnItemClickListener {
@@ -46,10 +42,14 @@ public class CommunityFragment2 extends BaseLazyFragment implements View.OnClick
     LinearLayout back;
     @BindView(R.id.txt_content)
     RelativeLayout txtContent;
+    @BindView(R.id.title)
+    TextView title;
+    @BindView(R.id.center_tv)
+    TextView centerTv;
     //    private ValueCallback mUploadMessage;
     private ValueCallback<Uri> uploadFile;
     private ValueCallback<Uri[]> uploadFiles;
-    private String url="";
+    private String url = "";
 
 
     @Override
@@ -70,9 +70,10 @@ public class CommunityFragment2 extends BaseLazyFragment implements View.OnClick
 
     @Override
     protected void initData() {
+        centerTv.setVisibility(View.VISIBLE);
 //        http://sq.emjiayuan.com/#/Home?userid=1&token=abc&app=1
-        url="http://sq.emjiayuan.com/#/Home?userid="+ Global.loginResult.getId()+"&token="+ MyUtils.md5(Global.loginResult.getId()+"webkey")+"&app=1";
-        MyUtils.e("===url===",url);
+        url = "http://sq.emjiayuan.com/#/Home?userid=" + Global.loginResult.getId() + "&token=" + MyUtils.md5(Global.loginResult.getId() + "webkey") + "&app=1";
+        MyUtils.e("===url===", url);
         webview.loadUrl(url);
 //        webview.loadUrl("https://www.baidu.com");
         WebSettings webSettings = webview.getSettings();
@@ -105,9 +106,9 @@ public class CommunityFragment2 extends BaseLazyFragment implements View.OnClick
             }
 
             // For Android  >= 5.0
-            public boolean onShowFileChooser(com.tencent.smtt.sdk.WebView webView,
+            public boolean onShowFileChooser(WebView webView,
                                              ValueCallback<Uri[]> filePathCallback,
-                                             WebChromeClient.FileChooserParams fileChooserParams) {
+                                             FileChooserParams fileChooserParams) {
 //                Log.i("test", "openFileChooser 4:" + filePathCallback.toString());
                 CommunityFragment2.this.uploadFiles = filePathCallback;
                 openFileChooseProcess();
@@ -135,12 +136,13 @@ public class CommunityFragment2 extends BaseLazyFragment implements View.OnClick
                 view.loadUrl(url);
                 return true;
             }
+
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                if (webview.canGoBack()){
+                if (webview.canGoBack()) {
                     back.setVisibility(View.VISIBLE);
-                }else{
+                } else {
                     back.setVisibility(View.GONE);
                 }
             }
@@ -203,6 +205,7 @@ public class CommunityFragment2 extends BaseLazyFragment implements View.OnClick
 //            progressBar.setProgress(newProgress);
         }
     };
+
     @Override
     protected boolean isLazyLoad() {
         return true;

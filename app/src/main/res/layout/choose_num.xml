@@ -44,6 +44,30 @@
                     android:text="¥112.00"
                     android:textColor="#C43947"
                     android:textSize="16sp"/>
+                <LinearLayout
+                    android:id="@+id/minusprice_ll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="立减"
+                        android:background="#F2D27B"
+                        android:paddingLeft="2dp"
+                        android:paddingRight="2dp"
+                        android:layout_marginRight="5dp"
+                        android:textColor="#ffffff"
+                        android:textSize="14sp"/>
+                    <TextView
+                        android:id="@+id/minusprice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="¥112.00"
+                        android:textColor="#C43947"
+                        android:textSize="12sp"/>
+                </LinearLayout>
                 <TextView
                     android:id="@+id/kc"
                     android:layout_width="wrap_content"

@@ -18,7 +18,7 @@ import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.Utils.SpUtils;
-import com.emjiayuan.app.adapter.CollectionAdapter;
+import com.emjiayuan.app.adapter.HistoryJlAdapter;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.Product;
 import com.emjiayuan.app.event.ColUpdateEvent;
@@ -68,7 +68,7 @@ public class HistoryActivity extends BaseActivity implements View.OnClickListene
     View lineTop;
     @BindView(R.id.stateLayout)
     StateFrameLayout stateLayout;
-    private CollectionAdapter adapter;
+    private HistoryJlAdapter adapter;
     private ArrayList<Product> list = new ArrayList<>();
     private boolean mIsFromItem = false;
     private ArrayList<Product> selectList = new ArrayList<>();
@@ -76,7 +76,7 @@ public class HistoryActivity extends BaseActivity implements View.OnClickListene
 
     @Override
     protected int setLayoutId() {
-        return R.layout.activity_collection;
+        return R.layout.activity_history;
     }
 
     @Override
@@ -97,7 +97,7 @@ public class HistoryActivity extends BaseActivity implements View.OnClickListene
         }else{
             stateLayout.changeState(StateFrameLayout.EMPTY);
         }
-        adapter = new CollectionAdapter(mActivity, list, new ShoppingCarFragment2.AllCheckListener() {
+        adapter = new HistoryJlAdapter(mActivity, list, new ShoppingCarFragment2.AllCheckListener() {
             @Override
             public void onCheckedChanged(boolean b) {
                 //根据不同的情况对maincheckbox做处理
@@ -210,7 +210,7 @@ public class HistoryActivity extends BaseActivity implements View.OnClickListene
                             }else{
                                 stateLayout.changeState(StateFrameLayout.EMPTY);
                             }
-                            adapter = new CollectionAdapter(mActivity, list, new ShoppingCarFragment2.AllCheckListener() {
+                            adapter = new HistoryJlAdapter(mActivity, list, new ShoppingCarFragment2.AllCheckListener() {
                                 @Override
                                 public void onCheckedChanged(boolean b) {
                                     //根据不同的情况对maincheckbox做处理

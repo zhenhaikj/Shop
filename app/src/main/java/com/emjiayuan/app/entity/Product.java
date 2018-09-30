@@ -96,6 +96,7 @@ public class Product implements Serializable{
     private String linkid;
     private String createdate;
     private String minprice;
+    private String minusprice;
     private boolean checked;
     /**
      * recommend : null
@@ -112,6 +113,23 @@ public class Product implements Serializable{
     private PromotioninfoBean promotioninfo;
     private int isbuy;
     private List<Product> style_list;
+    private List<LevelListBean> level_list;
+
+    public String getMinusprice() {
+        return minusprice;
+    }
+
+    public void setMinusprice(String minusprice) {
+        this.minusprice = minusprice;
+    }
+
+    public List<LevelListBean> getLevel_list() {
+        return level_list;
+    }
+
+    public void setLevel_list(List<LevelListBean> level_list) {
+        this.level_list = level_list;
+    }
 
     public String getMinprice() {
         return minprice;
@@ -640,5 +658,60 @@ public class Product implements Serializable{
             this.enddate = enddate;
         }
     }
+    public static class LevelListBean {
+        private String level_id;
+        private String level_name;
+        private String level_price;
+        private String level_discount;
+        private String level_discount_again;
+        private String level_use;
 
+        public String getLevel_id() {
+            return level_id;
+        }
+
+        public void setLevel_id(String level_id) {
+            this.level_id = level_id;
+        }
+
+        public String getLevel_name() {
+            return level_name;
+        }
+
+        public void setLevel_name(String level_name) {
+            this.level_name = level_name;
+        }
+
+        public String getLevel_price() {
+            return level_price;
+        }
+
+        public void setLevel_price(String level_price) {
+            this.level_price = level_price;
+        }
+
+        public String getLevel_discount() {
+            return level_discount;
+        }
+
+        public void setLevel_discount(String level_discount) {
+            this.level_discount = level_discount;
+        }
+
+        public String getLevel_discount_again() {
+            return level_discount_again;
+        }
+
+        public void setLevel_discount_again(String level_discount_again) {
+            this.level_discount_again = level_discount_again;
+        }
+
+        public String getLevel_use() {
+            return level_use;
+        }
+
+        public void setLevel_use(String level_use) {
+            this.level_use = level_use;
+        }
+    }
 }

@@ -60,6 +60,7 @@ public class IntegralYlAdapter extends BaseAdapter {
             holder.name = (TextView) convertView.findViewById(R.id.name);
             holder.yh = (TextView) convertView.findViewById(R.id.yh);
             holder.bg_ll =  convertView.findViewById(R.id.bg_ll);
+            holder.hyj =  convertView.findViewById(R.id.hyj);
             convertView.setTag(holder);
         } else {// 如果之前已经显示过该页面，则用viewholder中的缓存直接刷屏
             holder = (ViewHolder) convertView.getTag();
@@ -77,6 +78,7 @@ public class IntegralYlAdapter extends BaseAdapter {
         }else{
             holder.bg_ll.setVisibility(View.GONE);
         }
+        holder.hyj.setVisibility(View.GONE);
         return convertView;
     }
 
@@ -84,6 +86,7 @@ public class IntegralYlAdapter extends BaseAdapter {
         public ImageView icon;
         public TextView name;
         public TextView yh;
+        public TextView hyj;
         public LinearLayout bg_ll;
 
     }

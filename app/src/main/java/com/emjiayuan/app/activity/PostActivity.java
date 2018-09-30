@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
+import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -638,7 +639,7 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
         if(requestCode==222){
             if (resultCode==102){
                 FilePath=data.getStringExtra("videopath");
-                select.add(new Media(FilePath,"",0,0,0,0,""));
+                select.add(new Media(FilePath,"",0,3,0,0,""));
                 ArrayList<String> list=new ArrayList<>();
                 Log.i("select","select.size"+select.size());
                 for(Media media:select){
@@ -852,12 +853,12 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
     private boolean requestPermissions(){
         if (Build.VERSION.SDK_INT >= 23) {
             permissions = new ArrayList<>();
-//            if (mActivity.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-//                permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-//            }
-//            if (mActivity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-//                permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-//            }
+            if (mActivity.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+            }
+            if (mActivity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            }
             if (mActivity.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 permissions.add(Manifest.permission.CAMERA);
             }
@@ -889,7 +890,7 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
                 }
                 break;
             case 10001:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED&&grantResults[1]==PackageManager.PERMISSION_GRANTED) {//允许
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED&&grantResults[1]==PackageManager.PERMISSION_GRANTED&&grantResults[2]==PackageManager.PERMISSION_GRANTED&&grantResults[3]==PackageManager.PERMISSION_GRANTED) {//允许
                     Intent intent = new Intent();
                     switch (addType){
                         case 0:
@@ -938,7 +939,7 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
                             break;
                     }
                 } else {//拒绝
-                    MyUtils.showToast(mActivity, "相机或录音权限未开启");
+                    MyUtils.showToast(mActivity, "相关权限未开启");
                 }
                 break;
             default:
@@ -966,20 +967,24 @@ public class PostActivity extends BaseActivity implements AdapterView.OnItemClic
                             intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
                             intent.addCategory(Intent.CATEGORY_DEFAULT);
                             String f = System.currentTimeMillis()+".jpg";
+                            String fileDir=Environment.getExternalStorageDirectory().getAbsolutePath()+"/ymjy";
                             FilePath=Environment.getExternalStorageDirectory().getAbsolutePath()+"/ymjy/"+f;
-                            File file=new File(FilePath);
+                            File dirfile=new File(fileDir);
 //                        File dir=new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/ymjy");
 //                        if (!dir.exists()){
 //                            dir.mkdir();
 //                        }
-                            if (!file.exists()){
-                                try {
-                                    file.createNewFile();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+                            if (!dirfile.exists()){
+                                dirfile.mkdirs();
                             }
-                            Uri fileUri = Uri.fromFile(file);
+                            File file=new File(FilePath);
+                            Uri fileUri;
+                            if (Build.VERSION.SDK_INT >= 24) {
+                                fileUri = FileProvider.getUriForFile(mActivity,"com.emjiayuan.app.fileProvider", file);
+                            } else {
+                                fileUri = Uri.fromFile(file);
+                            }
+
                             intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
                             startActivityForResult(intent, 0);
                             break;

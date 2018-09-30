@@ -854,7 +854,7 @@ public class PostsAdapter extends BaseAdapter implements AbsListView.OnScrollLis
 
     class ViewHolder {
         @BindView(R.id.icon)
-        CircleImageView icon;
+        ImageView icon;
         @BindView(R.id.username)
         TextView username;
         @BindView(R.id.views)
@@ -912,7 +912,7 @@ public class PostsAdapter extends BaseAdapter implements AbsListView.OnScrollLis
         @BindView(R.id.ll_post)
         LinearLayout llPost;
         @BindView(R.id.icongg)
-        CircleImageView icongg;
+        ImageView icongg;
         @BindView(R.id.usernamegg)
         TextView usernamegg;
         @BindView(R.id.timegg)

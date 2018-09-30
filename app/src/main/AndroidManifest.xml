@@ -255,7 +255,6 @@
             android:theme="@style/FullScreen"></activity>
         <activity android:name=".activity.CustomImagePreviewActivity"
             android:windowSoftInputMode="stateHidden"
-            android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"></activity>
         //图片选择器
         <activity android:name="me.iwf.photopicker.PhotoPickerActivity"

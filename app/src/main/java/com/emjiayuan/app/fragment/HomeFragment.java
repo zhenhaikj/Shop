@@ -45,6 +45,7 @@ import com.emjiayuan.app.Utils.DownLoadManager;
 import com.emjiayuan.app.Utils.GlideUtil;
 import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
+import com.emjiayuan.app.Utils.SpUtils;
 import com.emjiayuan.app.activity.AllGoodsActivity;
 import com.emjiayuan.app.activity.CityActivity;
 import com.emjiayuan.app.activity.CouponGetActivity;
@@ -260,6 +261,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                     startActivity(intent);
                 } else if ("3".equals(item.getType())) {
                     Intent intent = new Intent(mActivity, SecondsKillActivity2.class);
+                    intent.putExtra("seckillid", item.getLinkid());
                     startActivity(intent);
                 }
             }
@@ -278,6 +280,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                     startActivity(intent);
                 } else if ("3".equals(item.getType())) {
                     Intent intent = new Intent(mActivity, SecondsKillActivity2.class);
+                    intent.putExtra("seckillid", item.getLinkid());
                     startActivity(intent);
                 }
             }
@@ -296,6 +299,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                     startActivity(intent);
                 } else if ("3".equals(item.getType())) {
                     Intent intent = new Intent(mActivity, SecondsKillActivity2.class);
+                    intent.putExtra("seckillid", item.getLinkid());
                     startActivity(intent);
                 }
             }
@@ -685,7 +689,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
 //                        return;
 //                    }
                     intent = new Intent(getActivity(), SecondsKillActivity2.class);
-//                intent.putExtra("product",Global.list.get(i));
+                    intent.putExtra("seckillid",seckillBean.getId());
                     startActivity(intent);
                     break;
                 case R.id.tejia_more_ll://今日特价
@@ -1073,6 +1077,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                             gg_ll.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
+                                    SpUtils.putString(mActivity,"bannerid",bannerItem.getId());
                                     if ("1".equals(bannerItem.getType())) {
                                         Intent intent = new Intent(mActivity, GoodsDetailActivity.class);
                                         intent.putExtra("productid", bannerItem.getLinkid());
@@ -1083,6 +1088,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                                         startActivity(intent);
                                     } else if ("3".equals(bannerItem.getType())) {
                                         Intent intent = new Intent(mActivity, SecondsKillActivity2.class);
+                                        intent.putExtra("seckillid", bannerItem.getLinkid());
                                         startActivity(intent);
                                     }
                                     dialog.dismiss();
@@ -1094,7 +1100,9 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                                     dialog.dismiss();
                                 }
                             });
-                            dialog.show();
+                            if(!SpUtils.getString(mActivity,"bannerid").equals(bannerItem.getId())){
+                                dialog.show();
+                            }
                         } else {
                             MyUtils.showToast(mActivity, message);
                         }

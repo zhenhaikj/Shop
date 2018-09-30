@@ -157,7 +157,7 @@ public class VipActivity extends BaseActivity implements View.OnClickListener {
                             int currentItem = viewPager.getCurrentItem();
                             levelid=vipList.get(currentItem).getId();
                             if (Integer.parseInt(levelid)<=now_id){
-                                MyUtils.showToast(mActivity,"请选择更高的等级来升级！");
+//                                MyUtils.showToast(mActivity,"请选择更高的等级来升级！");
                                 break;
                             }
                             showPopupWindow();
@@ -245,14 +245,18 @@ public class VipActivity extends BaseActivity implements View.OnClickListener {
         Glide.with(mActivity).load(user.getHeadimg()).apply(options).into(tx);
 //        Glide.with(mActivity).load(user.getHeadimg()).apply(RequestOptions.circleCropTransform()).into(tx);
         username.setText(user.getShowname());
-        now.setText("当前等级："+user.getClassname());
+        now.setText(user.getClassname());
         if ("Vip普通会员".equals(user.getClassname())){
             period.setText("会员截止日期：永久");
         }else{
             period.setText("会员截止日期："+user.getViptime());
         }
-
-        rights.setText("享受权益：购物享受" + Double.parseDouble(user.getDiscount())/10 + "折");
+        if (Double.parseDouble(user.getDiscount())/10==10.0){
+            rights.setText("购物无折扣");
+        }else{
+            rights.setText("购物享受"+Double.parseDouble(user.getDiscount())/10+"折");
+        }
+//        rights.setText("购物享受" + Double.parseDouble(user.getDiscount())/10 + "折");
         int class_id=Integer.parseInt(user.getClass_id());
         int buy_class_id=Integer.parseInt(user.getBuy_class_id());
         now_id=class_id>buy_class_id?class_id:buy_class_id;
@@ -331,12 +335,20 @@ public class VipActivity extends BaseActivity implements View.OnClickListener {
                                 Glide.with(mActivity).load(vip.getBackground()).into(bg);
                                 if (now_id==Integer.parseInt(vip.getId())){
                                     join.setText("当前等级");
+                                }else{
+                                    join.setText("开通会员");
                                 }
-                                join.getBackground().setAlpha(60);
+                                join.setVisibility(Integer.parseInt(vip.getId())<=now_id?View.GONE:View.VISIBLE);
+                                join.getBackground().setAlpha(160);
 //                                if (user.getClass_id())
                                 classname.setText(vip.getClassname()+"会员");
                                 cost.setText(vip.getCost()+"/年");
-                                content.setText("购物享受"+Double.parseDouble(vip.getDiscount())/10+"折");
+//                                if (Double.parseDouble(vip.getDiscount())/10==10){
+//                                    content.setText("购物无折扣");
+//                                }else{
+                                    content.setText("购物享受"+Double.parseDouble(vip.getDiscount())/10+"折");
+//                                }
+
                                 viewList.add(view);
                                 initViewPager();
 

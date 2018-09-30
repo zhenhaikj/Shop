@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:descendantFocusability="blocksDescendants"
     android:focusableInTouchMode="true"
     android:focusable="true"
@@ -24,12 +25,12 @@
             android:gravity="bottom|right"
             android:background="@color/black"
             android:orientation="vertical">
-            <ImageView
+            <com.emjiayuan.app.widget.RatioImageView
                 android:id="@+id/sold_out"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_margin="10dp"
-                android:src="@drawable/sold_out"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:src="@drawable/sold_out_2"
+                app:ratio="1.675"
                 android:scaleType="fitXY"/>
         </LinearLayout>
     </FrameLayout>

@@ -85,7 +85,7 @@ public class PostDetailActivity extends BaseActivity implements AdapterView.OnIt
     @BindView(R.id.line_top)
     View lineTop;
     @BindView(R.id.icon)
-    CircleImageView icon;
+    ImageView icon;
     @BindView(R.id.username)
     TextView username;
     @BindView(R.id.content)

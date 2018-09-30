@@ -1,5 +1,7 @@
 package com.emjiayuan.app.activity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -15,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -30,12 +33,14 @@ import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.Utils.SpUtils;
 import com.emjiayuan.app.adapter.CommentAdapter;
+import com.emjiayuan.app.adapter.VipPriceAdapter;
 import com.emjiayuan.app.entity.Comment;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.OrderComfirm;
 import com.emjiayuan.app.entity.Product;
 import com.emjiayuan.app.entity.SeckillBean;
 import com.emjiayuan.app.imageloader.GlideImageLoader;
+import com.emjiayuan.app.widget.MyGridView;
 import com.emjiayuan.app.widget.MyListView;
 import com.google.gson.Gson;
 import com.lwkandroid.stateframelayout.StateFrameLayout;
@@ -145,10 +150,14 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
     StateFrameLayout stateLayoutPl;
     @BindView(R.id.webview)
     WebView webview;
-    @BindView(R.id.hyj)
-    TextView hyj;
     @BindView(R.id.hyj_ll)
     LinearLayout hyjLl;
+    @BindView(R.id.vipGrid)
+    MyGridView vipGrid;
+    @BindView(R.id.hy_ll)
+    LinearLayout hyLl;
+    @BindView(R.id.vip_go)
+    TextView vipGo;
 
     private Product product;
     private PopupWindow popupWindow;
@@ -264,9 +273,11 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
             xl.setText("限量" + bean.getLimitnumX() + "件");
             remain.setText("剩" + bean.getStock() + "件");
             if ("0".equals(bean.getStock())) {
+                buy.setText("已售罄");
                 buy.setBackgroundColor(Color.parseColor("#9FA0A0"));
                 buy.setEnabled(false);
             } else {
+                buy.setText("立即抢购");
                 buy.setBackgroundColor(Color.parseColor("#B02520"));
                 buy.setEnabled(true);
             }
@@ -307,16 +318,39 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
             price.setText("¥" + product.getPrice());
 //            price.setText(Html.fromHtml("<small>¥ </small><big><big>"+product.getPrice().substring(0,product.getPrice().indexOf("."))+"</big></big><small>"+product.getPrice().substring(product.getPrice().indexOf("."),product.getPrice().length())+"</small>"));
             old_price.setText("¥" + product.getPreprice());
+            vipGrid.setAdapter(new VipPriceAdapter(mActivity, product.getLevel_list()));
+            vipGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    new AlertDialog.Builder(mActivity).setMessage("去了解更多会员权益？").setPositiveButton("去看看", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            startActivity(new Intent(mActivity,VipActivity.class));
+                        }
+                    }).setNegativeButton("取消",null).create().show();
+                }
+            });
         }
         name.setText(product.getName());
-        hyj.setText("会员价¥"+product.getMinprice());
-        hyjLl.setOnClickListener(new View.OnClickListener() {
+//        hyj.setText("会员价¥" + product.getMinprice());
+        vipGo.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
+        vipGo.getPaint().setAntiAlias(true);
+        vipGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(mActivity,VipActivity.class));
+                startActivity(new Intent(mActivity, VipActivity.class));
             }
         });
         kc.setText("库存：" + product.getTotalnum());
+        if ("0".equals(product.getTotalnum())) {
+            buy.setText("已售罄");
+            buy.setBackgroundColor(Color.parseColor("#9FA0A0"));
+            buy.setEnabled(false);
+        } else {
+            buy.setText("立即购买");
+            buy.setBackgroundColor(Color.parseColor("#B02520"));
+            buy.setEnabled(true);
+        }
         ys.setText("已售：" + product.getSellnum());
         cd.setText("产地：" + product.getSource());
         zs.setText("赠" + product.getJifen() + "积分");
@@ -799,7 +833,11 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
         TextView xg = view.findViewById(R.id.xg);
         LabelsView labelsView = view.findViewById(R.id.labels);
         LinearLayout gg_ll = view.findViewById(R.id.gg_ll);
+        LinearLayout minusprice_ll = view.findViewById(R.id.minusprice_ll);
+        final TextView minusprice = view.findViewById(R.id.minusprice);
         View gg_line = view.findViewById(R.id.gg_line);
+        minusprice_ll.setVisibility(flag||"0".equals(product.getMinusprice()) ? View.GONE : View.VISIBLE);
+        minusprice.setText("¥"+product.getMinusprice());
         gg_line.setVisibility(product.getStyle_list() == null ? View.GONE : View.VISIBLE);
         gg_ll.setVisibility(product.getStyle_list() == null ? View.GONE : View.VISIBLE);
         xg.setVisibility(View.GONE);
@@ -835,6 +873,7 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
                         price.setText("¥" + product.getPrice());
                         preprice.setText("原价¥" + product.getPreprice());
                         kc.setText("库存" + product.getTotalnum() + "件");
+                        minusprice.setText("¥"+product.getMinusprice());
                     }
                 }
             });

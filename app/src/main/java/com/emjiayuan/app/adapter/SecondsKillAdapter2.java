@@ -19,6 +19,7 @@ import com.emjiayuan.app.activity.GoodsDetailActivity;
 import com.emjiayuan.app.entity.SeckillBean;
 import com.emjiayuan.app.entity.SeckillBean.ProductListBean;
 import com.emjiayuan.app.widget.MyImageView;
+import com.emjiayuan.app.widget.RatioImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,12 +91,18 @@ public class SecondsKillAdapter2 extends BaseAdapter {
         if ("0".equals(seckillBean.getStatus())) {
             holder.second_kill_btn.setText("即将开秒");
             holder.xl.setText("限量" + item.getLimit_num() + "件");
+            holder.second_kill_btn.setBackgroundResource(R.drawable.kill_shape2);
+            holder.second_kill_btn.setEnabled(false);
         } else if ("1".equals(seckillBean.getStatus())) {
             holder.second_kill_btn.setText("立即抢购");
             holder.xl.setText("仅剩" + item.getKucun() + "件");
+            holder.second_kill_btn.setBackgroundResource(R.drawable.kill_shape1);
+            holder.second_kill_btn.setEnabled(true);
         } else if ("2".equals(seckillBean.getStatus())) {
             holder.second_kill_btn.setText("已结束");
             holder.xl.setText("仅剩" + item.getKucun() + "件");
+            holder.second_kill_btn.setBackgroundResource(R.drawable.kill_shape2);
+            holder.second_kill_btn.setEnabled(false);
         }
 
         holder.second_kill_btn.setOnClickListener(new View.OnClickListener() {
@@ -116,15 +123,15 @@ public class SecondsKillAdapter2 extends BaseAdapter {
         });
 
         holder.zs.setText("优惠" + yh + "元");
-        if (!"0".equals(item.getKucun())) {
+        if ("0".equals(item.getKucun())) {
             holder.bg_ll.setVisibility(View.VISIBLE);
             holder.bg_ll.getBackground().setAlpha(100);
             holder.second_kill_btn.setBackgroundResource(R.drawable.kill_shape2);
             holder.second_kill_btn.setEnabled(false);
         } else {
             holder.bg_ll.setVisibility(View.GONE);
-            holder.second_kill_btn.setBackgroundResource(R.drawable.kill_shape1);
-            holder.second_kill_btn.setEnabled(true);
+//            holder.second_kill_btn.setBackgroundResource(R.drawable.kill_shape1);
+//            holder.second_kill_btn.setEnabled(true);
         }
         return convertView;
     }
@@ -133,7 +140,7 @@ public class SecondsKillAdapter2 extends BaseAdapter {
         @BindView(R.id.image)
         MyImageView icon;
         @BindView(R.id.sold_out)
-        ImageView soldOut;
+        RatioImageView soldOut;
         @BindView(R.id.bg_ll)
         LinearLayout bg_ll;
         @BindView(R.id.name)

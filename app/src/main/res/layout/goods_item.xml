@@ -58,6 +58,15 @@
             android:text="¥78"
             android:textSize="14sp"
             android:textColor="@color/red"/>
-
+    <TextView
+        android:id="@+id/hyj"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="会员价¥78起"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:background="@drawable/hyj_shape"
+        android:textSize="11sp"
+        android:textColor="@color/white"/>
 
 </LinearLayout>

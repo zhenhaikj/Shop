@@ -1,18 +1,17 @@
 package com.emjiayuan.app.fragment.Community;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,7 +22,6 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.GlideUtil;
 import com.emjiayuan.app.Utils.MyOkHttp;
@@ -55,8 +53,6 @@ import com.emjiayuan.app.widget.MyGridView;
 import com.emjiayuan.app.widget.MyListView;
 import com.google.gson.Gson;
 import com.gyf.barlibrary.ImmersionBar;
-import com.previewlibrary.view.DownLoadImage;
-import com.previewlibrary.view.ImageDownLoadCallBack;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
@@ -67,7 +63,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -92,7 +87,7 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
     @BindView(R.id.username)
     TextView username;
     @BindView(R.id.profile_image)
-    CircleImageView profileImage;
+    ImageView profileImage;
     @BindView(R.id.gv_label)
     MyGridView gvLabel;
     @BindView(R.id.lv_post)
@@ -121,6 +116,10 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
     TextView messageCount;
     @BindView(R.id.ll_message)
     LinearLayout llMessage;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.center_tv)
+    TextView centerTv;
 
     private LabelAdapter labelAdapter;
     private PostsAdapter mAdapter;
@@ -175,7 +174,7 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(RefreshLayout refreshlayout) {
-                if (mAdapter!=null){
+                if (mAdapter != null) {
                     mAdapter.releasePlayer();
                 }
                 list.clear();
@@ -197,7 +196,7 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
         gvLabel.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if (mAdapter!=null){
+                if (mAdapter != null) {
                     mAdapter.releasePlayer();
                 }
                 JZVideoPlayer.releaseAllVideos();
@@ -222,7 +221,10 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (true){
+                while (true) {
+                    if (Global.loginResult==null){
+                        return;
+                    }
                     getWeiboMessage();
                     try {
                         sleep(10000);
@@ -303,6 +305,7 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
             }
         });
     }
+
     /**
      * 帖子类型
      */
@@ -367,6 +370,7 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
             }
         });
     }
+
     /**
      * 私信
      */
@@ -454,7 +458,7 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
                                 list.add(gson.fromJson(dataArray.getJSONObject(i).toString(), Post.class));
                             }
                             if (mAdapter == null) {
-                                mAdapter = new PostsAdapter(mActivity, list,false);
+                                mAdapter = new PostsAdapter(mActivity, list, false);
                                 lvPost.setAdapter(mAdapter);
                             } else {
                                 mAdapter.notifyDataSetChanged();
@@ -477,8 +481,8 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
                         String data = jsonObject.getString("data");
                         Gson gson = new Gson();
                         if ("200".equals(code)) {
-                            String bannerimage = jsonObject.has("bannerimage")?jsonObject.getString("bannerimage"):"";
-                            GlideUtil.loadImageViewLoding(mActivity,bannerimage,bg,R.drawable.bg_community,R.drawable.bg_community);
+                            String bannerimage = jsonObject.has("bannerimage") ? jsonObject.getString("bannerimage") : "";
+                            GlideUtil.loadImageViewLoding(mActivity, bannerimage, bg, R.drawable.bg_community, R.drawable.bg_community);
                             JSONArray jsonArray = new JSONArray(data);
                             labels.add(new Label("", "全部消息", "", ""));
                             for (int i = 0; i < jsonArray.length(); i++) {
@@ -503,10 +507,10 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
                         Gson gson = new Gson();
                         if ("200".equals(code)) {
                             JSONObject jsonObject1 = new JSONObject(data);
-                            llMessage.setVisibility("0".equals(jsonObject1.getString("num"))?View.GONE:View.VISIBLE);
-                            messageCount.setText(jsonObject1.getString("num")+"条新消息");
-                            String path=jsonObject1.getJSONObject("user").getString("headimg");
-                            GlideUtil.loadImageViewLoding(mActivity,path,messageIcon,R.drawable.default_tx,R.drawable.default_tx);
+                            llMessage.setVisibility("0".equals(jsonObject1.getString("num")) ? View.GONE : View.VISIBLE);
+                            messageCount.setText(jsonObject1.getString("num") + "条新消息");
+                            String path = jsonObject1.getJSONObject("user").getString("headimg");
+                            GlideUtil.loadImageViewLoding(mActivity, path, messageIcon, R.drawable.default_tx, R.drawable.default_tx);
                         } else {
                             MyUtils.showToast(mActivity, result);
                         }
@@ -563,7 +567,7 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
                         Gson gson = new Gson();
                         if ("200".equals(code)) {
                             post = gson.fromJson(data, Post.class);
-                            list.set(position,post);
+                            list.set(position, post);
                             mAdapter.notifyDataSetChanged();
                         } else {
                             MyUtils.showToast(mActivity, message);
@@ -582,7 +586,8 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
         write.setOnClickListener(this);
         lvPost.setOnItemClickListener(this);
         gvLabel.setOnItemClickListener(this);
-        llMine.setOnClickListener(this);
+//        llMine.setOnClickListener(this);
+        centerTv.setOnClickListener(this);
         llMessage.setOnClickListener(this);
     }
 
@@ -601,7 +606,7 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
                 showPopupWindow();
 //                startActivity(new Intent(getActivity(), PostActivity.class));
                 break;
-            case R.id.ll_mine:
+            case R.id.center_tv:
                 startActivity(new Intent(getActivity(), SqMineActivity.class));
                 break;
             case R.id.ll_message:
@@ -620,23 +625,23 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
 
                 break;
             case R.id.lv_post:
-                if ("1".equals(list.get(i).getIsadv())){
-                    if ("1".equals(list.get(i).getLinktype())){
+                if ("1".equals(list.get(i).getIsadv())) {
+                    if ("1".equals(list.get(i).getLinktype())) {
                         Intent intent = new Intent(getActivity(), GoodsDetailActivity.class);
                         intent.putExtra("productid", list.get(i).getLinkid());
                         startActivity(intent);
-                    }else if ("2".equals(list.get(i).getLinktype())){
+                    } else if ("2".equals(list.get(i).getLinktype())) {
                         Intent intent = new Intent(getActivity(), MessageDetailActivity.class);
                         intent.putExtra("newsid", list.get(i).getLinkid());
                         startActivity(intent);
-                    }else if ("3".equals(list.get(i).getLinktype())){
+                    } else if ("3".equals(list.get(i).getLinktype())) {
                         Intent intent = new Intent(getActivity(), SecondsKillActivity2.class);
-//                        intent.putExtra("productid", list.get(i).getLinkid());
+                        intent.putExtra("seckillid", list.get(i).getLinkid());
                         startActivity(intent);
-                    }else{
+                    } else {
 
                     }
-                }else{
+                } else {
                     Intent intent = new Intent(getActivity(), PostDetailActivity.class);
                     intent.putExtra("weiboid", list.get(i).getId());
                     intent.putExtra("position", i);
@@ -649,31 +654,34 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void Event(UpdateEvent event) {
         list.clear();
-        pageindex=1;
+        pageindex = 1;
         getWeiboList();
     }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void Event(LoginSuccessEvent event) {
         list.clear();
-        pageindex=1;
+        pageindex = 1;
         getWeiboList();
         getWeiboMessage();
         GlideUtil.loadImageViewLoding(mActivity, Global.loginResult.getHeadimg(), profileImage, R.drawable.default_tx, R.drawable.default_tx);
         username.setText(Global.loginResult.getNickname());
     }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void Event(IsReadEvent event) {
         getWeiboMessage();
     }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void Event(ZanEvent event) {
-        position=event.getPosition();
+        position = event.getPosition();
         getWeiboDetail(list.get(position).getId());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void Event(DeletePostEvent event) {
-        position=event.getPosition();
+        position = event.getPosition();
         list.remove(position);
         mAdapter.notifyDataSetChanged();
     }
@@ -683,11 +691,11 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
         final Post post = event.getPost();
         final int commentposition = event.getCommentposition();
         position = event.getPosition();
-        if (commentposition == -1){
+        if (commentposition == -1) {
             etPl.setHint("可以留言哦~");
-        }else if (commentposition==-2){
-            etPl.setHint("私信"+post.getNickname());
-        }else{
+        } else if (commentposition == -2) {
+            etPl.setHint("私信" + post.getNickname());
+        } else {
             bean = post.getReplylist().get(commentposition);
             etPl.setHint("回复" + bean.getNickname() + ":");
         }
@@ -703,10 +711,10 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
                     return;
                 }
                 if (commentposition == -2) {
-                    addWeiboLetter(post.getUserid(),content);
-                } else if (commentposition == -1){
+                    addWeiboLetter(post.getUserid(), content);
+                } else if (commentposition == -1) {
                     addWeiboReply(post.getId(), content, "");
-                }else{
+                } else {
                     addWeiboReply(post.getId(), content, bean.getUserid());
                 }
 
@@ -724,6 +732,7 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
 //        GlideUtil.loadImageViewLoding(mActivity, Global.loginResult.getHeadimg(), profileImage, R.drawable.default_tx, R.drawable.default_tx);
 //        username.setText(Global.loginResult.getNickname());
 //    }
+
     /**
      * 弹出Popupwindow
      */
@@ -738,15 +747,15 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
         pic_ll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(mActivity,PostActivity.class));
+                startActivity(new Intent(mActivity, PostActivity.class));
                 mPopupWindow.dismiss();
             }
         });
         video_ll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(mActivity,PostActivity.class);
-                intent.putExtra("addType",1);
+                Intent intent = new Intent(mActivity, PostActivity.class);
+                intent.putExtra("addType", 1);
                 startActivity(intent);
                 mPopupWindow.dismiss();
             }
@@ -754,7 +763,7 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
         audio_ll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(mActivity,PostAudioActivity.class));
+                startActivity(new Intent(mActivity, PostAudioActivity.class));
                 mPopupWindow.dismiss();
             }
         });
@@ -784,7 +793,7 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
     @Override
     protected void onInvisible() {
         super.onInvisible();
-        if (mAdapter!=null){
+        if (mAdapter != null) {
             mAdapter.releasePlayer();
         }
     }
@@ -792,7 +801,7 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
     @Override
     public void onPause() {
         super.onPause();
-        if (mAdapter!=null){
+        if (mAdapter != null) {
             mAdapter.releasePlayer();
         }
         //Stop polling service

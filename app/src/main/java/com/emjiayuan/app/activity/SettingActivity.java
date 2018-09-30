@@ -434,6 +434,7 @@ public class SettingActivity extends BaseActivity {
                 finish();
                 //登出
                 MobclickAgent.onProfileSignOff();
+                MyUtils.showToast(mActivity,"退出成功！");
             }
         });
         tx.setOnClickListener(new View.OnClickListener() {

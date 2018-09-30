@@ -45,25 +45,50 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/now"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="当前等级：VIP普通会员 "
-                    android:textColor="@color/vip_textcolor"
-                    android:textSize="@dimen/vip_textsize" />
-
-                <TextView
-                    android:id="@+id/rights"
-                    android:layout_width="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="我的等级： "
+                        android:textStyle="bold"
+                        android:textColor="@color/vip_textcolor"
+                        android:textSize="@dimen/vip_textsize" />
+                    <TextView
+                        android:id="@+id/now"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text=" "
+                        android:textColor="@color/vip_textcolor"
+                        android:textSize="@dimen/vip_textsize" />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="享受权益：购物折扣100折 "
-                    android:textColor="@color/vip_textcolor"
-                    android:textSize="@dimen/vip_textsize" />
-
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="我的权益： "
+                        android:textStyle="bold"
+                        android:textColor="@color/vip_textcolor"
+                        android:textSize="@dimen/vip_textsize" />
+                    <TextView
+                        android:id="@+id/rights"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text=" "
+                        android:textColor="@color/vip_textcolor"
+                        android:textSize="@dimen/vip_textsize" />
+                </LinearLayout>
                 <TextView
                     android:id="@+id/period"
                     android:layout_width="wrap_content"
@@ -100,7 +125,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:text="1、购买会员等级，享低价折扣！ "
+                        android:text="1.购买的会员等级，有效期为1年"
                         android:textColor="@color/yhxz"
                         android:textSize="@dimen/yhxz_textsize" />
 
@@ -108,7 +133,21 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:text="2、充值会员具有有效期，超过有效期会员将失效。 "
+                        android:text="2.普通会员，不享受产品折扣优惠 "
+                        android:textColor="@color/yhxz"
+                        android:textSize="@dimen/yhxz_textsize" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="3.会员等级可以购买获得或消费累计达到设置金额成为特定会员"
+                        android:textColor="@color/yhxz"
+                        android:textSize="@dimen/yhxz_textsize" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="4.如您有任何问题联系客服，客服电话：400-8123-337 "
                         android:textColor="@color/yhxz"
                         android:textSize="@dimen/yhxz_textsize" />
                 </LinearLayout>

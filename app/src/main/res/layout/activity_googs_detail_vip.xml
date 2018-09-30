@@ -199,33 +199,22 @@
                         android:layout_height="wrap_content"
                         android:background="@color/white"
                         android:padding="10dp">
-
                         <TextView
-                            android:id="@+id/price"
+                            android:id="@+id/name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="¥40.00"
-                            android:textStyle="bold"
-                            android:textColor="@color/price_color"
-                            android:textSize="@dimen/price_size" />
-
-                        <TextView
-                            android:id="@+id/old_price"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@id/price"
-                            android:text="¥45.00"
-                            android:textColor="@color/old_price_color"
-                            android:textSize="@dimen/old_price_size" />
-
+                            android:layout_marginRight="60dp"
+                            android:layout_marginTop="10dp"
+                            android:text="清真伊穆家园牛肉面标准化汤料【经济装】2.5斤使用装"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/detail_name_size" />
                         <TextView
                             android:id="@+id/zs"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentRight="true"
-                            android:layout_alignTop="@id/price"
-                            android:layout_below="@+id/price"
                             android:background="@drawable/zs_shape"
+                            android:layout_marginTop="10dp"
                             android:padding="2dp"
                             android:text="赠1积分"
                             android:textColor="@color/price_color"
@@ -234,11 +223,9 @@
                             android:id="@+id/youhui"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_toRightOf="@+id/old_price"
-                            android:layout_below="@id/price"
+                            android:layout_below="@id/name"
                             android:background="@drawable/seconds_kill_shape"
                             android:padding="2dp"
-                            android:layout_marginLeft="30dp"
                             android:text="优惠5元"
                             android:textColor="@color/price_color"
                             android:textSize="@dimen/kc_size" />
@@ -247,48 +234,51 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_toRightOf="@+id/youhui"
-                            android:layout_below="@id/price"
+                            android:layout_below="@id/name"
                             android:background="@drawable/seconds_kill_shape2"
                             android:padding="2dp"
                             android:text="限量20件"
                             android:textColor="@color/price_color"
                             android:textSize="@dimen/kc_size" />
 
-                        <TextView
-                            android:id="@+id/name"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginRight="30dp"
-                            android:layout_below="@+id/old_price"
-                            android:layout_marginTop="10dp"
-                            android:text="清真伊穆家园牛肉面标准化汤料【经济装】2.5斤使用装"
-                            android:textColor="@color/black"
-                            android:textSize="@dimen/detail_name_size" />
+
 
                         <ImageView
                             android:id="@+id/share"
                             android:layout_width="15dp"
                             android:layout_height="15dp"
                             android:layout_alignParentRight="true"
-                            android:layout_alignTop="@id/name"
-                            android:layout_below="@+id/old_price"
+                            android:layout_below="@+id/zs"
+                            android:layout_marginTop="10dp"
                             android:layout_marginLeft="5dp"
                             android:src="@drawable/share" />
                         <LinearLayout
                             android:id="@+id/hyj_ll"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_below="@+id/name"
+                            android:layout_below="@+id/youhui"
+                            android:background="#ffffff"
                             android:layout_marginTop="10dp"
                             android:gravity="center_vertical"
-                            android:orientation="vertical">
+                            android:orientation="horizontal">
+
+                            <com.emjiayuan.app.widget.MyGridView
+                                android:id="@+id/vipGrid"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:numColumns="4"
+                                android:horizontalSpacing="2dp"
+                                android:verticalSpacing="2dp"
+                                android:layout_weight="1"
+                                android:background="#ffffff"
+                                android:padding="8dp"/>
+
                             <LinearLayout
                                 android:id="@+id/hy_ll"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:background="#ffffff"
-                                android:paddingTop="8dp"
-                                android:paddingBottom="8dp"
+                                android:background="#F8C180"
+                                android:padding="8dp"
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal">
 
@@ -296,27 +286,15 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:gravity="center"
-                                    android:text="开通会员享受更多优惠，"
-                                    android:textColor="#6E6E6E" />
+                                    android:text="开通会员"
+                                    android:textColor="#3F3B38"
+                                    android:textSize="@dimen/kc_size" />
 
-                                <TextView
-                                    android:id="@+id/vip_go"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:gravity="center"
-                                    android:text="点击进入详情！"
-                                    android:autoLink="none"
-                                    android:textColor="#FF6C6C" />
+                                <ImageView
+                                    android:layout_width="10dp"
+                                    android:layout_height="10dp"
+                                    android:src="@drawable/go"/>
                             </LinearLayout>
-                            <com.emjiayuan.app.widget.MyGridView
-                                android:id="@+id/vipGrid"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:numColumns="5"
-                                android:horizontalSpacing="1dp"
-                                android:background="#ffffff"
-                                android:paddingTop="8dp"
-                                android:paddingBottom="8dp"/>
                         </LinearLayout>
                         <LinearLayout
                             android:id="@+id/bottom_ll"

@@ -24,7 +24,7 @@
             android:orientation="vertical">
             <com.emjiayuan.app.widget.RatioImageView
                 android:id="@+id/sold_out"
-                android:layout_width="80dp"
+                android:layout_width="40dp"
                 android:layout_height="wrap_content"
                 android:src="@drawable/sold_out_2"
                 app:ratio="1.675"

@@ -3,7 +3,12 @@ package com.emjiayuan.app.activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.view.View;
+import android.webkit.ValueCallback;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -12,10 +17,7 @@ import com.emjiayuan.app.BaseActivity;
 import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.event.UpdateEvent;
-import com.tencent.smtt.sdk.ValueCallback;
-import com.tencent.smtt.sdk.WebSettings;
-import com.tencent.smtt.sdk.WebView;
-import com.tencent.smtt.sdk.WebViewClient;
+
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -39,7 +41,7 @@ public class SoupwikiActivity extends BaseActivity {
 
     @Override
     protected int setLayoutId() {
-        return R.layout.fragment_community2;
+        return R.layout.activity_soupwiki;
     }
 
     @Override
@@ -48,12 +50,17 @@ public class SoupwikiActivity extends BaseActivity {
         title.setText("香料百科");
 //        http://sq.emjiayuan.com/#/Home?userid=1&token=abc&app=1
 //        url = "https://www.emjiayuan.com/about/company.html";
-        url = "https://h5.emjiayuan.com/index.php/app/soupwiki";
+//        url = "https://h5.emjiayuan.com/index.php/app/soupwiki";
+        url = "https://h5.emjiayuan.com/index.php/app/soupwiki?t=123";
         MyUtils.e("===url===", url);
-        webview.loadUrl(url);
+
 //        webview.loadUrl("https://www.baidu.com");
         WebSettings webSettings = webview.getSettings();
         webSettings.setDomStorageEnabled(true);
+        webSettings.setBlockNetworkImage(false); // 解决图片不显示
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ){
+            webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        }
         webSettings.setJavaScriptEnabled(true);
         // 设置允许JS弹窗
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
@@ -93,7 +100,7 @@ public class SoupwikiActivity extends BaseActivity {
                 super.onLoadResource(view, url);
             }
         });
-
+        webview.loadUrl(url);
 
     }
 

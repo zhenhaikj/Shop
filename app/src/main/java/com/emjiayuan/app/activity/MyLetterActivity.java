@@ -140,6 +140,7 @@ public class MyLetterActivity extends BaseActivity implements View.OnClickListen
                         String message = jsonObject.getString("message");
                         String data = jsonObject.getString("data");
                         Gson gson = new Gson();
+                        list.clear();
                         if ("200".equals(code)) {
                             JSONArray jsonArray = new JSONArray(data);
                             for (int i = 0; i < jsonArray.length(); i++) {

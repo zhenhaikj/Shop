@@ -14,10 +14,10 @@
         android:descendantFocusability="blocksDescendants"
         android:background="@color/white"
         android:orientation="horizontal">
-        <de.hdodenhof.circleimageview.CircleImageView
+        <ImageView
             android:id="@+id/icon"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginRight="10dp"
             android:src="@drawable/default_tx" />
         <LinearLayout
@@ -345,10 +345,10 @@
         android:descendantFocusability="blocksDescendants"
         android:background="@color/white"
         android:orientation="horizontal">
-        <de.hdodenhof.circleimageview.CircleImageView
+        <ImageView
             android:id="@+id/icongg"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginRight="10dp"
             android:src="@drawable/default_tx" />
         <LinearLayout

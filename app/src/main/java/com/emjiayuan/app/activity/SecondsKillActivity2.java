@@ -68,6 +68,7 @@ public class SecondsKillActivity2 extends BaseActivity implements View.OnClickLi
     private SeckillBean seckillBean;
     private List<String> images = new ArrayList<>();
     private SecondsKillAdapter2 adapter;
+    private String seckillid;
 
 
     @Override
@@ -83,6 +84,7 @@ public class SecondsKillActivity2 extends BaseActivity implements View.OnClickLi
     @Override
     protected void initView() {
         title.setText("秒杀专区");
+        seckillid=getIntent().getStringExtra("seckillid");
         request();
         //设置图片加载器
         banner.setImageLoader(new GlideImageLoader());
@@ -117,8 +119,9 @@ public class SecondsKillActivity2 extends BaseActivity implements View.OnClickLi
 
     public void request() {
         FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
+        formBody.add("seckillid",seckillid);
 //new call
-        Call call = MyOkHttp.GetCall("promotion.getSeckillList", formBody);
+        Call call = MyOkHttp.GetCall("promotion.getSeckillDetail", formBody);
 //请求加入调度
         call.enqueue(new Callback() {
             @Override
@@ -131,7 +134,7 @@ public class SecondsKillActivity2 extends BaseActivity implements View.OnClickLi
             public void onResponse(Call call, Response response) throws IOException {
 
                 String result = response.body().string();
-                Log.d("-----秒杀列表-------", result);
+                Log.d("-----秒杀详情-------", result);
                 Message message = new Message();
                 message.what = 0;
                 Bundle bundle = new Bundle();
@@ -158,10 +161,10 @@ public class SecondsKillActivity2 extends BaseActivity implements View.OnClickLi
                         Gson gson = new Gson();
                         images = new ArrayList<>();
                         if ("200".equals(code)) {
-                            JSONArray jsonArray = new JSONArray(data);
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                seckillBean = gson.fromJson(jsonArray.getJSONObject(i).toString(), SeckillBean.class);
-                            }
+//                            JSONArray jsonArray = new JSONArray(data);
+//                            for (int i = 0; i < jsonArray.length(); i++) {
+                                seckillBean = gson.fromJson(data, SeckillBean.class);
+//                            }
                             adapter = new SecondsKillAdapter2(mActivity, seckillBean);
                             lv_pl.setAdapter(adapter);
                             images.add(seckillBean.getUrl());

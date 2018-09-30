@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="#ffffff">
+
+    <include
+        android:id="@+id/tab_title"
+        layout="@layout/tool_bar"/>
+    <com.lwkandroid.stateframelayout.StateFrameLayout
+        android:id="@+id/stateLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/tab_title"
+        android:layout_above="@+id/manage_ll"
+        app:enableContentAnim="true"
+        app:emptyLayoutResId="@layout/layout_no_history"
+        app:netErrorLayoutResId="@layout/layout_net_error"
+        app:loadingLayoutResId="@layout/layout_loading">
+        <GridView
+            android:id="@+id/gv_cellection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:horizontalSpacing="10dp"
+            android:numColumns="2"
+            android:verticalSpacing="10dp" />
+    </com.lwkandroid.stateframelayout.StateFrameLayout>
+    <LinearLayout
+        android:id="@+id/manage_ll"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone"
+        android:background="@color/white"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/checkAll"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginLeft="10dp"
+            android:button="@null"
+            android:background="@drawable/check_selector" />
+
+        <TextView
+            android:id="@+id/check"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
+            android:gravity="center"
+            android:text="全选"
+            android:textColor="#909090"
+            android:textSize="15sp" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+        <TextView
+            android:id="@+id/delete"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:background="#53D75D"
+            android:gravity="center"
+            android:layout_gravity="right"
+            android:text="删除"
+            android:textColor="@color/white"
+            android:textSize="15sp" />
+    </LinearLayout>
+</RelativeLayout>
