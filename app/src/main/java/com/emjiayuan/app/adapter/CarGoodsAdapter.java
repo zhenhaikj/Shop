@@ -62,6 +62,7 @@ public class CarGoodsAdapter extends BaseAdapter {
             holder.yh = (TextView) convertView.findViewById(R.id.yh);
             holder.bg_ll =  convertView.findViewById(R.id.bg_ll);
             holder.item_ll =  convertView.findViewById(R.id.item_ll);
+            holder.hyj =  convertView.findViewById(R.id.hyj);
             convertView.setTag(holder);
         } else {// 如果之前已经显示过该页面，则用viewholder中的缓存直接刷屏
             holder = (ViewHolder) convertView.getTag();
@@ -82,6 +83,7 @@ public class CarGoodsAdapter extends BaseAdapter {
         }
         holder.item_ll.setBackgroundColor(Color.parseColor("#EFEFEF"));
         holder.icon.setBackgroundColor(Color.parseColor("#ffffff"));
+        holder.hyj.setText("会员价¥"+item.getMinprice()+"起");
         return convertView;
     }
 
@@ -89,6 +91,7 @@ public class CarGoodsAdapter extends BaseAdapter {
         public MyImageView icon;
         public TextView name;
         public TextView yh;
+        public TextView hyj;
         public LinearLayout bg_ll;
         public LinearLayout item_ll;
 
