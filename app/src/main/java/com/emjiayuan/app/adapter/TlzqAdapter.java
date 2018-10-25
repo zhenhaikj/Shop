@@ -36,7 +36,8 @@ public class TlzqAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return grouplists.size()>6?6:grouplists.size();
+        return grouplists.size();
+//        return grouplists.size()>6?6:grouplists.size();
     }
 
     @Override
@@ -66,7 +67,7 @@ public class TlzqAdapter extends BaseAdapter {
 
         Product item = grouplists.get(position);
         GlideUtil.loadImageViewLoding(mContext,item.getImages(),holder.icon,R.drawable.empty_img,R.drawable.empty_img);
-        holder.icon.setImageResource(R.drawable.img2);
+//        holder.icon.setImageResource(R.drawable.img2);
         holder.name.setText(item.getName());
         holder.hyj.setText("会员价¥"+item.getMinprice()+"起");
         holder.yh.setText(Html.fromHtml("<small>¥ </small><big><b>"+item.getPrice().substring(0,item.getPrice().indexOf("."))+"</b></big><small><b>"+item.getPrice().substring(item.getPrice().indexOf("."),item.getPrice().length())+"</b></small>"));

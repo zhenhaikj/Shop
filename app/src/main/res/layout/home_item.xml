@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginTop="10dp"
     android:paddingBottom="10dp"
     android:background="@color/white">
-    <LinearLayout
+    <!--<LinearLayout
         android:id="@+id/header_ll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -28,6 +29,20 @@
             android:layout_marginLeft="10dp"
             android:layout_gravity="center"
             android:src="@drawable/more"/>
+    </LinearLayout>-->
+    <LinearLayout
+        android:id="@+id/header_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_margin="10dp"
+        android:orientation="horizontal">
+        <com.emjiayuan.app.widget.RatioImageView
+            android:id="@+id/top_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:ratio="2.76"
+            android:layout_gravity="center"/>
     </LinearLayout>
     <com.emjiayuan.app.widget.MyGridView
         android:id="@+id/gv_goods"

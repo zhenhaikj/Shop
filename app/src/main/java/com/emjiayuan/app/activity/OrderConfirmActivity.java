@@ -219,6 +219,7 @@ public class OrderConfirmActivity extends BaseActivity implements View.OnClickLi
         }
         formBody.add("userid", Global.loginResult.getId());
         formBody.add("addressprovince", address.getShengfen());
+        formBody.add("address", address.getAddress().substring(0,address.getAddress().lastIndexOf(" ")));
         if (coupon != null) {
             formBody.add("couponid", coupon.getCouponid());
         }

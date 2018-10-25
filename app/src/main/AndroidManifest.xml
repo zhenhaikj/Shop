@@ -201,6 +201,8 @@
             android:screenOrientation="portrait"></activity>
         <activity android:name=".activity.EnterpriseActivity"
             android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.AgreementActivity"
+            android:screenOrientation="portrait"></activity>
         <activity android:name=".activity.HezuoActivity"
             android:screenOrientation="portrait"></activity>
         <activity android:name=".activity.SoupwikiActivity"

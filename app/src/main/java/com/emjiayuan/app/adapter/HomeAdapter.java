@@ -7,15 +7,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.emjiayuan.app.R;
+import com.emjiayuan.app.Utils.GlideUtil;
 import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.activity.GoodsDetailActivity;
 import com.emjiayuan.app.activity.TypeActivity;
 import com.emjiayuan.app.entity.Products;
 import com.emjiayuan.app.widget.MyGridView;
+import com.emjiayuan.app.widget.RatioImageView;
 
 import java.util.ArrayList;
 
@@ -78,7 +81,8 @@ public class HomeAdapter extends BaseAdapter {
             view.setTag(holder);
         }
         final Products products = grouplists.get(position);
-        holder.header.setText(products.getName());
+        GlideUtil.loadImageViewLoding(mContext,products.getBanner(),holder.top_image,R.drawable.empty_img,R.drawable.empty_img);
+//        holder.top_image.setText(products.getName());
         holder.headerLl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -118,8 +122,8 @@ public class HomeAdapter extends BaseAdapter {
     }
 
     static class ViewHolder {
-        @BindView(R.id.header)
-        TextView header;
+        @BindView(R.id.top_image)
+        RatioImageView top_image;
         @BindView(R.id.gv_goods)
         MyGridView gvGoods;
         @BindView(R.id.header_ll)

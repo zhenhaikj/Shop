@@ -1,7 +1,6 @@
 package com.emjiayuan.app.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,9 +11,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.emjiayuan.app.R;
-import com.emjiayuan.app.Utils.GlideUtil;
-import com.emjiayuan.app.Utils.MyUtils;
-import com.emjiayuan.app.activity.address.ModifyAddressActivity;
 import com.emjiayuan.app.entity.Product;
 
 import java.util.ArrayList;
@@ -23,7 +19,7 @@ import java.util.ArrayList;
  * Created by cyl on 2018年5月10日 09:52:49.
  */
 
-public class TopUpAdapter extends BaseAdapter {
+public class PersonalTopUpAdapter extends BaseAdapter {
     private Context mContext;
 
 
@@ -41,7 +37,7 @@ public class TopUpAdapter extends BaseAdapter {
     private ArrayList<Product> grouplists = new ArrayList<>();
     private LayoutInflater mInflater;
 
-    public TopUpAdapter(Context mContext, ArrayList<Product> grouplists) {
+    public PersonalTopUpAdapter(Context mContext, ArrayList<Product> grouplists) {
         super();
         this.mContext = mContext;
         this.grouplists = grouplists;
@@ -69,11 +65,11 @@ public class TopUpAdapter extends BaseAdapter {
         ViewHolder holder = null;
         if (convertView == null) {// 如果是第一次显示该页面(要记得保存到viewholder中供下次直接从缓存中调用)
             holder = new ViewHolder();
-            convertView = mInflater.inflate(R.layout.top_up_item, null);
+            convertView = mInflater.inflate(R.layout.top_up_item2, null);
             holder.value = (TextView) convertView.findViewById(R.id.value);
             holder.content = (TextView) convertView.findViewById(R.id.content);
             holder.item = (LinearLayout) convertView.findViewById(R.id.item);
-            holder.icon =  convertView.findViewById(R.id.icon);
+            holder.top_up_checked =  convertView.findViewById(R.id.top_up_checked);
             convertView.setTag(holder);
         } else {// 如果之前已经显示过该页面，则用viewholder中的缓存直接刷屏
             holder = (ViewHolder) convertView.getTag();
@@ -83,25 +79,10 @@ public class TopUpAdapter extends BaseAdapter {
         holder.value.setText(item.getGiftjifen()+"元");
         holder.content.setText(item.getName());
         if (selected==position){
-            holder.item.setBackgroundResource(R.drawable.top_up_check_bg);
-            holder.value.setTextColor(Color.parseColor("#ffffff"));
-            holder.content.setTextColor(Color.parseColor("#ffffff"));
+            holder.top_up_checked.setVisibility(View.VISIBLE);
         }else{
-            holder.item.setBackgroundResource(R.drawable.top_up_bg);
-            holder.value.setTextColor(Color.parseColor("#000000"));
-            holder.content.setTextColor(Color.parseColor("#FF3C3C"));
+            holder.top_up_checked.setVisibility(View.GONE);
         }
-        if ("1".equals(item.getGifttype())) {
-            if (selected==position){
-                holder.icon.setImageResource(R.drawable.money2);
-            }else{
-                holder.icon.setImageResource(R.drawable.money1);
-            }
-        } else if ("0".equals(item.getGifttype())) {
-            GlideUtil.loadImageViewLoding(mContext,item.getImages(),holder.icon,R.drawable.empty_img,R.drawable.empty_img);
-        }
-
-
         return convertView;
     }
 
@@ -109,7 +90,7 @@ public class TopUpAdapter extends BaseAdapter {
         public TextView value;
         public TextView content;
         public LinearLayout item;
-        public ImageView icon;
+        public ImageView top_up_checked;
 
     }
 }

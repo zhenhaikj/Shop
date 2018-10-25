@@ -12,17 +12,20 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.emjiayuan.app.MainActivity;
-import com.emjiayuan.app.Utils.SpUtils;
-import com.emjiayuan.app.event.LoginSuccessEvent;
-import com.google.gson.Gson;
+import com.bumptech.glide.Glide;
 import com.emjiayuan.app.BaseActivity;
+import com.emjiayuan.app.MainActivity;
 import com.emjiayuan.app.R;
+import com.emjiayuan.app.Utils.GlideUtil;
 import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
+import com.emjiayuan.app.Utils.SpUtils;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.LoginResult;
-import com.emjiayuan.app.event.UpdateEvent;
+import com.emjiayuan.app.event.LoginSuccessEvent;
+import com.emjiayuan.app.widget.MyImageView;
+import com.emjiayuan.app.widget.RatioImageView;
+import com.google.gson.Gson;
 import com.umeng.analytics.MobclickAgent;
 
 import org.greenrobot.eventbus.EventBus;
@@ -54,7 +57,13 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     TextView register;
     @BindView(R.id.password_forget)
     TextView pwdforget;
-    private int type=0;
+    @BindView(R.id.service_ll)
+    LinearLayout serviceLl;
+    @BindView(R.id.line_top)
+    View lineTop;
+    @BindView(R.id.im_login)
+    RatioImageView imLogin;
+    private int type = 0;
     private SharedPreferences sp;
 
     @Override
@@ -70,6 +79,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     @Override
     protected void initView() {
         title.setText("账号登录");
+        Glide.with(mActivity).load(R.drawable.login_gif).into(imLogin);
 //        et_username.setText("110");
 //        et_password.setText("110");
 //        et_username.setText("18767773654");
@@ -88,10 +98,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         register.setOnClickListener(this);
         pwdforget.setOnClickListener(this);
     }
-    public void getDevice () {
+
+    public void getDevice() {
 
         FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
-        formBody.add("userid",Global.loginResult.getId());
+        formBody.add("userid", Global.loginResult.getId());
         Log.d("------参数------", formBody.build().toString());
 //new call
 //        Call call = MyOkHttp.GetCall("public.appHome", formBody);
@@ -118,6 +129,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             }
         });
     }
+
     Handler myHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -135,7 +147,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                             Global.loginResult = new Gson().fromJson(data, LoginResult.class);
                             //当用户使用自有账号登录时，可以这样统计：
                             MobclickAgent.onProfileSignIn(Global.loginResult.getId());
-                            SpUtils.putObject(mActivity,"loginResult",Global.loginResult);
+                            SpUtils.putObject(mActivity, "loginResult", Global.loginResult);
                             MyUtils.showToast(LoginActivity.this, message);
 
                             getDevice();
@@ -155,10 +167,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                         String message = jsonObject.getString("message");
                         String data = jsonObject.getString("data");
                         if ("200".equals(code)) {
-                            Global.device_no=data;
-                            SpUtils.putString(mActivity,"device_no",data);
+                            Global.device_no = data;
+                            SpUtils.putString(mActivity, "device_no", data);
                         } else {
-                            MyUtils.showToast(mActivity,message);
+                            MyUtils.showToast(mActivity, message);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -170,7 +182,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
     @Override
     public void onClick(View view) {
-        if (!MyUtils.isFastClick()){
+        if (!MyUtils.isFastClick()) {
             return;
         }
         switch (view.getId()) {
@@ -229,9 +241,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (Global.loginResult==null){
+        if (Global.loginResult == null) {
             startActivity(new Intent(mActivity, MainActivity.class));
-        }else{
+        } else {
             EventBus.getDefault().post(new LoginSuccessEvent("update"));
         }
     }

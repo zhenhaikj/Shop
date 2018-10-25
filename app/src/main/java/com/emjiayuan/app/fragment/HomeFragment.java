@@ -51,6 +51,7 @@ import com.emjiayuan.app.activity.CityActivity;
 import com.emjiayuan.app.activity.CouponGetActivity;
 import com.emjiayuan.app.activity.GoodsDetailActivity;
 import com.emjiayuan.app.activity.IntegralYlActivity;
+import com.emjiayuan.app.activity.LoginActivity;
 import com.emjiayuan.app.activity.LogisticsActivity;
 import com.emjiayuan.app.activity.MessageActivity;
 import com.emjiayuan.app.activity.MessageDetailActivity;
@@ -75,6 +76,7 @@ import com.emjiayuan.app.entity.Products;
 import com.emjiayuan.app.entity.SeckillBean;
 import com.emjiayuan.app.event.UpdateEvent;
 import com.emjiayuan.app.imageloader.GlideImageLoader;
+import com.emjiayuan.app.widget.HorizontalListView;
 import com.emjiayuan.app.widget.MyGridView;
 import com.emjiayuan.app.widget.MyListView;
 import com.emjiayuan.app.widget.ObservableScrollView;
@@ -137,7 +139,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
     @BindView(R.id.txt_tlzq)
     TextView txt_tlzq;
     @BindView(R.id.gv_tlzq)
-    MyGridView gv_tlzq;
+    HorizontalListView gv_tlzq;
     @BindView(R.id.txt_specials)
     TextView txt_specials;
     @BindView(R.id.ymtt)
@@ -611,6 +613,10 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                             startActivity(new Intent(getActivity(), CouponGetActivity.class));
                             break;
                         case 5:
+                            if (Global.loginResult==null){
+                                startActivity(new Intent(getActivity(), LoginActivity.class));
+                                return;
+                            }
                             startActivity(new Intent(getActivity(), TopUpActivity.class));
                             break;
                         case 6:
@@ -947,6 +953,11 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                             txt_tlzq.setText(soupname);
                             soupid = soup.getString("id");
                             souplist = getProductList(soup.getJSONArray("list"));
+//                            souplist.addAll(souplist);
+//                            souplist.addAll(souplist);
+//                            souplist.addAll(souplist);
+//                            souplist.addAll(souplist);
+//                            souplist.addAll(souplist);
                             TlzqAdapter tlzqAdapter = new TlzqAdapter(getActivity(), souplist);
                             gv_tlzq.setAdapter(tlzqAdapter);
                             HomeAdapter homeAdapter = new HomeAdapter(getActivity(), Productslist);

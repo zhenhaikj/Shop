@@ -1,20 +1,17 @@
 package com.emjiayuan.app.fragment.Personal;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.RequiresApi;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -25,7 +22,6 @@ import com.bumptech.glide.request.RequestOptions;
 import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
-import com.emjiayuan.app.activity.BalanceActivity;
 import com.emjiayuan.app.activity.CollectionActivity;
 import com.emjiayuan.app.activity.CouponActivity2;
 import com.emjiayuan.app.activity.EnterpriseActivity;
@@ -39,13 +35,18 @@ import com.emjiayuan.app.activity.OrderIntegralActivity;
 import com.emjiayuan.app.activity.OrderNormalActivity2;
 import com.emjiayuan.app.activity.SettingActivity;
 import com.emjiayuan.app.activity.SpitActivity;
+import com.emjiayuan.app.activity.TopUpActivity;
 import com.emjiayuan.app.activity.VipActivity;
 import com.emjiayuan.app.activity.address.AddressActivity;
+import com.emjiayuan.app.adapter.PersonalTopUpAdapter;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.LoginResult;
+import com.emjiayuan.app.entity.Product;
 import com.emjiayuan.app.entity.User;
 import com.emjiayuan.app.event.LoginSuccessEvent;
 import com.emjiayuan.app.fragment.BaseLazyFragment;
+import com.emjiayuan.app.imageloader.GlideImageLoader;
+import com.emjiayuan.app.widget.HorizontalListView;
 import com.google.gson.Gson;
 import com.qiyukf.unicorn.api.ConsultSource;
 import com.qiyukf.unicorn.api.Unicorn;
@@ -53,10 +54,13 @@ import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.yalantis.ucrop.UCrop;
+import com.youth.banner.Banner;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
@@ -65,6 +69,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import butterknife.BindView;
@@ -131,7 +136,17 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
     LinearLayout hezuoLl;
     @BindView(R.id.record_ll)
     LinearLayout recordLl;
-
+    @BindView(R.id.top_up_center_ll)
+    LinearLayout topUpCenterLl;
+    @BindView(R.id.hlv)
+    HorizontalListView hlv;
+    @BindView(R.id.go_center)
+    TextView goCenter;
+    @BindView(R.id.banner)
+    Banner banner;
+    private ArrayList<Product> list = new ArrayList<>();//充值
+    private PersonalTopUpAdapter adapter;
+    private Product product;
 
     @Override
     protected int setLayoutId() {
@@ -157,12 +172,16 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
+        banner.setImageLoader(new GlideImageLoader());
+        banner.setImages(Global.images);
+        banner.start();
         vip_ll.getBackground().setAlpha(100);
         vip.getBackground().setAlpha(100);
 //        if (Global.loginResult == null) {
 //            startActivity(new Intent(getActivity(), LoginActivity.class));
 //        }
         user();
+        requestTopUp();
         refreshLayout.setEnableLoadMore(false);
         refreshLayout.setEnableHeaderTranslationContent(false);
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
@@ -171,7 +190,7 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
                 user();
             }
         });
-        new Thread(new Runnable() {
+        /*new Thread(new Runnable() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void run() {
@@ -186,7 +205,7 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
                     }
                 });
             }
-        }).start();
+        }).start();*/
     }
 
     @Override
@@ -197,6 +216,8 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
         balance_ll.setOnClickListener(this);
         integral_ll.setOnClickListener(this);
         coupon_ll.setOnClickListener(this);
+        goCenter.setOnClickListener(this);
+        topUpCenterLl.setOnClickListener(this);
 
 //        dfk_ll.setOnClickListener(this);
 //        dfh_ll.setOnClickListener(this);
@@ -228,11 +249,23 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
         }
         Intent intent = null;
         switch (view.getId()) {
+            case R.id.top_up_center_ll:
+                startActivity(new Intent(getActivity(), TopUpActivity.class));
+                break;
+            case R.id.go_center:
+                if (product == null) {
+                    MyUtils.showToast(mActivity, "请选择充值金额！");
+                    return;
+                }
+                intent = new Intent(getActivity(), TopUpActivity.class);
+                intent.putExtra("product", product);
+                startActivity(intent);
+                break;
             case R.id.vip_ll:
                 startActivity(new Intent(getActivity(), VipActivity.class));
                 break;
             case R.id.balance_ll:
-                startActivity(new Intent(getActivity(), BalanceActivity.class));
+                startActivity(new Intent(getActivity(), TopUpActivity.class));
                 break;
             case R.id.integral_ll:
                 startActivity(new Intent(getActivity(), IntegralActivity.class));
@@ -395,6 +428,37 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
         });
     }
 
+    public void requestTopUp() {
+        FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
+        formBody.add("producttype", "3");//传递键值对参数
+        formBody.add("pageindex", "1");//传递键值对参数
+        formBody.add("pagesize", "100");//传递键值对参数
+        formBody.add("provinceid", Global.provinceid);
+//new call
+        Call call = MyOkHttp.GetCall("product.getProductList", formBody);
+//请求加入调度
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("------------", e.toString());
+//                myHandler.sendEmptyMessage(1);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+
+                String result = response.body().string();
+                MyUtils.e("------赠品------", result);
+                Message message = new Message();
+                message.what = 3;
+                Bundle bundle = new Bundle();
+                bundle.putString("result", result);
+                message.setData(bundle);
+                myHandler.sendMessage(message);
+            }
+        });
+    }
+
     private User user;
     private String imagepath;
     Handler myHandler = new Handler() {
@@ -460,7 +524,35 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
                         e.printStackTrace();
                     }
                     break;
-
+                case 3:
+                    try {
+                        JSONObject jsonObject = new JSONObject(result);
+                        String code = jsonObject.getString("code");
+                        String message = jsonObject.getString("message");
+                        String data = jsonObject.getString("data");
+                        Gson gson = new Gson();
+                        if ("200".equals(code)) {
+                            JSONArray jsonArray = new JSONArray(data);
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                Product product = gson.fromJson(jsonArray.getJSONObject(i).toString(), Product.class);
+                                list.add(product);
+                            }
+                            adapter = new PersonalTopUpAdapter(mActivity, list);
+                            hlv.setAdapter(adapter);
+                            hlv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                    product = list.get(position);
+                                    adapter.setSelected(position);
+                                }
+                            });
+                        } else {
+                            MyUtils.showToast(mActivity, message);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    break;
 
             }
         }
