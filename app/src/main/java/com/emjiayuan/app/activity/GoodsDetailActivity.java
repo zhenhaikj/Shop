@@ -325,7 +325,7 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
                     new AlertDialog.Builder(mActivity).setMessage("去了解更多会员权益？").setPositiveButton("去看看", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            startActivity(new Intent(mActivity,VipActivity.class));
+                            startActivity(new Intent(mActivity,VipActivity2.class));
                         }
                     }).setNegativeButton("取消",null).create().show();
                 }
@@ -338,7 +338,7 @@ public class GoodsDetailActivity extends BaseActivity implements View.OnClickLis
         vipGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(mActivity, VipActivity.class));
+                startActivity(new Intent(mActivity, VipActivity2.class));
             }
         });
         kc.setText("库存：" + product.getTotalnum());

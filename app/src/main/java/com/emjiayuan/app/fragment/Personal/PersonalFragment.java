@@ -37,6 +37,7 @@ import com.emjiayuan.app.activity.SettingActivity;
 import com.emjiayuan.app.activity.SpitActivity;
 import com.emjiayuan.app.activity.TopUpActivity;
 import com.emjiayuan.app.activity.VipActivity;
+import com.emjiayuan.app.activity.VipActivity2;
 import com.emjiayuan.app.activity.address.AddressActivity;
 import com.emjiayuan.app.adapter.PersonalTopUpAdapter;
 import com.emjiayuan.app.entity.Global;
@@ -175,8 +176,8 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
         banner.setImageLoader(new GlideImageLoader());
         banner.setImages(Global.images);
         banner.start();
-        vip_ll.getBackground().setAlpha(100);
-        vip.getBackground().setAlpha(100);
+//        vip_ll.getBackground().setAlpha(0);
+//        vip.getBackground().setAlpha(0);
 //        if (Global.loginResult == null) {
 //            startActivity(new Intent(getActivity(), LoginActivity.class));
 //        }
@@ -250,7 +251,9 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
         Intent intent = null;
         switch (view.getId()) {
             case R.id.top_up_center_ll:
-                startActivity(new Intent(getActivity(), TopUpActivity.class));
+                intent = new Intent(getActivity(), TopUpActivity.class);
+                intent.putExtra("type", 1);
+                startActivity(intent);
                 break;
             case R.id.go_center:
                 if (product == null) {
@@ -259,10 +262,11 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
                 }
                 intent = new Intent(getActivity(), TopUpActivity.class);
                 intent.putExtra("product", product);
+                intent.putExtra("type", 1);
                 startActivity(intent);
                 break;
             case R.id.vip_ll:
-                startActivity(new Intent(getActivity(), VipActivity.class));
+                startActivity(new Intent(getActivity(), VipActivity2.class));
                 break;
             case R.id.balance_ll:
                 startActivity(new Intent(getActivity(), TopUpActivity.class));

@@ -1,5 +1,7 @@
 package com.emjiayuan.app.activity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -14,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -26,16 +27,18 @@ import com.emjiayuan.app.Constants;
 import com.emjiayuan.app.R;
 import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
-import com.emjiayuan.app.adapter.TopUpAdapter;
+import com.emjiayuan.app.adapter.RightsAdapter;
+import com.emjiayuan.app.adapter.VipAdapter;
 import com.emjiayuan.app.entity.Global;
-import com.emjiayuan.app.entity.LoginResult;
 import com.emjiayuan.app.entity.PayResult;
-import com.emjiayuan.app.entity.Product;
+import com.emjiayuan.app.entity.Rights;
 import com.emjiayuan.app.entity.User;
+import com.emjiayuan.app.entity.Vip;
+import com.emjiayuan.app.entity.VipCenter;
 import com.emjiayuan.app.entity.WXpayInfo;
 import com.emjiayuan.app.event.WXpaySuccessEvent;
 import com.emjiayuan.app.widget.BottomPopupOption;
-import com.emjiayuan.app.widget.MyGridView;
+import com.emjiayuan.app.widget.HorizontalListView;
 import com.google.gson.Gson;
 import com.tencent.mm.opensdk.constants.ConstantsAPI;
 import com.tencent.mm.opensdk.modelbase.BaseResp;
@@ -60,45 +63,45 @@ import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.Response;
 
-public class TopUpActivity extends BaseActivity implements View.OnClickListener, AdapterView.OnItemClickListener {
+public class VipActivity2 extends BaseActivity implements View.OnClickListener {
     @BindView(R.id.back)
     LinearLayout back;
     @BindView(R.id.title)
     TextView title;
     @BindView(R.id.save)
     TextView save;
-    @BindView(R.id.gv_sye)
-    MyGridView gv_sye;
-    @BindView(R.id.gv_ssp)
-    MyGridView gv_ssp;
     @BindView(R.id.service_ll)
     LinearLayout serviceLl;
-    @BindView(R.id.line_top)
-    View lineTop;
-    @BindView(R.id.cz_btn)
-    Button czBtn;
-    @BindView(R.id.balance)
-    TextView balance;
-    @BindView(R.id.checkAll)
-    CheckBox checkAll;
-    @BindView(R.id.check)
-    TextView check;
-    @BindView(R.id.check_ll)
-    LinearLayout checkLl;
-    @BindView(R.id.xieyi)
-    TextView xieyi;
+    @BindView(R.id.hlv)
+    HorizontalListView hlv;
+    @BindView(R.id.hlv_vip)
+    HorizontalListView hlvVip;
+    @BindView(R.id.username)
+    TextView username;
+    @BindView(R.id.period)
+    TextView period;
+    @BindView(R.id.level)
+    TextView level;
+    @BindView(R.id.discount)
+    TextView discount;
+    @BindView(R.id.total)
+    TextView total;
+    @BindView(R.id.detail)
+    TextView detail;
 
-    private TopUpAdapter adapter1;
-    private TopUpAdapter adapter2;
-    BottomPopupOption popupOption;
+
+    private ArrayList<Vip> vipList;
+    private ArrayList<Rights> rightsList;
+    private User user;
     private PopupWindow mPopupWindow;
-    private Product product;
+    private String levelid;
     private String orderInfo;
-    private String giftorderid = "";
+    private int now_id;
+
 
     @Override
     protected int setLayoutId() {
-        return R.layout.activity_top_up;
+        return R.layout.activity_vip2;
     }
 
     @Override
@@ -106,29 +109,56 @@ public class TopUpActivity extends BaseActivity implements View.OnClickListener,
 
     }
 
+    /**
+     * 初始化沉浸式
+     */
+    protected void initImmersionBar() {
+        super.initImmersionBar();
+        mImmersionBar.fitsSystemWindows(false);
+        mImmersionBar.statusBarColor(R.color.transparent);
+        mImmersionBar.keyboardEnable(true).navigationBarWithKitkatEnable(false).init();
+    }
+
     @Override
     protected void initView() {
         EventBus.getDefault().register(this);
-        popupOption = new BottomPopupOption(this, false);
-        product = (Product) getIntent().getSerializableExtra("product");
-        int type = getIntent().getIntExtra("type",0);
-        if (type==1){
-            title.setText("充值中心");
-        }else{
-            title.setText("余额");
-        }
-        save.setText("消费记录");
-        save.setVisibility(View.VISIBLE);
-        request();
+        title.setText("会员中心");
         user();
+        getVipCenter();
+        Rights rights1=new Rights(R.drawable.vip_discount,"尊享会员折扣","享受超级会员权益，购买产品更省钱。");
+        Rights rights2=new Rights(R.drawable.vip_kf,"客服优先","为了更好的服务您，享有优先接线的权益。");
+        Rights rights3=new Rights(R.drawable.vip_integal,"购物得积分","购买产品获得积分，积分可以换取精美礼品。");
+        Rights rights4=new Rights(R.drawable.vip_more,"更多权益","更多特权正在准备中，敬请期待！");
+        rightsList=new ArrayList<>();
+        rightsList.add(rights1);
+        rightsList.add(rights2);
+        rightsList.add(rights3);
+        rightsList.add(rights4);
+        RightsAdapter adapter=new RightsAdapter(mActivity,rightsList);
+        hlv.setAdapter(adapter);
+    }
+
+    @Override
+    protected void setListener() {
+        back.setOnClickListener(this);
+    }
+
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.back:
+                finish();
+                break;
+        }
     }
 
     public void user() {
         FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
-//        if (Global.loginResult == null) {
-//            startActivity(new Intent(mActivity, LoginActivity.class));
-//            return;
-//        }
+        if (Global.loginResult == null) {
+            startActivity(new Intent(mActivity, LoginActivity.class));
+            return;
+        }
         formBody.add("userid", Global.loginResult.getId());
 
 //new call
@@ -146,7 +176,7 @@ public class TopUpActivity extends BaseActivity implements View.OnClickListener,
                 String result = response.body().string();
                 MyUtils.e("------获取用户信息------", result);
                 Message message = new Message();
-                message.what = 4;
+                message.what = 1;
                 Bundle bundle = new Bundle();
                 bundle.putString("result", result);
                 message.setData(bundle);
@@ -155,19 +185,63 @@ public class TopUpActivity extends BaseActivity implements View.OnClickListener,
         });
     }
 
-    public void request() {
+    public void getVipCenter() {
+        FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
         if (Global.loginResult == null) {
             startActivity(new Intent(mActivity, LoginActivity.class));
-            finish();
             return;
         }
-        FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
-        formBody.add("producttype", "3");//传递键值对参数
-        formBody.add("pageindex", "1");//传递键值对参数
-        formBody.add("pagesize", "100");//传递键值对参数
-        formBody.add("provinceid", Global.provinceid);
+        formBody.add("userid", Global.loginResult.getId());
+
 //new call
-        Call call = MyOkHttp.GetCall("product.getProductList", formBody);
+        Call call = MyOkHttp.GetCall("user.getVipCenter", formBody);
+//请求加入调度
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("------------", e.toString());
+//                        myHandler.sendEmptyMessage(1);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String result = response.body().string();
+                MyUtils.e("------会员信息------", result);
+                Message message = new Message();
+                message.what = 2;
+                Bundle bundle = new Bundle();
+                bundle.putString("result", result);
+                message.setData(bundle);
+                myHandler.sendMessage(message);
+            }
+        });
+    }
+
+    public void setData() {
+        username.setText(user.getShowname());
+        level.setText(user.getClassname());
+        detail.setText("累计节省费用 明细>");
+        if ("Vip普通会员".equals(user.getClassname())) {
+            period.setText("永久");
+        } else {
+            period.setText( user.getViptime()+" 到期");
+        }
+        if (Double.parseDouble(user.getDiscount()) / 10 == 10.0) {
+            discount.setText("当前会员等级购物无折扣");
+        } else {
+            discount.setText("当前会员等级 可享" + Double.parseDouble(user.getDiscount()) / 10 + "折优惠");
+        }
+        int class_id = Integer.parseInt(user.getClass_id());
+        int buy_class_id = Integer.parseInt(user.getBuy_class_id());
+        now_id = class_id > buy_class_id ? class_id : buy_class_id;
+        getLevelList();
+    }
+
+
+    public void getLevelList() {
+        FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
+//new call
+        Call call = MyOkHttp.GetCall("user.getLevelList", formBody);
 //请求加入调度
         call.enqueue(new Callback() {
             @Override
@@ -180,7 +254,7 @@ public class TopUpActivity extends BaseActivity implements View.OnClickListener,
             public void onResponse(Call call, Response response) throws IOException {
 
                 String result = response.body().string();
-                MyUtils.e("------赠品------", result);
+                MyUtils.e("------获取vip------", result);
                 Message message = new Message();
                 message.what = 0;
                 Bundle bundle = new Bundle();
@@ -191,79 +265,7 @@ public class TopUpActivity extends BaseActivity implements View.OnClickListener,
         });
     }
 
-    public void alipayrequest() {
-        FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
-        formBody.add("paytype", "RECHARGE_GIVE");//传递键值对参数
-        if (Global.loginResult == null) {
-            MyUtils.showToast(mActivity, "请先登录！");
-            return;
-//            startActivity(new Intent(mActivity,LoginActivity.class));
-        }
-        formBody.add("userid", Global.loginResult.getId());//传递键值对参数
-        formBody.add("productid", product.getId());//传递键值对参数
-//new call
-        Call call = MyOkHttp.GetCall("pay.alipay", formBody);
-//请求加入调度
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.d("------------", e.toString());
-//                myHandler.sendEmptyMessage(1);
-            }
 
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-
-                String result = response.body().string();
-                MyUtils.e("------支付宝支付------", result);
-                Message message = new Message();
-                message.what = 1;
-                Bundle bundle = new Bundle();
-                bundle.putString("result", result);
-                message.setData(bundle);
-                myHandler.sendMessage(message);
-            }
-        });
-    }
-
-    public void WXpayrequest() {
-        FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
-        formBody.add("paytype", "RECHARGE_GIVE");//传递键值对参数
-        if (Global.loginResult == null) {
-            MyUtils.showToast(mActivity, "请先登录！");
-            return;
-//            startActivity(new Intent(mActivity,LoginActivity.class));
-        }
-        formBody.add("userid", Global.loginResult.getId());//传递键值对参数
-        formBody.add("productid", product.getId());//传递键值对参数
-//new call
-        Call call = MyOkHttp.GetCall("pay.wxpay", formBody);
-//请求加入调度
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.d("------------", e.toString());
-//                myHandler.sendEmptyMessage(1);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-
-                String result = response.body().string();
-                MyUtils.e("------微信支付------", result);
-                Message message = new Message();
-                message.what = 3;
-                Bundle bundle = new Bundle();
-                bundle.putString("result", result);
-                message.setData(bundle);
-                myHandler.sendMessage(message);
-            }
-        });
-    }
-
-    private ArrayList<Product> list1 = new ArrayList<>();//送余额
-    private ArrayList<Product> list2 = new ArrayList<>();//送商品
-    private User user;
     Handler myHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -278,34 +280,46 @@ public class TopUpActivity extends BaseActivity implements View.OnClickListener,
                         String message = jsonObject.getString("message");
                         String data = jsonObject.getString("data");
                         Gson gson = new Gson();
+                        vipList = new ArrayList<>();
                         if ("200".equals(code)) {
                             JSONArray jsonArray = new JSONArray(data);
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                Product product = gson.fromJson(jsonArray.getJSONObject(i).toString(), Product.class);
-                                if ("1".equals(product.getGifttype())) {
-                                    list1.add(product);
-                                } else if ("0".equals(product.getGifttype())) {
-                                    list2.add(product);
-                                }
-                            }
-                            adapter1 = new TopUpAdapter(mActivity, list1);
-                            adapter2 = new TopUpAdapter(mActivity, list2);
-                            gv_sye.setAdapter(adapter1);
-                            gv_ssp.setAdapter(adapter2);
-                            for (int i = 0; i < list1.size(); i++) {
-                                if (product != null && product.getId().equals(list1.get(i).getId())) {
-                                    adapter1.setSelected(i);
-                                }
-                            }
-                            for (int i = 0; i < list2.size(); i++) {
-                                if (product != null && product.getId().equals(list2.get(i).getId())) {
-                                    adapter2.setSelected(i);
-                                }
+                            for (int i = jsonArray.length() - 1; i >= 0; i--) {
+                                Vip vip = gson.fromJson(jsonArray.getJSONObject(i).toString(), Vip.class);
+                                vipList.add(vip);
+                                VipAdapter adapter=new VipAdapter(mActivity,vipList,now_id);
+                                hlvVip.setAdapter(adapter);
+                                hlvVip.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                    @Override
+                                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                        levelid=vipList.get(position).getId();
+                                        if (Integer.parseInt(levelid)<=now_id){
+                                        }else{
+                                            showPopupWindow();
+                                        }
+                                    }
+                                });
                             }
                         } else {
                             MyUtils.showToast(mActivity, message);
                         }
                     } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case 2:
+                    try {
+                        JSONObject jsonObject = new JSONObject(result);
+                        String code = jsonObject.getString("code");
+                        String message = jsonObject.getString("message");
+                        String data = jsonObject.getString("data");
+                        Gson gson = new Gson();
+                        if ("200".equals(code)) {
+                            VipCenter center= gson.fromJson(data, VipCenter.class);
+                            total.setText(center.getSavemoney()+"元");
+                        } else {
+                            MyUtils.showToast(mActivity, message);
+                        }
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                     break;
@@ -315,24 +329,18 @@ public class TopUpActivity extends BaseActivity implements View.OnClickListener,
                         String code = jsonObject.getString("code");
                         String message = jsonObject.getString("message");
                         String data = jsonObject.getString("data");
-                        if ("0".equals(product.getGifttype())) {
-                            giftorderid = jsonObject.getString("giftorderid");
-                        }
                         Gson gson = new Gson();
                         if ("200".equals(code)) {
-                            orderInfo = data;
-//                            Intent intent=new Intent(mActivity,OrderConfirmActivity3.class);
-//                            intent.putExtra("orderid",giftorderid);
-//                            startActivity(intent);
-                            alipay();
+                            user = gson.fromJson(data, User.class);
+                            setData();
                         } else {
                             MyUtils.showToast(mActivity, message);
                         }
-                    } catch (JSONException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                     break;
-                case 2:
+                case 3://支付宝支付结果
                     @SuppressWarnings("unchecked")
                     PayResult payResult = new PayResult((Map<String, String>) msg.obj);
                     /**
@@ -345,24 +353,51 @@ public class TopUpActivity extends BaseActivity implements View.OnClickListener,
                         // 该笔订单是否真实支付成功，需要依赖服务端的异步通知。
                         MyUtils.showToast(mActivity, "支付成功");
                         mPopupWindow.dismiss();
-                        Intent intent = new Intent(mActivity, OrderConfirmActivity3.class);
-                        intent.putExtra("orderid", giftorderid);
-                        startActivity(intent);
                     } else {
                         // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
                         MyUtils.showToast(mActivity, "支付失败");
                         mPopupWindow.dismiss();
                     }
                     break;
-                case 3:
+                case Constants.WALLETPAY:
                     try {
                         JSONObject jsonObject = new JSONObject(result);
                         String code = jsonObject.getString("code");
                         String message = jsonObject.getString("message");
                         String data = jsonObject.getString("data");
-                        if ("0".equals(product.getGifttype())) {
-                            giftorderid = jsonObject.getString("giftorderid");
+                        Gson gson = new Gson();
+                        if ("200".equals(code)) {
+                            MyUtils.showToast(mActivity, message);
+                        } else {
+                            MyUtils.showToast(mActivity, message);
                         }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case Constants.ALIPAY:
+                    try {
+                        JSONObject jsonObject = new JSONObject(result);
+                        String code = jsonObject.getString("code");
+                        String message = jsonObject.getString("message");
+                        String data = jsonObject.getString("data");
+                        Gson gson = new Gson();
+                        if ("200".equals(code)) {
+                            orderInfo = data;
+                            alipay();
+                        } else {
+                            MyUtils.showToast(mActivity, message);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case Constants.WXPAY:
+                    try {
+                        JSONObject jsonObject = new JSONObject(result);
+                        String code = jsonObject.getString("code");
+                        String message = jsonObject.getString("message");
+                        String data = jsonObject.getString("data");
                         Gson gson = new Gson();
                         if ("200".equals(code)) {
                             WXpayInfo payInfo = gson.fromJson(data, WXpayInfo.class);
@@ -374,94 +409,9 @@ public class TopUpActivity extends BaseActivity implements View.OnClickListener,
                         e.printStackTrace();
                     }
                     break;
-                case 4:
-                    try {
-                        JSONObject jsonObject = new JSONObject(result);
-                        String code = jsonObject.getString("code");
-                        String message = jsonObject.getString("message");
-                        String data = jsonObject.getString("data");
-                        Gson gson = new Gson();
-                        if ("200".equals(code)) {
-                            user = gson.fromJson(data, User.class);
-                            Global.loginResult = gson.fromJson(data, LoginResult.class);
-                            balance.setText(user.getYue());
-                        } else {
-                            MyUtils.showToast(mActivity, message);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    break;
             }
         }
     };
-
-    @Override
-    protected void setListener() {
-        back.setOnClickListener(this);
-        save.setOnClickListener(this);
-        czBtn.setOnClickListener(this);
-        gv_sye.setOnItemClickListener(this);
-        gv_ssp.setOnItemClickListener(this);
-        xieyi.setOnClickListener(this);
-//        checkAll.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//            @Override
-//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//
-//            }
-//        });
-    }
-
-    @Override
-    public void onClick(View view) {
-        if (!MyUtils.isFastClick()) {
-            return;
-        }
-        switch (view.getId()) {
-            case R.id.back:
-                finish();
-                break;
-            case R.id.xieyi:
-                startActivity(new Intent(mActivity,AgreementActivity.class));
-                break;
-            case R.id.save:
-                startActivity(new Intent(mActivity,BalanceActivity.class));
-                break;
-            case R.id.cz_btn:
-                if (!checkAll.isChecked()) {
-                    MyUtils.showToast(mActivity, "请阅读并同意充值协议！");
-                    return;
-                }
-                if (product == null) {
-                    MyUtils.showToast(mActivity, "请选择充值金额！");
-                    return;
-                }
-                showPopupWindow();
-                break;
-        }
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        if (MyUtils.isFastClick()) {
-            switch (adapterView.getId()) {
-                case R.id.gv_sye:
-                    product = list1.get(i);
-                    adapter1.setSelected(i);
-                    adapter2.setSelected(-1);
-//                    showPopupWindow();
-                    break;
-                case R.id.gv_ssp:
-                    product = list2.get(i);
-                    adapter2.setSelected(i);
-                    adapter1.setSelected(-1);
-//                    showPopupWindow();
-                    break;
-
-            }
-        }
-
-    }
 
     /**
      * 弹出Popupwindow
@@ -472,6 +422,7 @@ public class TopUpActivity extends BaseActivity implements View.OnClickListener,
         LinearLayout weixin_ll = popupWindow_view.findViewById(R.id.weixin_ll);
         final LinearLayout alipay_ll = popupWindow_view.findViewById(R.id.alipay_ll);
         Button cz_btn = popupWindow_view.findViewById(R.id.cz_btn);
+        cz_btn.setText("立即支付");
         Button cancel_btn = popupWindow_view.findViewById(R.id.cancel_btn);
         final CheckBox weixin_check = popupWindow_view.findViewById(R.id.weixin_check);
         final CheckBox alipay_check = popupWindow_view.findViewById(R.id.alipay_check);
@@ -526,15 +477,36 @@ public class TopUpActivity extends BaseActivity implements View.OnClickListener,
                     return;
                 }
                 if (alipay_check.isChecked() == true) {
-                    //支付宝支付
                     alipayrequest();
                 } else if (weixin_check.isChecked() == true) {
-                    //微信支付
                     WXpayrequest();
                 } else if (yepay_check.isChecked() == true) {
-//                    MyUtils.showToast(mActivity, "余额支付");
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                    builder.setIcon(android.R.drawable.ic_dialog_info);
+                    builder.setTitle("温馨提示");
+                    builder.setMessage("余额支付" + levelid + "元，确定要继续吗");
+                    builder.setCancelable(true);
+
+                    builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Walletpayrequest();
+                        }
+                    });
+                    builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            /*
+                             *  在这里实现你自己的逻辑
+                             */
+                        }
+                    });
+                    builder.create().show();
+
                 } else {
-                    MyUtils.showToast(mActivity, "请选择支付方式");
+                    Toast.makeText(mActivity, "请选择支付方式",
+                            Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -575,10 +547,10 @@ public class TopUpActivity extends BaseActivity implements View.OnClickListener,
 
             @Override
             public void run() {
-                PayTask alipay = new PayTask(TopUpActivity.this);
+                PayTask alipay = new PayTask(VipActivity2.this);
                 Map<String, String> result = alipay.payV2(orderInfo, true);
                 Message msg = new Message();
-                msg.what = 2;
+                msg.what = 3;
                 msg.obj = result;
                 myHandler.sendMessage(msg);
             }
@@ -601,6 +573,96 @@ public class TopUpActivity extends BaseActivity implements View.OnClickListener,
         request.timeStamp = payInfo.getTimestamp();
         request.sign = payInfo.getSign();
         api.sendReq(request);
+    }
+
+    public void Walletpayrequest() {
+        FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
+        formBody.add("paytype", "BUY_LEVEL");//传递键值对参数
+        formBody.add("levelid", levelid);//传递键值对参数
+        formBody.add("userid", Global.loginResult.getId());
+//new call
+        Call call = MyOkHttp.GetCall("pay.wallet", formBody);
+//请求加入调度
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("------------", e.toString());
+//                myHandler.sendEmptyMessage(1);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+
+                String result = response.body().string();
+                MyUtils.e("------余额支付------", result);
+                Message message = new Message();
+                message.what = Constants.WALLETPAY;
+                Bundle bundle = new Bundle();
+                bundle.putString("result", result);
+                message.setData(bundle);
+                myHandler.sendMessage(message);
+            }
+        });
+    }
+
+    public void alipayrequest() {
+        FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
+        formBody.add("paytype", "BUY_LEVEL");//传递键值对参数
+        formBody.add("levelid", levelid);//传递键值对参数
+        formBody.add("userid", Global.loginResult.getId());
+//new call
+        Call call = MyOkHttp.GetCall("pay.alipay", formBody);
+//请求加入调度
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("------------", e.toString());
+//                myHandler.sendEmptyMessage(1);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+
+                String result = response.body().string();
+                MyUtils.e("------支付宝支付------", result);
+                Message message = new Message();
+                message.what = Constants.ALIPAY;
+                Bundle bundle = new Bundle();
+                bundle.putString("result", result);
+                message.setData(bundle);
+                myHandler.sendMessage(message);
+            }
+        });
+    }
+
+    public void WXpayrequest() {
+        FormBody.Builder formBody = new FormBody.Builder();//创建表单请求体
+        formBody.add("paytype", "BUY_LEVEL");//传递键值对参数
+        formBody.add("levelid", levelid);//传递键值对参数
+        formBody.add("userid", Global.loginResult.getId());
+//new call
+        Call call = MyOkHttp.GetCall("pay.wxpay", formBody);
+//请求加入调度
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("------------", e.toString());
+//                myHandler.sendEmptyMessage(1);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+
+                String result = response.body().string();
+                MyUtils.e("------微信支付------", result);
+                Message message = new Message();
+                message.what = Constants.WXPAY;
+                Bundle bundle = new Bundle();
+                bundle.putString("result", result);
+                message.setData(bundle);
+                myHandler.sendMessage(message);
+            }
+        });
     }
 
     @Override
@@ -631,18 +693,13 @@ public class TopUpActivity extends BaseActivity implements View.OnClickListener,
 					}
 				});
 				builder.show();*/
-                if ("0".equals(product.getGifttype())) {
-                    Intent intent = new Intent(mActivity, OrderConfirmActivity3.class);
-                    intent.putExtra("orderid", giftorderid);
-                    startActivity(intent);
-                    mPopupWindow.dismiss();
-//                    finish();
-                }
-
+                Toast.makeText(mActivity, "支付成功", Toast.LENGTH_SHORT)
+                        .show();
             } else if (resp.errCode == -1) {  // -1 错误  可能的原因：签名错误、未注册APPID、项目设置APPID不正确、注册的APPID与设置的不匹配、其他异常等。
                 Toast.makeText(mActivity, "支付出错", Toast.LENGTH_SHORT)
                         .show();
                 mPopupWindow.dismiss();
+
             } else if (resp.errCode == -2) {  // -2 用户取消    无需处理。发生场景：用户不支付了，点击取消，返回APP。
                 Toast.makeText(mActivity, "取消支付", Toast.LENGTH_SHORT)
                         .show();

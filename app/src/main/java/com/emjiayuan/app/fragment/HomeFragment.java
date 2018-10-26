@@ -617,7 +617,9 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                                 startActivity(new Intent(getActivity(), LoginActivity.class));
                                 return;
                             }
-                            startActivity(new Intent(getActivity(), TopUpActivity.class));
+                            intent = new Intent(getActivity(), TopUpActivity.class);
+                            intent.putExtra("type", 1);
+                            startActivity(intent);
                             break;
                         case 6:
                             startActivity(new Intent(getActivity(), IntegralYlActivity.class));

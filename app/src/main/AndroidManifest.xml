@@ -171,6 +171,8 @@
             android:screenOrientation="portrait"></activity>
         <activity android:name=".activity.VipActivity"
             android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.VipActivity2"
+            android:screenOrientation="portrait"></activity>
         <activity android:name=".activity.CouponGetActivity"
             android:screenOrientation="portrait"></activity>
         <activity android:name=".activity.CouponUseActivity"
