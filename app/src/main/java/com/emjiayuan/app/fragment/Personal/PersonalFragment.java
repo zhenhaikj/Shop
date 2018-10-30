@@ -29,6 +29,7 @@ import com.emjiayuan.app.activity.HelpActivity;
 import com.emjiayuan.app.activity.HezuoActivity;
 import com.emjiayuan.app.activity.HistoryActivity;
 import com.emjiayuan.app.activity.IntegralActivity;
+import com.emjiayuan.app.activity.IntegralCenterActivity;
 import com.emjiayuan.app.activity.LoginActivity;
 import com.emjiayuan.app.activity.LogisticsActivity;
 import com.emjiayuan.app.activity.OrderIntegralActivity;
@@ -272,7 +273,7 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
                 startActivity(new Intent(getActivity(), TopUpActivity.class));
                 break;
             case R.id.integral_ll:
-                startActivity(new Intent(getActivity(), IntegralActivity.class));
+                startActivity(new Intent(getActivity(), IntegralCenterActivity.class));
                 break;
             case R.id.coupon_ll:
                 startActivity(new Intent(getActivity(), CouponActivity2.class));

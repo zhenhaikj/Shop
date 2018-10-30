@@ -155,6 +155,7 @@
         android:background="@drawable/balance_shape"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
+        android:textColor="@color/white"
         android:text="退出登录"/>
     </LinearLayout>
 </LinearLayout>

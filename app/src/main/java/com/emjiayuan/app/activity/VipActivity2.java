@@ -37,7 +37,6 @@ import com.emjiayuan.app.entity.Vip;
 import com.emjiayuan.app.entity.VipCenter;
 import com.emjiayuan.app.entity.WXpayInfo;
 import com.emjiayuan.app.event.WXpaySuccessEvent;
-import com.emjiayuan.app.widget.BottomPopupOption;
 import com.emjiayuan.app.widget.HorizontalListView;
 import com.google.gson.Gson;
 import com.tencent.mm.opensdk.constants.ConstantsAPI;
@@ -88,6 +87,8 @@ public class VipActivity2 extends BaseActivity implements View.OnClickListener {
     TextView total;
     @BindView(R.id.detail)
     TextView detail;
+    @BindView(R.id.introduction_ll)
+    LinearLayout introductionLl;
 
 
     private ArrayList<Vip> vipList;
@@ -125,22 +126,23 @@ public class VipActivity2 extends BaseActivity implements View.OnClickListener {
         title.setText("会员中心");
         user();
         getVipCenter();
-        Rights rights1=new Rights(R.drawable.vip_discount,"尊享会员折扣","享受超级会员权益，购买产品更省钱。");
-        Rights rights2=new Rights(R.drawable.vip_kf,"客服优先","为了更好的服务您，享有优先接线的权益。");
-        Rights rights3=new Rights(R.drawable.vip_integal,"购物得积分","购买产品获得积分，积分可以换取精美礼品。");
-        Rights rights4=new Rights(R.drawable.vip_more,"更多权益","更多特权正在准备中，敬请期待！");
-        rightsList=new ArrayList<>();
+        Rights rights1 = new Rights(R.drawable.vip_discount, "尊享会员折扣", "享受超级会员权益，购买产品更省钱。");
+        Rights rights2 = new Rights(R.drawable.vip_kf, "客服优先", "为了更好的服务您，享有优先接线的权益。");
+        Rights rights3 = new Rights(R.drawable.vip_integal, "购物得积分", "购买产品获得积分，积分可以换取精美礼品。");
+        Rights rights4 = new Rights(R.drawable.vip_more, "更多权益", "更多特权正在准备中，敬请期待！");
+        rightsList = new ArrayList<>();
         rightsList.add(rights1);
         rightsList.add(rights2);
         rightsList.add(rights3);
         rightsList.add(rights4);
-        RightsAdapter adapter=new RightsAdapter(mActivity,rightsList);
+        RightsAdapter adapter = new RightsAdapter(mActivity, rightsList);
         hlv.setAdapter(adapter);
     }
 
     @Override
     protected void setListener() {
         back.setOnClickListener(this);
+        introductionLl.setOnClickListener(this);
     }
 
 
@@ -149,6 +151,9 @@ public class VipActivity2 extends BaseActivity implements View.OnClickListener {
         switch (view.getId()) {
             case R.id.back:
                 finish();
+                break;
+            case R.id.introduction_ll:
+                startActivity(new Intent(mActivity,VipAgreementActivity.class));
                 break;
         }
     }
@@ -220,11 +225,11 @@ public class VipActivity2 extends BaseActivity implements View.OnClickListener {
     public void setData() {
         username.setText(user.getShowname());
         level.setText(user.getClassname());
-        detail.setText("累计节省费用 明细>");
+        detail.setText("累计节省费用");
         if ("Vip普通会员".equals(user.getClassname())) {
             period.setText("永久");
         } else {
-            period.setText( user.getViptime()+" 到期");
+            period.setText(user.getViptime() + " 到期");
         }
         if (Double.parseDouble(user.getDiscount()) / 10 == 10.0) {
             discount.setText("当前会员等级购物无折扣");
@@ -286,14 +291,14 @@ public class VipActivity2 extends BaseActivity implements View.OnClickListener {
                             for (int i = jsonArray.length() - 1; i >= 0; i--) {
                                 Vip vip = gson.fromJson(jsonArray.getJSONObject(i).toString(), Vip.class);
                                 vipList.add(vip);
-                                VipAdapter adapter=new VipAdapter(mActivity,vipList,now_id);
+                                VipAdapter adapter = new VipAdapter(mActivity, vipList, now_id);
                                 hlvVip.setAdapter(adapter);
                                 hlvVip.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                     @Override
                                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                        levelid=vipList.get(position).getId();
-                                        if (Integer.parseInt(levelid)<=now_id){
-                                        }else{
+                                        levelid = vipList.get(position).getId();
+                                        if (Integer.parseInt(levelid) <= now_id) {
+                                        } else {
                                             showPopupWindow();
                                         }
                                     }
@@ -314,8 +319,8 @@ public class VipActivity2 extends BaseActivity implements View.OnClickListener {
                         String data = jsonObject.getString("data");
                         Gson gson = new Gson();
                         if ("200".equals(code)) {
-                            VipCenter center= gson.fromJson(data, VipCenter.class);
-                            total.setText(center.getSavemoney()+"元");
+                            VipCenter center = gson.fromJson(data, VipCenter.class);
+                            total.setText(center.getSavemoney() + "元");
                         } else {
                             MyUtils.showToast(mActivity, message);
                         }
@@ -421,6 +426,16 @@ public class VipActivity2 extends BaseActivity implements View.OnClickListener {
         LinearLayout yepay_ll = popupWindow_view.findViewById(R.id.yepay_ll);
         LinearLayout weixin_ll = popupWindow_view.findViewById(R.id.weixin_ll);
         final LinearLayout alipay_ll = popupWindow_view.findViewById(R.id.alipay_ll);
+        final LinearLayout vip_ll = popupWindow_view.findViewById(R.id.vip_ll);
+        final CheckBox checkAll = popupWindow_view.findViewById(R.id.checkAll);
+        final TextView xieyi = popupWindow_view.findViewById(R.id.xieyi);
+        vip_ll.setVisibility(View.VISIBLE);
+        xieyi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(mActivity, VipAgreementActivity.class));
+            }
+        });
         Button cz_btn = popupWindow_view.findViewById(R.id.cz_btn);
         cz_btn.setText("立即支付");
         Button cancel_btn = popupWindow_view.findViewById(R.id.cancel_btn);
@@ -474,6 +489,10 @@ public class VipActivity2 extends BaseActivity implements View.OnClickListener {
             @Override
             public void onClick(View view) {
                 if (!MyUtils.isFastClick()) {
+                    return;
+                }
+                if (!checkAll.isChecked()) {
+                    MyUtils.showToast(mActivity, "请阅读并同意VIP会员服务说明！");
                     return;
                 }
                 if (alipay_check.isChecked() == true) {

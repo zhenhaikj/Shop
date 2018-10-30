@@ -15,6 +15,7 @@ import android.os.Message;
 import android.support.v4.content.FileProvider;
 import android.util.Base64;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -458,11 +459,12 @@ public class SettingActivity extends BaseActivity {
                 if (!MyUtils.isFastClick()) {
                     return;
                 }
-                final EditText et = new EditText(mActivity);
+                View vw=LayoutInflater.from(mActivity).inflate(R.layout.edit_layout,null);
+                final EditText et=vw.findViewById(R.id.et);
                 et.setText(user.getNickname());
+                et.setSelection(et.getText().length());
                 new AlertDialog.Builder(mActivity).setTitle("修改昵称")
-                        .setIcon(android.R.drawable.sym_def_app_icon)
-                        .setView(et)
+                        .setView(vw)
                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {

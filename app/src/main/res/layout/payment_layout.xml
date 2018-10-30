@@ -93,6 +93,47 @@
             android:enabled="false"
             android:background="@drawable/pay_check_selector"/>
     </LinearLayout>
+    <LinearLayout
+        android:id="@+id/vip_ll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        android:gravity="center">
+        <LinearLayout
+            android:id="@+id/check_ll"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center">
+            <CheckBox
+                android:id="@+id/checkAll"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginLeft="10dp"
+                android:button="@null"
+                android:background="@drawable/check_selector" />
+            <TextView
+                android:id="@+id/check"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp"
+                android:gravity="center"
+                android:text="我已经阅读并同意伊穆家园的"
+                android:textColor="@color/black"
+                android:textSize="15sp" />
+        </LinearLayout>
+        <TextView
+            android:id="@+id/xieyi"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="VIP会员服务说明"
+            android:textColor="#46D34E"
+            android:textSize="15sp" />
+    </LinearLayout>
     <Button
         android:id="@+id/cz_btn"
         android:layout_width="match_parent"
@@ -101,6 +142,7 @@
         android:layout_marginRight="30dp"
         android:layout_marginTop="10dp"
         android:background="@drawable/cz_bg"
+        android:textColor="@color/white"
         android:text="立即充值"/>
     <Button
         android:id="@+id/cancel_btn"

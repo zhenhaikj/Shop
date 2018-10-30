@@ -126,6 +126,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:horizontalSpacing="3dp"
+                    android:listSelector="@null"
                     android:numColumns="5"
                     android:verticalSpacing="3dp" />
                 <View

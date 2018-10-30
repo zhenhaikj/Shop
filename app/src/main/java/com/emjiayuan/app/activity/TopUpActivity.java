@@ -443,7 +443,7 @@ public class TopUpActivity extends BaseActivity implements View.OnClickListener,
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        if (MyUtils.isFastClick()) {
+//        if (MyUtils.isFastClick()) {
             switch (adapterView.getId()) {
                 case R.id.gv_sye:
                     product = list1.get(i);
@@ -459,7 +459,7 @@ public class TopUpActivity extends BaseActivity implements View.OnClickListener,
                     break;
 
             }
-        }
+//        }
 
     }
 

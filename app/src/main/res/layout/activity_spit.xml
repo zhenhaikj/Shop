@@ -26,5 +26,6 @@
         android:layout_height="40dp"
         android:layout_margin="30dp"
         android:background="@drawable/balance_shape"
+        android:textColor="@color/white"
         android:text="提交"/>
 </LinearLayout>

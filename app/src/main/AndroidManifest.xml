@@ -42,7 +42,7 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/start_icon"
         tools:replace="android:theme"
-        android:theme="@style/Theme.AppCompat.NoActionBar">
+        android:theme="@style/AppTheme">
 
         <provider
 
@@ -151,6 +151,8 @@
             android:screenOrientation="portrait"></activity>
         <activity android:name=".activity.IntegralActivity"
             android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.IntegralCenterActivity"
+            android:screenOrientation="portrait"></activity>
         <activity android:name=".activity.CouponActivity"
             android:screenOrientation="portrait"></activity>
         <activity android:name=".activity.CouponActivity2"
@@ -204,6 +206,8 @@
         <activity android:name=".activity.EnterpriseActivity"
             android:screenOrientation="portrait"></activity>
         <activity android:name=".activity.AgreementActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.VipAgreementActivity"
             android:screenOrientation="portrait"></activity>
         <activity android:name=".activity.HezuoActivity"
             android:screenOrientation="portrait"></activity>

@@ -3,8 +3,11 @@ package com.emjiayuan.app.Utils;
 import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
@@ -25,6 +28,7 @@ import android.widget.ListAdapter;
 import android.widget.Toast;
 
 import com.emjiayuan.app.Constants;
+import com.emjiayuan.app.activity.VipActivity2;
 import com.emjiayuan.app.entity.NameValuePair;
 
 import java.io.IOException;
@@ -272,7 +276,13 @@ public class MyUtils {
         animator.start();
     }
     public static void showToast(Context context, String text) {
-        Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+        new AlertDialog.Builder(context).setMessage(text).setPositiveButton("我知道了", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        }).create().show();
     }
 
     public static String md5(String string) {
