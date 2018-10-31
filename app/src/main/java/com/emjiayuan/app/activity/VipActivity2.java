@@ -4,9 +4,12 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.RequiresApi;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -18,6 +21,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -89,6 +93,10 @@ public class VipActivity2 extends BaseActivity implements View.OnClickListener {
     TextView detail;
     @BindView(R.id.introduction_ll)
     LinearLayout introductionLl;
+    @BindView(R.id.sv)
+    ScrollView sv;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
 
 
     private ArrayList<Vip> vipList;
@@ -98,7 +106,9 @@ public class VipActivity2 extends BaseActivity implements View.OnClickListener {
     private String levelid;
     private String orderInfo;
     private int now_id;
-
+    private int fadingHeight = 600; // 当ScrollView滑动到什么位置时渐变消失（根据需要进行调整）
+    private static final int START_ALPHA = 0;//scrollview滑动开始位置
+    private static final int END_ALPHA = 255;//scrollview滑动结束位置
 
     @Override
     protected int setLayoutId() {
@@ -115,11 +125,13 @@ public class VipActivity2 extends BaseActivity implements View.OnClickListener {
      */
     protected void initImmersionBar() {
         super.initImmersionBar();
-        mImmersionBar.fitsSystemWindows(false);
-        mImmersionBar.statusBarColor(R.color.transparent);
-        mImmersionBar.keyboardEnable(true).navigationBarWithKitkatEnable(false).init();
+        mImmersionBar.titleBar(R.id.toolbar)
+                .fitsSystemWindows(false)
+                .statusBarColor(R.color.transparent)
+                .init();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void initView() {
         EventBus.getDefault().register(this);
@@ -137,6 +149,25 @@ public class VipActivity2 extends BaseActivity implements View.OnClickListener {
         rightsList.add(rights4);
         RightsAdapter adapter = new RightsAdapter(mActivity, rightsList);
         hlv.setAdapter(adapter);
+        sv.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(View view, int x, int y, int i2, int i3) {
+                if (y > fadingHeight) {
+                    y = fadingHeight; // 当滑动到指定位置之后设置颜色为纯色，之前的话要渐变---实现下面的公式即可
+
+//                relativela_id.setBackgroundColor(Color.WHITE);
+                } else if (y < 0) {
+                    y = 0;
+                } else {
+//                relativela_id.setBackgroundColor(0x99FFFFFF);
+                }
+                toolbar.getBackground().setAlpha(y * (END_ALPHA - START_ALPHA) / fadingHeight
+                        + START_ALPHA);
+//                drawable.setAlpha(y * (END_ALPHA - START_ALPHA) / fadingHeight
+//                        + START_ALPHA);
+            }
+        });
+        toolbar.getBackground().setAlpha(START_ALPHA);
     }
 
     @Override
@@ -153,7 +184,7 @@ public class VipActivity2 extends BaseActivity implements View.OnClickListener {
                 finish();
                 break;
             case R.id.introduction_ll:
-                startActivity(new Intent(mActivity,VipAgreementActivity.class));
+                startActivity(new Intent(mActivity, VipAgreementActivity.class));
                 break;
         }
     }
