@@ -174,6 +174,7 @@ public class ViewPagerFragment extends BaseLazyFragment {
                 soupOrderList.clear();
                 pageindex=1;
                 refreshLayout.finishLoadMore(false);
+                refreshLayout.setNoMoreData(false);
                 if (type==3){
                     getSoupOrder();
                 }else{
@@ -379,7 +380,8 @@ public class ViewPagerFragment extends BaseLazyFragment {
                             }
                             refreshLayout.finishLoadMore(true);
                             if (pageindex!=1){
-                                MyUtils.showToast(getActivity(), "已全部加载");
+                                refreshLayout.finishLoadMoreWithNoMoreData();
+//                                MyUtils.showToast(getActivity(), "已全部加载");
                             }else{
 //                                MyUtils.showToast(getActivity(), message);
                             }
@@ -428,7 +430,8 @@ public class ViewPagerFragment extends BaseLazyFragment {
                             }
                             refreshLayout.finishLoadMore(true);
                             if (pageindex!=1){
-                                MyUtils.showToast(getActivity(), "已全部加载");
+//                                MyUtils.showToast(getActivity(), "已全部加载");
+                                refreshLayout.finishLoadMoreWithNoMoreData();
                             }else{
 //                                MyUtils.showToast(getActivity(), message);
                             }

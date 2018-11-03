@@ -75,7 +75,7 @@ public class IntegralCenterActivity extends BaseActivity implements View.OnClick
     @Override
     protected void initData() {
         title.setText("积分中心");
-        save.setText("礼品中心");
+        save.setText("积分商城");
         save.setVisibility(View.VISIBLE);
         adapter = new IntegralAdapter(this, list);
         lvHistory.setAdapter(adapter);
@@ -90,6 +90,7 @@ public class IntegralCenterActivity extends BaseActivity implements View.OnClick
                 pageindex = 1;
                 refreshLayout.finishLoadMore(false);
                 refreshLayout.setEnableLoadMore(true);
+                refreshLayout.setNoMoreData(false);
                 request(pageindex, status);
             }
         });
@@ -170,8 +171,18 @@ public class IntegralCenterActivity extends BaseActivity implements View.OnClick
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 list.add(gson.fromJson(jsonArray.getJSONObject(i).toString(), Integral.class));
                             }
-                            stateLayout.changeState(StateFrameLayout.SUCCESS);
+//                            stateLayout.changeState(StateFrameLayout.SUCCESS);
                             adapter.notifyDataSetChanged();
+                            if (pageindex == 1&&jsonArray.length()==0) {
+                                stateLayout.changeState(StateFrameLayout.EMPTY);
+                            } else {
+                                stateLayout.changeState(StateFrameLayout.SUCCESS);
+                            }
+                            if (pageindex != 1&&jsonArray.length()==0) {
+                                refreshLayout.finishLoadMoreWithNoMoreData();
+                            } else {
+//                                MyUtils.showToast(mActivity, message);
+                            }
                         } else {
                             refreshLayout.finishLoadMore(true);
                             if (pageindex == 1) {
@@ -180,7 +191,8 @@ public class IntegralCenterActivity extends BaseActivity implements View.OnClick
                                 stateLayout.changeState(StateFrameLayout.SUCCESS);
                             }
                             if (pageindex != 1) {
-                                MyUtils.showToast(mActivity, "已全部加载");
+//                                MyUtils.showToast(mActivity, "已全部加载");
+                                refreshLayout.finishLoadMoreWithNoMoreData();
                             } else {
                                 MyUtils.showToast(mActivity, message);
                             }

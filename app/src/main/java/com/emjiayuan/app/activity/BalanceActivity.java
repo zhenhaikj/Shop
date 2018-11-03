@@ -123,6 +123,7 @@ public class BalanceActivity extends BaseActivity implements View.OnClickListene
                 list.clear();
                 pageindex = 1;
                 refreshLayout.finishLoadMore(false);
+                refreshLayout.setNoMoreData(false);
                 request(pageindex, status);
             }
         });
@@ -212,7 +213,8 @@ public class BalanceActivity extends BaseActivity implements View.OnClickListene
                                 stateLayout.changeState(StateFrameLayout.SUCCESS);
                             }
                             if (pageindex!=1){
-                                MyUtils.showToast(mActivity, "已全部加载");
+//                                MyUtils.showToast(mActivity, "已全部加载");
+                                refreshLayout.finishLoadMoreWithNoMoreData();
                             }else{
                                 MyUtils.showToast(mActivity, message);
                             }
@@ -232,9 +234,9 @@ public class BalanceActivity extends BaseActivity implements View.OnClickListene
 
     @Override
     public void onClick(View view) {
-        if (!MyUtils.isFastClick()) {
+        /*if (!MyUtils.isFastClick()) {
             return;
-        }
+        }*/
         switch (view.getId()) {
             case R.id.back:
                 finish();
@@ -242,6 +244,7 @@ public class BalanceActivity extends BaseActivity implements View.OnClickListene
             case R.id.cz_ll:
 //                cz_ll.setBackgroundColor(Color.parseColor("#48C351"));
                 refreshLayout.finishLoadMore(false);
+                refreshLayout.setNoMoreData(false);
                 status = "2";
                 pageindex = 1;
                 list.clear();
@@ -253,6 +256,7 @@ public class BalanceActivity extends BaseActivity implements View.OnClickListene
                 break;
             case R.id.xf_ll:
                 refreshLayout.finishLoadMore(false);
+                refreshLayout.setNoMoreData(false);
 //                xf_ll.setBackgroundColor(Color.parseColor("#48C351"));
                 status = "4";
                 pageindex = 1;

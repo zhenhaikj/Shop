@@ -2,6 +2,9 @@ package com.emjiayuan.app.entity;
 
 import com.emjiayuan.app.Utils.MyUtils;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class User {
 
     /**
@@ -121,7 +124,16 @@ public class User {
     }
 
     public String getViptime() {
-        return MyUtils.stampToDate(viptime);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        long lt = new Long(viptime);
+        if (viptime.length()==13){
+            Date date = new Date(lt);
+            return simpleDateFormat.format(date);
+        }else{
+            Date date = new Date(lt*1000);
+            return simpleDateFormat.format(date);
+        }
+//        return MyUtils.stampToDate(viptime);
     }
 
     public void setViptime(String viptime) {

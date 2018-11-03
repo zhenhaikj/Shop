@@ -141,7 +141,7 @@ public class LogisticsActivity extends BaseActivity implements View.OnClickListe
 //                            MyUtils.showToast(LogisticsActivity.this, result);
                         } else {
                             stateLayout.changeState(StateFrameLayout.EMPTY);
-                            MyUtils.showToast(LogisticsActivity.this, message);
+//                            MyUtils.showToast(LogisticsActivity.this, message);
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();

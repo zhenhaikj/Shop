@@ -618,7 +618,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
                                 return;
                             }
                             intent = new Intent(getActivity(), TopUpActivity.class);
-                            intent.putExtra("type", 1);
+                            intent.putExtra("type", 2);
                             startActivity(intent);
                             break;
                         case 6:
@@ -1060,7 +1060,7 @@ public class HomeFragment extends BaseLazyFragment implements AdapterView.OnItem
 
 
                         } else {
-                            MyUtils.showToast(mActivity, message);
+//                            MyUtils.showToast(mActivity, message);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

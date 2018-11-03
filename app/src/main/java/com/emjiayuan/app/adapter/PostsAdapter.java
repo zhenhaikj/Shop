@@ -358,7 +358,7 @@ public class PostsAdapter extends BaseAdapter implements AbsListView.OnScrollLis
                     EventBus.getDefault().post(new CommentEvent(post, position, -1));
                 }
             });
-            holder.llLetter.setVisibility(post.getUserid().equals(Global.loginResult.getId()) ? View.GONE : View.VISIBLE);
+            holder.llLetter.setVisibility(Global.loginResult!=null?(post.getUserid().equals(Global.loginResult.getId()) ? View.GONE : View.VISIBLE):View.GONE);
             holder.llLetter.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

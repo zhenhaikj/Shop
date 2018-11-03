@@ -150,7 +150,7 @@ public class CouponGetActivity extends BaseActivity implements View.OnClickListe
                             adapter.notifyDataSetChanged();
                         } else {
                             stateLayout.changeState(StateFrameLayout.EMPTY);
-                            MyUtils.showToast(mActivity, message);
+//                            MyUtils.showToast(mActivity, message);
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();

@@ -10,21 +10,22 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.emjiayuan.app.BaseActivity;
 import com.emjiayuan.app.MainActivity;
 import com.emjiayuan.app.R;
-import com.emjiayuan.app.Utils.GlideUtil;
 import com.emjiayuan.app.Utils.MyOkHttp;
 import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.Utils.SpUtils;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.LoginResult;
 import com.emjiayuan.app.event.LoginSuccessEvent;
-import com.emjiayuan.app.widget.MyImageView;
+import com.emjiayuan.app.widget.KeyboardLayout;
 import com.emjiayuan.app.widget.RatioImageView;
+import com.emjiayuan.app.widget.SoftKeyInputHidWidget;
 import com.google.gson.Gson;
 import com.umeng.analytics.MobclickAgent;
 
@@ -63,6 +64,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     View lineTop;
     @BindView(R.id.im_login)
     RatioImageView imLogin;
+//    @BindView(R.id.login_sv)
+//    ScrollView loginSv;
+//    @BindView(R.id.main_ll)
+//    KeyboardLayout mainLl;
     private int type = 0;
     private SharedPreferences sp;
 
@@ -88,7 +93,27 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 //        if (intent!=null){
 //            type=intent.getIntExtra("type",0);
 //        }
+        /*mainLl.setKeyboardListener(new KeyboardLayout.KeyboardLayoutListener() {
+            @Override
+            public void onKeyboardStateChanged(boolean isActive, int keyboardHeight) {
+                Log.e("onKeyboardStateChanged", "isActive:" + isActive + " keyboardHeight:" + keyboardHeight);
+                if (isActive) {
+                    loginSv.postDelayed(new Runnable() {
 
+                        @Override
+                        public void run() {
+                            loginSv.smoothScrollTo(0, loginSv.getBottom() + SoftKeyInputHidWidget.getStatusBarHeight(LoginActivity.this));
+                        }
+                    }, 100);
+                }
+            }
+        });*/
+    }
+
+    @Override
+    protected void initImmersionBar() {
+        super.initImmersionBar();
+        mImmersionBar.fitsSystemWindows(false);
     }
 
     @Override
@@ -148,7 +173,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                             //当用户使用自有账号登录时，可以这样统计：
                             MobclickAgent.onProfileSignIn(Global.loginResult.getId());
                             SpUtils.putObject(mActivity, "loginResult", Global.loginResult);
-                            MyUtils.showToast(LoginActivity.this, message);
+//                            MyUtils.showToast(LoginActivity.this, message);
 
                             getDevice();
                             setResult(RESULT_OK);

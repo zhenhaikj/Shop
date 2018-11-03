@@ -102,6 +102,7 @@ public class IntegralActivity extends BaseActivity implements View.OnClickListen
                 list.clear();
                 pageindex = 1;
                 refreshLayout.finishLoadMore(false);
+                refreshLayout.setNoMoreData(false);
                 refreshLayout.setEnableLoadMore(true);
                 request(pageindex, status);
             }
@@ -195,7 +196,8 @@ public class IntegralActivity extends BaseActivity implements View.OnClickListen
                                 stateLayout.changeState(StateFrameLayout.SUCCESS);
                             }
                             if (pageindex!=1){
-                                MyUtils.showToast(mActivity, "已全部加载");
+//                                MyUtils.showToast(mActivity, "已全部加载");
+                                refreshLayout.finishLoadMoreWithNoMoreData();
                             }else{
                                 MyUtils.showToast(mActivity, message);
                             }

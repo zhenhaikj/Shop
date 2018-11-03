@@ -71,7 +71,7 @@ public class IntegralAdapter extends BaseAdapter {
         }
 
         Integral item = grouplists.get(position);
-        holder.tab_sj.setText(item.getPoints());
+        holder.tab_sj.setText(("2".equals(item.getStatus())?"-":"+")+item.getPoints());
         holder.tab_je.setText(item.getCreatetime());
         if (position%2==0){
             holder.tab_ll.setBackgroundColor(Color.parseColor("#ffffff"));

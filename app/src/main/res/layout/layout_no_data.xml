@@ -7,10 +7,9 @@
     android:background="#ffffff">
 
     <ImageView
-        android:layout_width="244dp"
-        android:layout_height="180dp"
-        android:visibility="gone"
-        android:background="@drawable/no_wl"/>
+        android:layout_width="122dp"
+        android:layout_height="90dp"
+        android:background="@drawable/all_empty"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

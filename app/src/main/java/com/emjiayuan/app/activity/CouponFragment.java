@@ -327,7 +327,7 @@ public  class CouponFragment extends BaseLazyFragment {
                             }
                             stateLayout.changeState(StateFrameLayout.EMPTY);
                             refreshLayout.finishLoadMore(true);
-                            MyUtils.showToast(getActivity(), message);
+//                            MyUtils.showToast(getActivity(), message);
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();

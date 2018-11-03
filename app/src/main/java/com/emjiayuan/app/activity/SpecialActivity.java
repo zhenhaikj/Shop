@@ -103,6 +103,7 @@ public class SpecialActivity extends BaseActivity {
                 list.clear();
                 pageindex=1;
                 refreshLayout.finishLoadMore(false);
+                refreshLayout.setNoMoreData(false);
                 request(pageindex);
             }
         });
@@ -189,7 +190,8 @@ public class SpecialActivity extends BaseActivity {
                             });
                         } else {
                             if (pageindex!=1){
-                                MyUtils.showToast(mActivity,"已全部加载");
+//                                MyUtils.showToast(mActivity,"已全部加载");
+                                refreshLayout.finishLoadMoreWithNoMoreData();
                             }else{
                                 MyUtils.showToast(mActivity,message);
                             }

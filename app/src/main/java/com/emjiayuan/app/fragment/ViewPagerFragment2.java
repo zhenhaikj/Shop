@@ -151,6 +151,7 @@ public class ViewPagerFragment2 extends BaseLazyFragment {
                 orderList.clear();
                 pageindex=1;
                 refreshLayout.finishLoadMore(false);
+                refreshLayout.setNoMoreData(false);
                 getOrder();
             }
         });
@@ -296,7 +297,8 @@ public class ViewPagerFragment2 extends BaseLazyFragment {
                             }
                             refreshLayout.finishLoadMore(true);
                             if (pageindex!=1){
-                                MyUtils.showToast(getActivity(), "已全部加载");
+//                                MyUtils.showToast(getActivity(), "已全部加载");
+                                refreshLayout.finishLoadMoreWithNoMoreData();
                             }else{
 //                                MyUtils.showToast(getActivity(), message);
                             }

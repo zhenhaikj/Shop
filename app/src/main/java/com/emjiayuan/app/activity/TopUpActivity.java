@@ -114,11 +114,16 @@ public class TopUpActivity extends BaseActivity implements View.OnClickListener,
         int type = getIntent().getIntExtra("type",0);
         if (type==1){
             title.setText("充值中心");
+            save.setVisibility(View.VISIBLE);
+        }else if(type==2){
+            title.setText("充值有礼");
+            save.setVisibility(View.GONE);
         }else{
             title.setText("余额");
+            save.setVisibility(View.VISIBLE);
         }
         save.setText("消费记录");
-        save.setVisibility(View.VISIBLE);
+
         request();
         user();
     }

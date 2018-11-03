@@ -25,6 +25,7 @@ import com.emjiayuan.app.Utils.MyUtils;
 import com.emjiayuan.app.activity.CollectionActivity;
 import com.emjiayuan.app.activity.CouponActivity2;
 import com.emjiayuan.app.activity.EnterpriseActivity;
+import com.emjiayuan.app.activity.GoodsDetailActivity;
 import com.emjiayuan.app.activity.HelpActivity;
 import com.emjiayuan.app.activity.HezuoActivity;
 import com.emjiayuan.app.activity.HistoryActivity;
@@ -32,8 +33,10 @@ import com.emjiayuan.app.activity.IntegralActivity;
 import com.emjiayuan.app.activity.IntegralCenterActivity;
 import com.emjiayuan.app.activity.LoginActivity;
 import com.emjiayuan.app.activity.LogisticsActivity;
+import com.emjiayuan.app.activity.MessageDetailActivity;
 import com.emjiayuan.app.activity.OrderIntegralActivity;
 import com.emjiayuan.app.activity.OrderNormalActivity2;
+import com.emjiayuan.app.activity.SecondsKillActivity2;
 import com.emjiayuan.app.activity.SettingActivity;
 import com.emjiayuan.app.activity.SpitActivity;
 import com.emjiayuan.app.activity.TopUpActivity;
@@ -41,6 +44,7 @@ import com.emjiayuan.app.activity.VipActivity;
 import com.emjiayuan.app.activity.VipActivity2;
 import com.emjiayuan.app.activity.address.AddressActivity;
 import com.emjiayuan.app.adapter.PersonalTopUpAdapter;
+import com.emjiayuan.app.entity.BannerItem;
 import com.emjiayuan.app.entity.Global;
 import com.emjiayuan.app.entity.LoginResult;
 import com.emjiayuan.app.entity.Product;
@@ -57,6 +61,7 @@ import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.yalantis.ucrop.UCrop;
 import com.youth.banner.Banner;
+import com.youth.banner.listener.OnBannerListener;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -147,6 +152,7 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
     @BindView(R.id.banner)
     Banner banner;
     private ArrayList<Product> list = new ArrayList<>();//充值
+    private ArrayList<String> images = new ArrayList<>();
     private PersonalTopUpAdapter adapter;
     private Product product;
 
@@ -174,9 +180,7 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
-        banner.setImageLoader(new GlideImageLoader());
-        banner.setImages(Global.images);
-        banner.start();
+
 //        vip_ll.getBackground().setAlpha(0);
 //        vip.getBackground().setAlpha(0);
 //        if (Global.loginResult == null) {
@@ -481,6 +485,40 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
                         String message = jsonObject.getString("message");
                         String data = jsonObject.getString("data");
                         Gson gson = new Gson();
+                        if (jsonObject.has("bannerlist")){
+                            String bannerlist = jsonObject.getString("bannerlist");
+                            JSONArray jsonArray=new JSONArray(bannerlist);
+                            final ArrayList<BannerItem> bannerList=new ArrayList<>();
+                            images=new ArrayList<>();
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                BannerItem bannerItem = gson.fromJson(jsonArray.getJSONObject(i).toString(), BannerItem.class);
+                                images.add(bannerItem.getImage());
+                                bannerList.add(bannerItem);
+                            }
+                            banner.setImageLoader(new GlideImageLoader());
+                            banner.setImages(images);
+                            banner.start();
+                            banner.setOnBannerListener(new OnBannerListener() {
+                                @Override
+                                public void OnBannerClick(int position) {
+                                    BannerItem item = bannerList.get(position);
+                                    if ("1".equals(item.getType())) {
+                                        Intent intent = new Intent(mActivity, GoodsDetailActivity.class);
+                                        intent.putExtra("productid", item.getLinkid());
+                                        startActivity(intent);
+                                    } else if ("2".equals(item.getType())) {
+                                        Intent intent = new Intent(mActivity, MessageDetailActivity.class);
+                                        intent.putExtra("newsid", item.getLinkid());
+                                        startActivity(intent);
+                                    } else if ("3".equals(item.getType())) {
+                                        Intent intent = new Intent(mActivity, SecondsKillActivity2.class);
+                                        intent.putExtra("seckillid", item.getLinkid());
+                                        startActivity(intent);
+                                    }
+                                }
+                            });
+                        }
+
                         if ("200".equals(code)) {
                             user = gson.fromJson(data, User.class);
                             Global.loginResult = gson.fromJson(data, LoginResult.class);

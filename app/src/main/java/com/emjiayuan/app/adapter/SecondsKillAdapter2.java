@@ -90,17 +90,17 @@ public class SecondsKillAdapter2 extends BaseAdapter {
 
         if ("0".equals(seckillBean.getStatus())) {
             holder.second_kill_btn.setText("即将开秒");
-            holder.xl.setText("限量" + item.getLimit_num() + "件");
+            holder.xl.setText("库存" + item.getKucun() + "件");
             holder.second_kill_btn.setBackgroundResource(R.drawable.kill_shape2);
             holder.second_kill_btn.setEnabled(false);
         } else if ("1".equals(seckillBean.getStatus())) {
             holder.second_kill_btn.setText("立即抢购");
-            holder.xl.setText("仅剩" + item.getKucun() + "件");
+            holder.xl.setText("库存" + item.getKucun() + "件");
             holder.second_kill_btn.setBackgroundResource(R.drawable.kill_shape1);
             holder.second_kill_btn.setEnabled(true);
         } else if ("2".equals(seckillBean.getStatus())) {
             holder.second_kill_btn.setText("已结束");
-            holder.xl.setText("仅剩" + item.getKucun() + "件");
+            holder.xl.setText("库存" + item.getKucun() + "件");
             holder.second_kill_btn.setBackgroundResource(R.drawable.kill_shape2);
             holder.second_kill_btn.setEnabled(false);
         }

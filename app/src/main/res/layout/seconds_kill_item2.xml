@@ -106,6 +106,7 @@
                 android:layout_height="25dp"
                 android:text="即将开秒"
                 android:gravity="center"
+                android:textColor="@color/white"
                 android:background="@drawable/second_kill_btn" />
         </LinearLayout>
     </LinearLayout>
