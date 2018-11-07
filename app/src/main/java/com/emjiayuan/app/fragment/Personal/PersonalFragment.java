@@ -498,6 +498,11 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
                             banner.setImageLoader(new GlideImageLoader());
                             banner.setImages(images);
                             banner.start();
+                            if (images.size()==0){
+                                banner.setVisibility(View.GONE);
+                            }else{
+                                banner.setVisibility(View.VISIBLE);
+                            }
                             banner.setOnBannerListener(new OnBannerListener() {
                                 @Override
                                 public void OnBannerClick(int position) {
@@ -609,7 +614,11 @@ public class PersonalFragment extends BaseLazyFragment implements View.OnClickLi
 
     private void setData() {
         nickname.setText(user.getShowname());
-        vip.setText(user.getClassname() + "(购物享受" + Double.parseDouble(user.getDiscount()) / 10 + "折)");
+        if ("普通会员".equals(user.getClassname())){
+            vip.setText(user.getClassname());
+        }else{
+            vip.setText(user.getClassname() + "(购物享受" + Double.parseDouble(user.getDiscount()) / 10 + "折)");
+        }
         balance.setText(user.getYue());
         integral.setText(user.getJifen());
         count.setText(user.getCouponcount());

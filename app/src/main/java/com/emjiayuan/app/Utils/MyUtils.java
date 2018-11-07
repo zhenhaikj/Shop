@@ -455,7 +455,7 @@ public class MyUtils {
             drawable = Drawable.createFromStream(
                     new URL(imageUrl).openStream(), "image.jpg");
         } catch (IOException e) {
-            Log.d("test", e.getMessage());
+            e.printStackTrace();
         }
         if (drawable == null) {
             Log.d("test", "null drawable");

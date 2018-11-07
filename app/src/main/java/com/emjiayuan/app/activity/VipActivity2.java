@@ -257,7 +257,7 @@ public class VipActivity2 extends BaseActivity implements View.OnClickListener {
         username.setText(user.getShowname());
         level.setText(user.getClassname());
         detail.setText("累计节省费用");
-        if ("Vip普通会员".equals(user.getClassname())) {
+        if ("普通会员".equals(user.getClassname())) {
             period.setText("永久");
         } else {
             period.setText(user.getViptime() + " 到期");

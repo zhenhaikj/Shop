@@ -591,6 +591,7 @@ public class ShoppingCarFragment extends BaseLazyFragment implements View.OnClic
                                 productCarlist.add(gson.fromJson(dataArray.getJSONObject(i).toString(), Product.class));
                             }
                             MyGridView gridView=stateLayout.mEmptyView.findViewById(R.id.gv_guest);
+//                            LinearLayout tj_ll=stateLayout.mEmptyView.findViewById(R.id.tj_ll);
                             CarGoodsAdapter adapter=new CarGoodsAdapter(mActivity,productCarlist);
                             gridView.setAdapter(adapter);
                             gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

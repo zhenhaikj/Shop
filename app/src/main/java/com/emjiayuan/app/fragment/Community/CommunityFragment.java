@@ -165,8 +165,10 @@ public class CommunityFragment extends BaseLazyFragment implements View.OnClickL
     @SuppressLint("NewApi")
     @Override
     protected void initData() {
-        GlideUtil.loadImageViewLoding(mActivity, Global.loginResult.getHeadimg(), profileImage, R.drawable.default_tx, R.drawable.default_tx);
-        username.setText(Global.loginResult.getNickname());
+        if (Global.loginResult!=null){
+            GlideUtil.loadImageViewLoding(mActivity, Global.loginResult.getHeadimg(), profileImage, R.drawable.default_tx, R.drawable.default_tx);
+            username.setText(Global.loginResult.getNickname());
+        }
         getWeiboTypeList();
         getWeiboList();
         getWeiboMessage();
